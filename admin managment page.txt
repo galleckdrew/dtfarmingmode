@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tractor Load Submission</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: #f8f8f8;
+    }
+    form {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    select, input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    @media (max-width: 600px) {
+      body { padding: 10px; }
+      form { padding: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center">Submit Load</h2>
+  <form id="loadForm">
+    <label for="tractor">Tractor</label>
+    <select id="tractor" name="tractor" required></select>
+
+    <label for="farm">Farm</label>
+    <select id="farm" name="farm" required></select>
+
+    <label for="field">Field</label>
+    <select id="field" name="field" required></select>
+
+    <label for="pit">Pit</label>
+    <select id="pit" name="pit" required></select>
+
+    <label for="startHour">Start Hour</label>
+    <input type="number" id="startHour" name="startHour" required />
+
+    <label for="endHour">End Hour (optional)</label>
+    <input type="number" id="endHour" name="endHour" />
+
+    <label for="gallons">Gallons</label>
+    <input type="number" id="gallons" name="gallons" readonly />
+
+    <button type="submit">Submit Load</button>
+  </form>
+
+  <script>
+    async function populateDropdown(id, endpoint) {
+      const res = await fetch(endpoint);
+      const data = await res.json();
+      const dropdown = document.getElementById(id);
+      data.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item._id;
+        option.textContent = item.name;
+        dropdown.appendChild(option);
+      });
+    }
+
+    async function fetchGallons(tractorId) {
+      const res = await fetch(`/admin/tractors/${tractorId}`);
+      const data = await res.json();
+      document.getElementById("gallons").value = data.gallons || 0;
+    }
+
+    document.getElementById("tractor").addEventListener("change", (e) => {
+      fetchGallons(e.target.value);
+    });
+
+    document.getElementById("loadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const loadData = {
+        tractor: form.tractor.value,
+        farm: form.farm.value,
+        field: form.field.value,
+        pit: form.pit.value,
+        gallons: parseFloat(form.gallons.value),
+        startHour: parseFloat(form.startHour.value),
+        endHour: form.endHour.value ? parseFloat(form.endHour.value) : null
+      };
+      const res = await fetch("/load", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loadData)
+      });
+      const result = await res.json();
+      alert(result.message || "✅ Load submitted!");
+      form.reset();
+    });
+
+    // Load dropdowns
+    populateDropdown("tractor", "/admin/tractors");
+    populateDropdown("farm", "/admin/farms");
+    populateDropdown("field", "/admin/fields");
+    populateDropdown("pit", "/admin/pits");
+  </script>
+</body>
+</html>

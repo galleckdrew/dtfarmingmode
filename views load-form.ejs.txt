@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Submit Load</title>
+</head>
+<body>
+  <h1>Submit Load</h1>
+  <form action="/load" method="POST">
+    <label for="tractor">Tractor:</label>
+    <select name="tractor" required>
+      <% tractors.forEach(t => { %>
+        <option value="<%= t._id %>"><%= t.name %></option>
+      <% }) %>
+    </select><br><br>
+
+    <label for="farm">Farm:</label>
+    <select name="farm" required>
+      <% farms.forEach(f => { %>
+        <option value="<%= f._id %>"><%= f.name %></option>
+      <% }) %>
+    </select><br><br>
+
+    <label for="field">Field:</label>
+    <select name="field" required>
+      <% fields.forEach(fl => { %>
+        <option value="<%= fl._id %>"><%= fl.name %></option>
+      <% }) %>
+    </select><br><br>
+
+    <label for="pit">Pit:</label>
+    <select name="pit" required>
+      <% pits.forEach(p => { %>
+        <option value="<%= p._id %>"><%= p.name %></option>
+      <% }) %>
+    </select><br><br>
+
+    <label for="startHour">Start Hour:</label>
+    <input type="number" name="startHour" required><br><br>
+
+    <button type="submit">Submit Load</button>
+  </form>
+</body>
+</html>

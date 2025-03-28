@@ -1,0 +1,14 @@
+const mongoose = require("mongoose");
+
+const loadSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  tractor: { type: mongoose.Schema.Types.ObjectId, ref: "Tractor" },
+  location: { type: mongoose.Schema.Types.ObjectId, ref: "Location" },
+  gallons: Number,
+  startHour: Number,
+  endHour: Number,
+  totalHours: Number,
+  timestamp: { type: Date, default: Date.now }
+});
+
+module.exports = mongoose.model("Load", loadSchema);

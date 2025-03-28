@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tractor Load Submission</title>
+</head>
+<body>
+  <h2>Tractor Load Submission</h2>
+
+  <form id="loadForm">
+    <label for="tractor">Tractor:</label>
+    <select id="tractor" name="tractor"></select><br><br>
+
+    <label for="location">Location:</label>
+    <select id="location" name="location"></select><br><br>
+
+    <label for="gallons">Gallons:</label>
+    <input type="number" id="gallons" name="gallons" required><br><br>
+
+    <label for="startHours">Start Hours:</label>
+    <input type="number" id="startHours" name="startHours"><br><br>
+
+    <label for="endHours">End Hours:</label>
+    <input type="number" id="endHours" name="endHours"><br><br>
+
+    <label for="totalHours">Total Hours:</label>
+    <input type="text" id="totalHours" name="totalHours" readonly><br><br>
+
+    <button type="submit">Submit Load</button>
+  </form>
+
+  <script>
+    // Dummy data — later you’ll replace this with actual values from server
+    const tractors = ["Tractor A", "Tractor B", "Tractor C"];
+    const locations = ["Field 1", "Field 2", "Field 3"];
+
+    const tractorSelect = document.getElementById("tractor");
+    const locationSelect = document.getElementById("location");
+
+    tractors.forEach(t => {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      tractorSelect.appendChild(opt);
+    });
+
+    locations.forEach(l => {
+      const opt = document.createElement("option");
+      opt.value = l;
+      opt.textContent = l;
+      locationSelect.appendChild(opt);
+    });
+
+    // Calculate total hours automatically
+    document.getElementById("startHours").addEventListener("input", calculateHours);
+    document.getElementById("endHours").addEventListener("input", calculateHours);
+
+    function calculateHours() {
+      const start = Number(document.getElementById("startHours").value);
+      const end = Number(document.getElementById("endHours").value);
+      const total = end > start ? (end - start) : 0;
+      document.getElementById("totalHours").value = total;
+    }
+
+    document.getElementById("loadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const formData = {
+        tractor: document.getElementById("tractor").value,
+        location: document.getElementById("location").value,
+        gallons: Number(document.getElementById("gallons").value),
+        startHours: Number(document.getElementById("startHours").value),
+        endHours: Number(document.getElementById("endHours").value),
+        totalHours: Number(document.getElementById("totalHours").value),
+        submittedAt: new Date().toISOString()
+      };
+
+      console.log("Submitting load:", formData);
+
+      // In step 4 we'll connect this to the backend via API POST
+    });
+  </script>
+</body>
+</html>

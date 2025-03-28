@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tractor Load System</title>
+</head>
+<body>
+  <h1>✅ Welcome to the Tractor Load System</h1>
+  <a href="/load-form">Submit a Load</a>
+</body>
+</html>
