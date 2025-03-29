@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 
-const TractorSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
+const tractorSchema = new mongoose.Schema({
+  name: String,
+  gallons: Number // ✅ This line adds gallons
 });
 
-module.exports = mongoose.model("Tractor", TractorSchema);
+module.exports = mongoose.model("Tractor", tractorSchema);
