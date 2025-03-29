@@ -57,6 +57,10 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
+const driverHistoryRoutes = require("./driverHistoryRoutes");
+app.use(driverHistoryRoutes);
+
+
 // Start server
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
