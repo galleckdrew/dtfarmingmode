@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,6 +6,16 @@
 </head>
 <body>
   <h1>Submit Load</h1>
+
+  <!-- ✅ Daily Summary Section -->
+  <p><strong>Total Gallons Today:</strong> <%= totalGallons %></p>
+  <% if (lastLoad) { %>
+    <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString() %> by <%= lastLoad.tractor?.name || "Unknown" %></p>
+  <% } else { %>
+    <p><em>No loads submitted yet today.</em></p>
+  <% } %>
+
+  <!-- ✅ Load Submission Form -->
   <form action="/load" method="POST">
     <label for="tractor">Tractor:</label>
     <select name="tractor" id="tractorSelect" required>
@@ -46,6 +57,7 @@
     <button type="submit">Submit Load</button>
   </form>
 
+  <!-- ✅ Gallons Autofill Script -->
   <script>
     const tractors = <%- JSON.stringify(tractors) %>;
     const tractorSelect = document.getElementById("tractorSelect");
@@ -57,12 +69,13 @@
       gallonsInput.value = selectedTractor?.gallons || "";
     });
 
-    // Auto-fill gallons on page load
+    // Autofill on page load for first tractor
     window.addEventListener("DOMContentLoaded", () => {
-      const selectedId = tractorSelect.value;
-      const selectedTractor = tractors.find(t => t._id === selectedId);
-      gallonsInput.value = selectedTractor?.gallons || "";
+      if (tractors.length > 0) {
+        gallonsInput.value = tractors[0].gallons || "";
+      }
     });
   </script>
 </body>
 </html>
+

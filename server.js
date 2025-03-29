@@ -4,6 +4,21 @@ const app = express();
 require("dotenv").config();
 require("./db"); // MongoDB connection
 
+const session = require("express-session");
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || "supersecret",
+  resave: false,
+  saveUninitialized: true
+}));
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || "tractorsecret",
+  resave: false,
+  saveUninitialized: false,
+}));
+
+
 const PORT = process.env.PORT || 3000;
 
 // Set up EJS as the view engine
@@ -37,6 +52,55 @@ app.use(driverHistoryRoutes); // contains /driver-history
 // Home page
 app.get("/", (req, res) => {
   res.render("index");
+});
+
+function requireLogin(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect("/auth/login");
+  }
+  next();
+}
+
+app.get("/submit-load", requireLogin, async (req, res) => {
+  // Your existing code to fetch tractors, farms, etc
+});
+app.get("/submit-load", async (req, res) => {
+  // ✅ Require login
+  if (!req.session.user) {
+    return res.redirect("/auth/login");
+  }
+
+  try {
+    const tractors = await Tractor.find();
+    const farms = await Farm.find();
+    const fields = await Field.find();
+    const pits = await Pit.find();
+
+    // ✅ Total gallons for today
+    const today = new Date().toISOString().split("T")[0];
+    const todayLoads = await Load.find({
+      timestamp: {
+        $gte: new Date(`${today}T00:00:00.000Z`),
+        $lte: new Date(`${today}T23:59:59.999Z`)
+      }
+    });
+    const totalGallons = todayLoads.reduce((sum, load) => sum + (load.gallons || 0), 0);
+
+    // ✅ Last submitted load
+    const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor");
+
+    res.render("load-form", {
+      tractors,
+      farms,
+      fields,
+      pits,
+      totalGallons,
+      lastLoad
+    });
+  } catch (err) {
+    console.error("❌ Error loading form:", err);
+    res.status(500).send("Internal Server Error while loading the form.");
+  }
 });
 
 // ✅ Driver load form page with tractor gallons

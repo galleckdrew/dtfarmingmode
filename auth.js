@@ -1,20 +1,20 @@
+
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("./models/User");
 
-// Show register form
+// ✅ Show Register Form
 router.get("/register", (req, res) => {
   res.render("register");
 });
 
-
-// ✅ Show login form
+// ✅ Show Login Form
 router.get("/login", (req, res) => {
   res.render("login");
 });
 
-// ✅ Handle login (redirect to form)
+// ✅ Handle Login with Session
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -25,16 +25,33 @@ router.post("/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).send("❌ Invalid username or password");
 
-    res.redirect("/submit-load"); // ✅ Go to driver load form
+    // ✅ Save session data
+    req.session.user = {
+      id: user._id,
+      username: user.username,
+      role: user.role,
+    };
+
+if (!req.session.user) return res.redirect("/auth/login");
+
+    res.redirect("/submit-load");
   } catch (err) {
     console.error("❌ Login error:", err);
     res.status(500).send("❌ Server error");
   }
 });
 
-// ✅ Handle registration
+// ✅ Handle Logout
+router.get("/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.redirect("/auth/login");
+  });
+});
+
+// ✅ Handle Registration
 router.post("/register", async (req, res) => {
   const { username, password, role = "driver" } = req.body;
+
   try {
     const existingUser = await User.findOne({ username });
     if (existingUser) return res.status(400).send("❌ User already exists");
