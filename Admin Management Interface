@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    h2 {
+      text-align: center;
+    }
+    .section {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label, input, button {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h2>Admin: Manage Dropdown Options</h2>
+
+  <div class="section">
+    <h3>Add Tractor</h3>
+    <input type="text" id="tractorName" placeholder="Tractor Name">
+    <input type="number" id="tractorGallons" placeholder="Gallons">
+    <button onclick="addTractor()">Add Tractor</button>
+  </div>
+
+  <div class="section">
+    <h3>Add Farm</h3>
+    <input type="text" id="farmName" placeholder="Farm Name">
+    <button onclick="addFarm()">Add Farm</button>
+  </div>
+
+  <div class="section">
+    <h3>Add Field</h3>
+    <input type="text" id="fieldName" placeholder="Field Name">
+    <button onclick="addField()">Add Field</button>
+  </div>
+
+  <div class="section">
+    <h3>Add Pit</h3>
+    <input type="text" id="pitName" placeholder="Pit Name">
+    <button onclick="addPit()">Add Pit</button>
+  </div>
+
+  <script>
+    async function addTractor() {
+      const name = document.getElementById('tractorName').value;
+      const gallons = document.getElementById('tractorGallons').value;
+      const res = await fetch('/admin/tractors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, gallons })
+      });
+      const data = await res.json();
+      alert(data.message || '✅ Tractor added!');
+    }
+
+    async function addFarm() {
+      const name = document.getElementById('farmName').value;
+      const res = await fetch('/admin/farms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+      const data = await res.json();
+      alert(data.message || '✅ Farm added!');
+    }
+
+    async function addField() {
+      const name = document.getElementById('fieldName').value;
+      const res = await fetch('/admin/fields', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+      const data = await res.json();
+      alert(data.message || '✅ Field added!');
+    }
+
+    async function addPit() {
+      const name = document.getElementById('pitName').value;
+      const res = await fetch('/admin/pits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+      const data = await res.json();
+      alert(data.message || '✅ Pit added!');
+    }
+  </script>
+</body>
+</html>

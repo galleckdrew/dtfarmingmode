@@ -39,7 +39,7 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
-// Driver load form page
+// ✅ Driver load form page with tractor gallons
 app.get("/submit-load", async (req, res) => {
   try {
     const tractors = await Tractor.find();
@@ -47,7 +47,12 @@ app.get("/submit-load", async (req, res) => {
     const fields = await Field.find();
     const pits = await Pit.find();
 
-    res.render("load-form", { tractors, farms, fields, pits });
+    res.render("load-form", {
+      tractors,
+      farms,
+      fields,
+      pits
+    });
   } catch (err) {
     console.error("❌ Error loading form:", err);
     res.status(500).send("Internal Server Error while loading the form.");
