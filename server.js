@@ -1,4 +1,3 @@
-
 const express = require("express");
 const path = require("path");
 const app = express();
@@ -20,9 +19,13 @@ const authRoutes = require("./auth");
 const adminRoutes = require("./adminRoutes");
 const loadRoutes = require("./loadRoutes");
 const printRoutes = require("./printRoutes");
-const driverHistoryRoutes = require("./driverHistoryRoute"); // ✅ Check spelling
+const driverHistoryRoutes = require("./driverHistoryRoute");
 
-// MongoDB Models
+// Models for form
+const Tractor = require("./models/Tractor");
+const Farm = require("./models/Farm");
+const Field = require("./models/Field");
+const Pit = require("./models/Pit");
 
 // Register Routes
 app.use("/auth", authRoutes);
@@ -36,29 +39,7 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
-// Driver load form - works for BOTH /submit-load and /load-form
-app.get(["/submit-load", "/load-form"], async (req, res) => {
-  try {
-    const tractors = await Tractor.find();
-    const farms = await Farm.find();
-    const fields = await Field.find();
-    const pits = await Pit.find();
-    res.render("load-form", { tractors, farms, fields, pits });
-  } catch (err) {
-    res.status(500).send("❌ Error loading form");
-  }
-});
-
-// Optional: For backwards compatibility
-app.get("/driver-form", (req, res) => {
-  res.render("driverForm");
-});
-const Tractor = require("./models/Tractor");
-const Farm = require("./models/Farm");
-const Field = require("./models/Field");
-const Pit = require("./models/Pit");
-
-// Route to show the load submission form
+// Driver load form page
 app.get("/submit-load", async (req, res) => {
   try {
     const tractors = await Tractor.find();
@@ -71,6 +52,11 @@ app.get("/submit-load", async (req, res) => {
     console.error("❌ Error loading form:", err);
     res.status(500).send("Internal Server Error while loading the form.");
   }
+});
+
+// Fallback route
+app.get("*", (req, res) => {
+  res.status(404).send("Page not found.");
 });
 
 // Start server
