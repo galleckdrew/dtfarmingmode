@@ -23,10 +23,6 @@ const printRoutes = require("./printRoutes");
 const driverHistoryRoutes = require("./driverHistoryRoute"); // ✅ Check spelling
 
 // MongoDB Models
-const Tractor = require("./models/Tractor");
-const Farm = require("./models/Farm");
-const Field = require("./models/Field");
-const Pit = require("./models/Pit");
 
 // Register Routes
 app.use("/auth", authRoutes);
