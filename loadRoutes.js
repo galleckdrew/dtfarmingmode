@@ -1,9 +1,12 @@
+
+
 const express = require("express");
 const router = express.Router();
-const Load = require("./models/Load"); // Make sure Load.js exists
+const Load = require("./models/Load");
+const Tractor = require("./models/Tractor");
 const moment = require("moment");
 
-// POST /load
+// ✅ POST /load - Submit load
 router.post("/", async (req, res) => {
   try {
     const { tractor, location, gallons, startHour, endHour } = req.body;
@@ -29,13 +32,13 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ✅ Route to get all loads and total gallons
+// ✅ GET /load - All loads + totals
 router.get("/", async (req, res) => {
   try {
     const loads = await Load.find()
       .populate("tractor", "name")
       .populate("location", "name")
-      .sort({ timestamp: -1 }); // newest first
+      .sort({ timestamp: -1 });
 
     const totalGallons = loads.reduce((sum, load) => sum + load.gallons, 0);
 
@@ -55,5 +58,16 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ✅ GET /load/tractor-gallons/:id - Get tractor default gallons
+router.get("/tractor-gallons/:id", async (req, res) => {
+  try {
+    const tractor = await Tractor.findById(req.params.id);
+    if (!tractor) return res.status(404).json({ error: "Tractor not found" });
+    res.json({ gallons: tractor.gallons });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 module.exports = router;
+

@@ -56,6 +56,13 @@
       const selectedTractor = tractors.find(t => t._id === selectedId);
       gallonsInput.value = selectedTractor?.gallons || "";
     });
+
+    // Auto-fill gallons on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      const selectedId = tractorSelect.value;
+      const selectedTractor = tractors.find(t => t._id === selectedId);
+      gallonsInput.value = selectedTractor?.gallons || "";
+    });
   </script>
 </body>
 </html>
