@@ -39,7 +39,7 @@ const authRoutes = require("./auth");
 const adminRoutes = require("./adminRoutes");
 const loadRoutes = require("./loadRoutes");
 const printRoutes = require("./printRoutes");
-const driverHistoryRoutes = require("./driverHistoryRoutes");
+const driverHistoryRoutes = require("./driverHistoryRoute");
 
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
