@@ -57,6 +57,25 @@ app.get(["/submit-load", "/load-form"], async (req, res) => {
 app.get("/driver-form", (req, res) => {
   res.render("driverForm");
 });
+const Tractor = require("./models/Tractor");
+const Farm = require("./models/Farm");
+const Field = require("./models/Field");
+const Pit = require("./models/Pit");
+
+// Route to show the load submission form
+app.get("/submit-load", async (req, res) => {
+  try {
+    const tractors = await Tractor.find();
+    const farms = await Farm.find();
+    const fields = await Field.find();
+    const pits = await Pit.find();
+
+    res.render("load-form", { tractors, farms, fields, pits });
+  } catch (err) {
+    console.error("❌ Error loading form:", err);
+    res.status(500).send("Internal Server Error while loading the form.");
+  }
+});
 
 // Start server
 app.listen(PORT, () => {
