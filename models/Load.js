@@ -11,7 +11,7 @@ const loadSchema = new mongoose.Schema({
   totalHours: Number,
   timestamp: {
     type: Date,
-    default: Date.now
+    default: Date.now // ✅ this is critical
   }
 });
 
