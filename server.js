@@ -6,18 +6,13 @@ require("./db"); // MongoDB connection
 
 const session = require("express-session");
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || "supersecret",
-  resave: false,
-  saveUninitialized: true
-}));
+
 
 app.use(session({
   secret: process.env.SESSION_SECRET || "tractorsecret",
   resave: false,
   saveUninitialized: false,
 }));
-
 
 const PORT = process.env.PORT || 3000;
 
