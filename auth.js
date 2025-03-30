@@ -37,13 +37,13 @@ router.post("/login", async (req, res) => {
       role: user.role
     };
 
-    console.log("✅ Login successful, redirecting to /submit-load");
-    return res.redirect("/submit-load");
-  } catch (err) {
-    console.error("❌ Login error:", err);
-    res.status(500).send("❌ Server error");
-  }
-});
+res.send(`
+  <script>
+    alert("✅ Login successful!");
+    window.location.href = "/submit-load";
+  </script>
+`);
+
 
 // Handle registration
 
