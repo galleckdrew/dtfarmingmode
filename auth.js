@@ -13,24 +13,31 @@ router.get("/register", (req, res) => {
   res.render("register");
 });
 
-// Handle login
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
+  console.log("🔐 Login attempt:", username);
 
   try {
     const user = await User.findOne({ username });
-    if (!user) return res.status(401).send("❌ Invalid username or password");
+    if (!user) {
+      console.log("❌ No user found");
+      return res.status(401).send("❌ Invalid username or password");
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).send("❌ Invalid username or password");
+    if (!isMatch) {
+      console.log("❌ Password mismatch");
+      return res.status(401).send("❌ Invalid username or password");
+    }
 
-    // ✅ Save session
+    // Save session
     req.session.user = {
       id: user._id,
       username: user.username,
       role: user.role
     };
 
+    console.log("✅ Login successful, redirecting to /submit-load");
     return res.redirect("/submit-load");
   } catch (err) {
     console.error("❌ Login error:", err);
