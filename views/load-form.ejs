@@ -4,9 +4,9 @@
   <title>Submit Load</title>
 </head>
 <body>
-  <h1>🚜 Submit Load</h1>
+  <h1>Submit Load</h1>
 
-  <!-- Daily Summary -->
+  <!-- ✅ Daily Summary Section -->
   <p><strong>Total Gallons Today:</strong> <%= totalGallons %></p>
   <% if (lastLoad) { %>
     <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString() %> by <%= lastLoad.tractor?.name || "Unknown" %></p>
@@ -14,21 +14,15 @@
     <p><em>No loads submitted yet today.</em></p>
   <% } %>
 
-  <!-- Load Form -->
+  <!-- ✅ Load Submission Form -->
   <form action="/load" method="POST">
-    <!-- Tractor -->
     <label for="tractor">Tractor:</label>
-    <select name="tractor" id="tractorSelect" required>
+    <select name="tractor" required>
       <% tractors.forEach(t => { %>
-        <option value="<%= t._id %>"><%= t.name %></option>
+        <option value="<%= t._id %>"><%= t.name %> - <%= t.gallons %> gallons</option>
       <% }) %>
     </select><br><br>
 
-    <!-- Gallons (auto-filled) -->
-    <label for="gallons">Gallons:</label>
-    <input type="number" name="gallons" id="gallonsInput" required><br><br>
-
-    <!-- Farm -->
     <label for="farm">Farm:</label>
     <select name="farm" required>
       <% farms.forEach(f => { %>
@@ -36,7 +30,6 @@
       <% }) %>
     </select><br><br>
 
-    <!-- Field -->
     <label for="field">Field:</label>
     <select name="field" required>
       <% fields.forEach(fl => { %>
@@ -44,7 +37,6 @@
       <% }) %>
     </select><br><br>
 
-    <!-- Pit -->
     <label for="pit">Pit:</label>
     <select name="pit" required>
       <% pits.forEach(p => { %>
@@ -52,31 +44,13 @@
       <% }) %>
     </select><br><br>
 
-    <!-- Start Hour -->
     <label for="startHour">Start Hour:</label>
     <input type="number" name="startHour" required><br><br>
 
-    <!-- End Hour -->
     <label for="endHour">End Hour:</label>
     <input type="number" name="endHour"><br><br>
 
     <button type="submit">Submit Load</button>
   </form>
-
-  <!-- Auto-fill Gallons Script -->
-  <script>
-    const tractors = <%- JSON.stringify(tractors) %>;
-    const tractorSelect = document.getElementById("tractorSelect");
-    const gallonsInput = document.getElementById("gallonsInput");
-
-    function updateGallons() {
-      const selectedId = tractorSelect.value;
-      const selected = tractors.find(t => t._id === selectedId);
-      gallonsInput.value = selected?.gallons || "";
-    }
-
-    tractorSelect.addEventListener("change", updateGallons);
-    window.addEventListener("DOMContentLoaded", updateGallons);
-  </script>
 </body>
 </html>

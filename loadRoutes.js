@@ -6,28 +6,32 @@ const moment = require("moment");
 // POST /load
 router.post("/", async (req, res) => {
   try {
-    const { tractor, gallons, farm, field, pit, startHour, endHour } = req.body;
+    const { tractor, farm, field, pit, startHour, endHour } = req.body;
 
-    const totalHours = endHour && startHour ? Number(endHour) - Number(startHour) : null;
-    const timestamp = moment().toISOString();
+    const tractorDoc = await Tractor.findById(tractor);
+    if (!tractorDoc) return res.status(404).json({ error: "❌ Tractor not found" });
+
+    const gallons = tractorDoc.gallons;
+    const totalHours = endHour && startHour ? endHour - startHour : 0;
+    const timestamp = new Date();
 
     const newLoad = new Load({
       tractor,
-      gallons,
       farm,
       field,
       pit,
+      gallons,
       startHour,
       endHour,
       totalHours,
-      timestamp,
+      timestamp
     });
 
     await newLoad.save();
     res.redirect("/submit-load");
   } catch (error) {
-    console.error("❌ Failed to submit load:", error);
-    res.status(500).send("❌ Failed to submit load");
+    console.error("❌ Error submitting load:", error);
+    res.status(500).json({ error: "❌ Failed to submit load" });
   }
 });
 
