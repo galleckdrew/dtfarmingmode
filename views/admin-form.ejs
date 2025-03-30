@@ -4,26 +4,35 @@
   <title>Admin Panel</title>
 </head>
 <body>
-  <h1>🚜 Admin: Add Tractors, Farms, Fields, and Pits</h1>
+  <h1>⚙️ Admin - Manage Dropdown Options</h1>
 
   <form action="/admin/add" method="POST">
-    <h3>Add Tractor</h3>
-    <input type="text" name="tractor" placeholder="Tractor Name" />
-    <br><br>
-
-    <h3>Add Farm</h3>
-    <input type="text" name="farm" placeholder="Farm Name" />
-    <br><br>
-
-    <h3>Add Field</h3>
-    <input type="text" name="field" placeholder="Field Name" />
-    <br><br>
-
-    <h3>Add Pit</h3>
-    <input type="text" name="pit" placeholder="Pit Name" />
-    <br><br>
-
-    <button type="submit">Submit</button>
+    <h2>Add Tractor</h2>
+    <label>Name:</label>
+    <input type="text" name="tractor" required>
+    <label>Gallons:</label>
+    <input type="number" name="gallons" placeholder="Default gallons" required>
+    <button type="submit">Add Tractor</button>
   </form>
+
+  <form action="/admin/add" method="POST">
+    <h2>Add Farm</h2>
+    <input type="text" name="farm" required>
+    <button type="submit">Add Farm</button>
+  </form>
+
+  <form action="/admin/add" method="POST">
+    <h2>Add Field</h2>
+    <input type="text" name="field" required>
+    <button type="submit">Add Field</button>
+  </form>
+
+  <form action="/admin/add" method="POST">
+    <h2>Add Pit</h2>
+    <input type="text" name="pit" required>
+    <button type="submit">Add Pit</button>
+  </form>
+
+  <p><a href="/submit-load">⬅️ Back to Load Form</a></p>
 </body>
 </html>
