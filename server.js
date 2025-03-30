@@ -7,14 +7,14 @@ require("./db"); // MongoDB connection
 
 const PORT = process.env.PORT || 3000;
 
-// Session setup
+// ✅ Clean Session Setup (Only once)
 app.use(session({
   secret: process.env.SESSION_SECRET || "tractorsecret",
   resave: false,
   saveUninitialized: false,
 }));
 
-// Set up EJS as the view engine
+// View Engine Setup
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -22,14 +22,14 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Import Routes
+// Routes
 const authRoutes = require("./auth");
 const adminRoutes = require("./adminRoutes");
 const loadRoutes = require("./loadRoutes");
 const printRoutes = require("./printRoutes");
 const driverHistoryRoutes = require("./driverHistoryRoute");
 
-// Models for form
+// Models
 const Tractor = require("./models/Tractor");
 const Farm = require("./models/Farm");
 const Field = require("./models/Field");
@@ -41,22 +41,20 @@ app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/load", loadRoutes);
 app.use("/print-report", printRoutes);
-app.use(driverHistoryRoutes); // contains /driver-history
+app.use(driverHistoryRoutes);
 
-// Home page
+// Homepage
 app.get("/", (req, res) => {
   res.render("index");
 });
 
-// Middleware to require login
+// ✅ Login Required Middleware
 function requireLogin(req, res, next) {
-  if (!req.session.user) {
-    return res.redirect("/auth/login");
-  }
+  if (!req.session.user) return res.redirect("/auth/login");
   next();
 }
 
-// ✅ Driver load form page with session login and extra info
+// ✅ Load Form with Summary Info
 app.get("/submit-load", requireLogin, async (req, res) => {
   try {
     const tractors = await Tractor.find();
@@ -64,17 +62,14 @@ app.get("/submit-load", requireLogin, async (req, res) => {
     const fields = await Field.find();
     const pits = await Pit.find();
 
-// ✅ Total gallons for today
-const today = new Date().toISOString().split("T")[0];
-const todayStart = new Date(`${today}T00:00:00.000Z`);
-const todayEnd = new Date(`${today}T23:59:59.999Z`);
-const todayLoads = await Load.find({
-  timestamp: { $gte: todayStart, $lte: todayEnd }
-});
-const totalGallons = todayLoads.reduce((sum, load) => sum + (load.gallons || 0), 0);
-
-
-    // ✅ Last submitted load
+    const today = new Date().toISOString().split("T")[0];
+    const todayLoads = await Load.find({
+      timestamp: {
+        $gte: new Date(`${today}T00:00:00.000Z`),
+        $lte: new Date(`${today}T23:59:59.999Z`)
+      }
+    });
+    const totalGallons = todayLoads.reduce((sum, l) => sum + (l.gallons || 0), 0);
     const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor");
 
     res.render("load-form", {
@@ -91,12 +86,12 @@ const totalGallons = todayLoads.reduce((sum, load) => sum + (load.gallons || 0),
   }
 });
 
-// Fallback route
+// 404
 app.get("*", (req, res) => {
   res.status(404).send("Page not found.");
 });
 
-// Start server
+// Start
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });
