@@ -74,7 +74,6 @@ const todayLoads = await Load.find({
 const totalGallons = todayLoads.reduce((sum, load) => sum + (load.gallons || 0), 0);
 
 
-
     // ✅ Last submitted load
     const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor");
 
