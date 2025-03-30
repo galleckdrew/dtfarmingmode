@@ -6,8 +6,6 @@ require("./db"); // MongoDB connection
 
 const session = require("express-session");
 
-
-
 app.use(session({
   secret: process.env.SESSION_SECRET || "tractorsecret",
   resave: false,
