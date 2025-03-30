@@ -1,54 +1,19 @@
-
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("./models/User");
 
-// ✅ Show Register Form
+// Show register form
 router.get("/register", (req, res) => {
   res.render("register");
 });
 
-// ✅ Show Login Form
+// Show login form
 router.get("/login", (req, res) => {
   res.render("login");
 });
 
-// ✅ Handle Login with Session
-router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    const user = await User.findOne({ username });
-    if (!user) return res.status(401).send("❌ Invalid username or password");
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).send("❌ Invalid username or password");
-
-    // ✅ Save session data
-    req.session.user = {
-      id: user._id,
-      username: user.username,
-      role: user.role,
-    };
-
-if (!req.session.user) return res.redirect("/auth/login");
-
-    res.redirect("/submit-load");
-  } catch (err) {
-    console.error("❌ Login error:", err);
-    res.status(500).send("❌ Server error");
-  }
-});
-
-// ✅ Handle Logout
-router.get("/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.redirect("/auth/login");
-  });
-});
-
-// ✅ Handle Registration
+// ✅ Handle registration
 router.post("/register", async (req, res) => {
   const { username, password, role = "driver" } = req.body;
 
@@ -60,10 +25,35 @@ router.post("/register", async (req, res) => {
     const newUser = new User({ username, password: hashedPassword, role });
     await newUser.save();
 
-    res.send("✅ Driver registered successfully");
+    res.send("✅ Driver registered successfully. <a href='/auth/login'>Login here</a>");
   } catch (err) {
     console.error("❌ Registration error:", err);
     res.status(500).send("❌ Registration failed");
+  }
+});
+
+// ✅ Handle login (store session)
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const user = await User.findOne({ username });
+    if (!user) return res.status(401).send("❌ Invalid username or password");
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).send("❌ Invalid username or password");
+
+    // Save session
+    req.session.user = {
+      id: user._id,
+      username: user.username,
+      role: user.role
+    };
+
+    res.redirect("/submit-load");
+  } catch (err) {
+    console.error("❌ Login error:", err);
+    res.status(500).send("❌ Server error");
   }
 });
 
