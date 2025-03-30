@@ -1,73 +1,49 @@
-
-
 const express = require("express");
 const router = express.Router();
 const Load = require("./models/Load");
-const Tractor = require("./models/Tractor");
 const moment = require("moment");
 
-// ✅ POST /load - Submit load
+// POST /load
 router.post("/", async (req, res) => {
   try {
-    const { tractor, location, gallons, startHour, endHour } = req.body;
+    const { tractor, gallons, farm, field, pit, startHour, endHour } = req.body;
 
-    const totalHours = endHour - startHour;
-    const timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
+    const totalHours = endHour && startHour ? Number(endHour) - Number(startHour) : null;
+    const timestamp = moment().toISOString();
 
     const newLoad = new Load({
       tractor,
-      location,
       gallons,
+      farm,
+      field,
+      pit,
       startHour,
       endHour,
       totalHours,
-      timestamp
+      timestamp,
     });
 
     await newLoad.save();
-    res.json({ message: "✅ Load submitted!" });
+    res.redirect("/submit-load");
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "❌ Failed to submit load" });
+    console.error("❌ Failed to submit load:", error);
+    res.status(500).send("❌ Failed to submit load");
   }
 });
 
-// ✅ GET /load - All loads + totals
+// (Optional) GET all loads + totals (can be removed or adjusted)
 router.get("/", async (req, res) => {
   try {
     const loads = await Load.find()
-      .populate("tractor", "name")
-      .populate("location", "name")
+      .populate("tractor farm field pit")
       .sort({ timestamp: -1 });
 
-    const totalGallons = loads.reduce((sum, load) => sum + load.gallons, 0);
+    const totalGallons = loads.reduce((sum, load) => sum + (load.gallons || 0), 0);
 
-    res.json({
-      loads: loads.map(load => ({
-        tractor: load.tractor.name,
-        location: load.location.name,
-        gallons: load.gallons,
-        startHour: load.startHour,
-        endHour: load.endHour,
-        timestamp: load.timestamp
-      })),
-      totalGallons,
-    });
+    res.json({ loads, totalGallons });
   } catch (err) {
     res.status(500).json({ error: "❌ Failed to fetch loads" });
   }
 });
 
-// ✅ GET /load/tractor-gallons/:id - Get tractor default gallons
-router.get("/tractor-gallons/:id", async (req, res) => {
-  try {
-    const tractor = await Tractor.findById(req.params.id);
-    if (!tractor) return res.status(404).json({ error: "Tractor not found" });
-    res.json({ gallons: tractor.gallons });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
 module.exports = router;
-
