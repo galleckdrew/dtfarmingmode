@@ -1,81 +1,54 @@
-
 <!DOCTYPE html>
 <html>
 <head>
   <title>Submit Load</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    label { font-weight: bold; }
+    select, input { margin-bottom: 15px; width: 200px; }
+    .summary { background: #f0f0f0; padding: 10px; margin-bottom: 20px; }
+  </style>
 </head>
 <body>
-  <h1>Submit Load</h1>
+  <h1>🚜 Submit Load</h1>
 
-  <!-- ✅ Daily Summary Section -->
-  <p><strong>Total Gallons Today:</strong> <%= totalGallons %></p>
-  <% if (lastLoad) { %>
-    <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString() %> by <%= lastLoad.tractor?.name || "Unknown" %></p>
-  <% } else { %>
-    <p><em>No loads submitted yet today.</em></p>
-  <% } %>
+  <!-- ✅ Summary Section -->
+  <div class="summary">
+    <p><strong>Total Gallons Today:</strong> <%= typeof totalGallons !== 'undefined' ? totalGallons : 0 %></p>
+    <% if (typeof lastLoad !== 'undefined' && lastLoad) { %>
+      <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString() %> by <%= lastLoad.tractor?.name || "Unknown" %></p>
+    <% } else { %>
+      <p><em>No loads submitted yet.</em></p>
+    <% } %>
+  </div>
 
   <!-- ✅ Load Submission Form -->
   <form action="/load" method="POST">
-    <label for="tractor">Tractor:</label>
+    <label for="tractor">Tractor:</label><br>
     <select name="tractor" id="tractorSelect" required>
       <% tractors.forEach(t => { %>
         <option value="<%= t._id %>"><%= t.name %></option>
       <% }) %>
-    </select><br><br>
+    </select><br>
 
-    <label for="gallons">Gallons:</label>
-    <input type="number" name="gallons" id="gallonsInput" required><br><br>
+    <label for="gallons">Gallons:</label><br>
+    <input type="number" name="gallons" id="gallonsInput" required><br>
 
-    <label for="farm">Farm:</label>
+    <label for="farm">Farm:</label><br>
     <select name="farm" required>
       <% farms.forEach(f => { %>
         <option value="<%= f._id %>"><%= f.name %></option>
       <% }) %>
-    </select><br><br>
+    </select><br>
 
-    <label for="field">Field:</label>
+    <label for="field">Field:</label><br>
     <select name="field" required>
       <% fields.forEach(fl => { %>
         <option value="<%= fl._id %>"><%= fl.name %></option>
       <% }) %>
-    </select><br><br>
+    </select><br>
 
-    <label for="pit">Pit:</label>
+    <label for="pit">Pit:</label><br>
     <select name="pit" required>
       <% pits.forEach(p => { %>
-        <option value="<%= p._id %>"><%= p.name %></option>
-      <% }) %>
-    </select><br><br>
-
-    <label for="startHour">Start Hour:</label>
-    <input type="number" name="startHour" required><br><br>
-
-    <label for="endHour">End Hour:</label>
-    <input type="number" name="endHour"><br><br>
-
-    <button type="submit">Submit Load</button>
-  </form>
-
-  <!-- ✅ Gallons Autofill Script -->
-  <script>
-    const tractors = <%- JSON.stringify(tractors) %>;
-    const tractorSelect = document.getElementById("tractorSelect");
-    const gallonsInput = document.getElementById("gallonsInput");
-
-    tractorSelect.addEventListener("change", () => {
-      const selectedId = tractorSelect.value;
-      const selectedTractor = tractors.find(t => t._id === selectedId);
-      gallonsInput.value = selectedTractor?.gallons || "";
-    });
-
-    // Autofill on page load for first tractor
-    window.addEventListener("DOMContentLoaded", () => {
-      if (tractors.length > 0) {
-        gallonsInput.value = tractors[0].gallons || "";
-      }
-    });
-  </script>
-</body>
-</html>
-
+        <option value="<%= p._id %>"><%= p.name %></
