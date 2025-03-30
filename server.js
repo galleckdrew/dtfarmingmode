@@ -66,13 +66,14 @@ app.get("/submit-load", requireLogin, async (req, res) => {
 
     // ✅ Total gallons for today
     const today = new Date().toISOString().split("T")[0];
-    const todayLoads = await Load.find({
-      timestamp: {
-        $gte: new Date(`${today}T00:00:00.000Z`),
-        $lte: new Date(`${today}T23:59:59.999Z`)
-      }
-    });
-    const totalGallons = todayLoads.reduce((sum, load) => sum + (load.gallons || 0), 0);
+       const totalGallons = todayLoads.reduce((sum, load) => sum + (load.gallons || 0), 0);
+
+const todayLoads = await Load.find({
+  timestamp: {
+    $gte: new Date(`${today}T00:00:00.000Z`),
+    $lte: new Date(`${today}T23:59:59.999Z`)
+  }
+});
 
     // ✅ Last submitted load
     const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor");
