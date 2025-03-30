@@ -55,41 +55,36 @@ function requireLogin(req, res, next) {
 }
 
 app.get("/submit-load", requireLogin, async (req, res) => {
-  try {
-    console.log("✅ [GET] /submit-load started");
+try {
+  const tractors = await Tractor.find();
+  const farms = await Farm.find();
+  const fields = await Field.find();
+  const pits = await Pit.find();
 
-    const tractors = await Tractor.find();
-    console.log("🛠 Tractors fetched");
+  const today = new Date().toISOString().split("T")[0];
+  const todayLoads = await Load.find({
+    timestamp: {
+      $gte: new Date(`${today}T00:00:00.000Z`),
+      $lte: new Date(`${today}T23:59:59.999Z`)
+    }
+  });
 
-    const farms = await Farm.find();
-    const fields = await Field.find();
-    const pits = await Pit.find();
+  const totalGallons = todayLoads.reduce((sum, load) => sum + (load.gallons || 0), 0);
+  const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor");
 
-    const today = new Date().toISOString().split("T")[0];
-    const todayLoads = await Load.find({
-      timestamp: {
-        $gte: new Date(`${today}T00:00:00.000Z`),
-        $lte: new Date(`${today}T23:59:59.999Z`)
-      }
-    });
-    const totalGallons = todayLoads.reduce((sum, load) => sum + (load.gallons || 0), 0);
+  res.render("load-form", {
+    tractors,
+    farms,
+    fields,
+    pits,
+    totalGallons,
+    lastLoad
+  });
 
-    const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor");
-
-    console.log("✅ Rendering load-form...");
-    res.render("load-form", {
-      tractors,
-      farms,
-      fields,
-      pits,
-      totalGallons,
-      lastLoad
-    });
-  } catch (err) {
-    console.error("❌ Error in /submit-load:", err);
-    res.status(500).send("Error loading form.");
-  }
-});
+} catch (err) {
+  console.error("❌ Error loading form:", err.message);
+  res.status(500).send("Internal Server Error while loading the form.");
+}
 
 // Fallback route
 app.get("*", (req, res) => {
