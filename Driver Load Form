@@ -28,7 +28,7 @@
     <select id="pit" name="pit" required></select>
 
     <label for="startHour">Start Hour</label>
-    <input type="number" id="startHour" name="startHour" required />
+    <input type="number" id="startHour" name="startHour" />
 
     <label for="endHour">End Hour (optional)</label>
     <input type="number" id="endHour" name="endHour" />
