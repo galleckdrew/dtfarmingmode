@@ -11,15 +11,25 @@ router.get("/print-report", async (req, res) => {
     let totalGallons = 0;
 
     const rows = loads.map(load => {
-      totalGallons += load.gallons;
+      // Check if timestamp exists and is a valid date
+      const formattedTimestamp = load.timestamp instanceof Date
+        ? load.timestamp.toLocaleString()
+        : "N/A";
+
+      // Check if tractor and location exist
+      const tractorName = load.tractor?.name || "Unknown Tractor";
+      const locationName = load.location?.name || "Unknown Location";
+
+      totalGallons += load.gallons || 0;
+
       return `
         <tr>
-          <td>${new Date(load.timestamp).toLocaleString()}</td>
-          <td>${load.tractor.name}</td>
-          <td>${load.location.name}</td>
-          <td>${load.gallons}</td>
-          <td>${load.startHour}</td>
-          <td>${load.endHour}</td>
+          <td>${formattedTimestamp}</td>
+          <td>${tractorName}</td>
+          <td>${locationName}</td>
+          <td>${load.gallons || 0}</td>
+          <td>${load.startHour || "N/A"}</td>
+          <td>${load.endHour || "N/A"}</td>
         </tr>
       `;
     }).join("");

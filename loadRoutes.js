@@ -27,7 +27,19 @@ router.post("/", async (req, res) => {
     });
 
     await newLoad.save();
-    res.json({ message: "✅ Load submitted!" });
+
+   res.send(`
+  <html>
+    <head>
+      <meta http-equiv="refresh" content="5; URL=/submit-load" />
+    </head>
+    <body>
+      <h2>✅ Load submitted successfully!</h2>
+      <p>Redirecting to the load form in 5 seconds...</p>
+    </body>
+  </html>
+`);
+
 
   } catch (error) {
     console.error("❌ Error submitting load:", error);

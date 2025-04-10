@@ -16,10 +16,10 @@
 
   <!-- ✅ Load Submission Form -->
   <form action="/load" method="POST">
-    <label for="tractor">Tractor:</label>
-    <select name="tractor" required>
+    <label for="tractor">Tractor/Gallons:</label>
+    <select name="tractor" id="tractorSelect" required>
       <% tractors.forEach(t => { %>
-        <option value="<%= t._id %>"><%= t.name %> - <%= t.gallons %> gallons</option>
+        <option value="<%= t._id %>"><%= t.name %> - <%= t.defaultGallons %> gallons</option>
       <% }) %>
     </select><br><br>
 
