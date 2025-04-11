@@ -1,38 +1,91 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Admin Panel</title>
+  <title>Admin Management</title>
 </head>
 <body>
-  <h1>⚙️ Admin - Manage Dropdown Options</h1>
+  <h1>Manage Farms, Fields, Pits, and Tractors</h1>
 
-  <form action="/admin/add" method="POST">
-    <h2>Add Tractor</h2>
-    <label>Name:</label>
-    <input type="text" name="tractor" required>
-    <label>Gallons:</label>
+  <h2>Farms</h2>
+  <form action="/admin/farms" method="POST">
+    <input type="text" name="name" placeholder="New farm name" required>
+    <button type="submit">Add Farm</button>
+  </form>
+  <ul>
+    <% farms.forEach(farm => { %>
+      <li>
+        <%= farm.name %>
+        <form action="/admin/farms/<%= farm._id %>?_method=PUT" method="POST" style="display:inline;">
+          <input type="text" name="name" placeholder="Rename">
+          <button type="submit">Update</button>
+        </form>
+        <form action="/admin/farms/<%= farm._id %>?_method=DELETE" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+
+  <h2>Fields</h2>
+  <form action="/admin/fields" method="POST">
+    <input type="text" name="name" placeholder="New field name" required>
+    <button type="submit">Add Field</button>
+  </form>
+  <ul>
+    <% fields.forEach(field => { %>
+      <li>
+        <%= field.name %>
+        <form action="/admin/fields/<%= field._id %>?_method=PUT" method="POST" style="display:inline;">
+          <input type="text" name="name" placeholder="Rename">
+          <button type="submit">Update</button>
+        </form>
+        <form action="/admin/fields/<%= field._id %>?_method=DELETE" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+
+  <h2>Pits</h2>
+  <form action="/admin/pits" method="POST">
+    <input type="text" name="name" placeholder="New pit name" required>
+    <button type="submit">Add Pit</button>
+  </form>
+  <ul>
+    <% pits.forEach(pit => { %>
+      <li>
+        <%= pit.name %>
+        <form action="/admin/pits/<%= pit._id %>?_method=PUT" method="POST" style="display:inline;">
+          <input type="text" name="name" placeholder="Rename">
+          <button type="submit">Update</button>
+        </form>
+        <form action="/admin/pits/<%= pit._id %>?_method=DELETE" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+
+  <h2>Tractors</h2>
+  <form action="/admin/tractors" method="POST">
+    <input type="text" name="name" placeholder="New tractor name" required>
     <input type="number" name="gallons" placeholder="Default gallons" required>
     <button type="submit">Add Tractor</button>
   </form>
-
-  <form action="/admin/add" method="POST">
-    <h2>Add Farm</h2>
-    <input type="text" name="farm" required>
-    <button type="submit">Add Farm</button>
-  </form>
-
-  <form action="/admin/add" method="POST">
-    <h2>Add Field</h2>
-    <input type="text" name="field" required>
-    <button type="submit">Add Field</button>
-  </form>
-
-  <form action="/admin/add" method="POST">
-    <h2>Add Pit</h2>
-    <input type="text" name="pit" required>
-    <button type="submit">Add Pit</button>
-  </form>
-
-  <p><a href="/submit-load">⬅️ Back to Load Form</a></p>
+  <ul>
+    <% tractors.forEach(tractor => { %>
+      <li>
+        <%= tractor.name %> - <%= tractor.gallons %> gallons
+        <form action="/admin/tractors/<%= tractor._id %>?_method=PUT" method="POST" style="display:inline;">
+          <input type="text" name="name" placeholder="Rename">
+          <input type="number" name="gallons" placeholder="Gallons">
+          <button type="submit">Update</button>
+        </form>
+        <form action="/admin/tractors/<%= tractor._id %>?_method=DELETE" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
 </body>
 </html>
