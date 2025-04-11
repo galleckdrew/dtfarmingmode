@@ -33,3 +33,7 @@ router.delete("/tractors/:id", async (req, res) => {
   await Tractor.findByIdAndDelete(req.params.id);
   res.redirect("/admin/form");
 });
+
+module.exports = router;
+
+

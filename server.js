@@ -14,6 +14,9 @@ app.use(session({
   saveUninitialized: false,
 }));
 
+const methodOverride = require("method-override");
+app.use(methodOverride("_method"));
+
 // View Engine Setup
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -90,9 +93,6 @@ app.get("/submit-load", requireLogin, async (req, res) => {
 app.get("*", (req, res) => {
   res.status(404).send("Page not found.");
 });
-
-const methodOverride = require("method-override");
-app.use(methodOverride("_method"));
 
 // Start
 app.listen(PORT, () => {
