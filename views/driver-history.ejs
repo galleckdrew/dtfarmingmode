@@ -73,7 +73,7 @@
         <td><%= load.startHour ?? '' %></td>
         <td><%= load.endHour ?? '' %></td>
         <td class="actions">
-          <form method="GET" action="/driver-history/<%= load._id %>" style="display:inline">
+          <form method="GET" action="/driver-history/<%= load._id %>/edit" style="display:inline">
             <button>Edit</button>
           </form>
           <form method="POST" action="/driver-history/<%= load._id %>?_method=DELETE" style="display:inline">
