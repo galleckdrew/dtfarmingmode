@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Farms</title>
+</head>
+<body>
+  <h1>🌾 Manage Farms</h1>
+
+  <!-- Add new farm -->
+  <form action="/admin/farms" method="POST">
+    <input type="text" name="name" placeholder="New farm name" required>
+    <button type="submit">Add Farm</button>
+  </form>
+
+  <!-- List of farms -->
+  <ul>
+    <% farms.forEach(farm => { %>
+      <li>
+        <form action="/admin/farms/<%= farm._id %>?_method=PUT" method="POST" style="display:inline;">
+          <input type="text" name="name" value="<%= farm.name %>">
+          <button type="submit">Update</button>
+        </form>
+        <form action="/admin/farms/<%= farm._id %>?_method=DELETE" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+
+  <a href="/admin/form">⬅ Back to Admin Menu</a>
+</body>
+</html>

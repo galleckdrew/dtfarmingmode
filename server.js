@@ -91,6 +91,9 @@ app.get("*", (req, res) => {
   res.status(404).send("Page not found.");
 });
 
+const methodOverride = require("method-override");
+app.use(methodOverride("_method"));
+
 // Start
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
