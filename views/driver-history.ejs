@@ -3,49 +3,85 @@
 <head>
   <title>Driver History</title>
   <style>
-    body { font-family: Arial; padding: 20px; background: #f9f9f9; }
-    h2 { text-align: center; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
-    th { background-color: #007BFF; color: white; }
-    tfoot { font-weight: bold; background: #eee; }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    .filter-form { margin-bottom: 20px; }
+    .summary { margin: 20px 0; font-weight: bold; }
+    .actions { display: flex; gap: 10px; justify-content: center; }
   </style>
 </head>
 <body>
-  <h2>Driver Load History</h2>
+  <h1>🚜 Driver Load History</h1>
+
+  <form class="filter-form" method="GET" action="/driver-history">
+    <label>Date From: <input type="date" name="from"></label>
+    <label>Date To: <input type="date" name="to"></label>
+    <label>Tractor:
+      <select name="tractor">
+        <option value="">All</option>
+        <% tractors.forEach(t => { %>
+          <option value="<%= t._id %>"><%= t.name %></option>
+        <% }) %>
+      </select>
+    </label>
+    <label>Farm:
+      <select name="farm">
+        <option value="">All</option>
+        <% farms.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+    </label>
+    <label>Field:
+      <select name="field">
+        <option value="">All</option>
+        <% fields.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+    </label>
+    <button type="submit">Filter</button>
+    <button onclick="window.print()">🖨️ Print</button>
+  </form>
+
+  <div class="summary">
+    Total Loads: <%= loads.length %> | Total Gallons: <%= totalGallons %>
+  </div>
+
   <table>
-    <thead>
+    <tr>
+      <th>Date</th>
+      <th>Tractor</th>
+      <th>Farm</th>
+      <th>Field</th>
+      <th>Pit</th>
+      <th>Gallons</th>
+      <th>Start Hour</th>
+      <th>End Hour</th>
+      <th>Actions</th>
+    </tr>
+    <% loads.forEach(load => { %>
       <tr>
-        <th>Date</th>
-        <th>Tractor</th>
-        <th>Farm</th>
-        <th>Field</th>
-        <th>Pit</th>
-        <th>Gallons</th>
-        <th>Start</th>
-        <th>End</th>
+        <td><%= new Date(load.timestamp).toLocaleString() %></td>
+        <td><%= load.tractor?.name || '' %></td>
+        <td><%= load.farm?.name || '' %></td>
+        <td><%= load.field?.name || '' %></td>
+        <td><%= load.pit?.name || '' %></td>
+        <td><%= load.gallons %></td>
+        <td><%= load.startHour ?? '' %></td>
+        <td><%= load.endHour ?? '' %></td>
+        <td class="actions">
+          <form method="GET" action="/edit-load/<%= load._id %>" style="display:inline">
+            <button>Edit</button>
+          </form>
+          <form method="POST" action="/delete-load/<%= load._id %>?_method=DELETE" style="display:inline">
+            <button>Delete</button>
+          </form>
+        </td>
       </tr>
-    </thead>
-    <tbody>
-      <% loads.forEach(load => { %>
-        <tr>
-          <td><%= new Date(load.createdAt).toLocaleString() %></td>
-          <td><%= load.tractor?.name %></td>
-          <td><%= load.farm?.name %></td>
-          <td><%= load.field?.name %></td>
-          <td><%= load.pit?.name %></td>
-          <td><%= load.gallons %></td>
-          <td><%= load.startHour %></td>
-          <td><%= load.endHour ?? "-" %></td>
-        </tr>
-      <% }) %>
-    </tbody>
-    <tfoot>
-      <tr>
-        <td colspan="5">Total Gallons</td>
-        <td colspan="3"><%= totalGallons %></td>
-      </tr>
-    </tfoot>
+    <% }) %>
   </table>
 </body>
 </html>
