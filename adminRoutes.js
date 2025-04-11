@@ -34,6 +34,53 @@ router.delete("/tractors/:id", async (req, res) => {
   res.redirect("/admin/form");
 });
 
+// UPDATE ROUTES
+
+// Update Farm
+router.put("/farms/:id", async (req, res) => {
+  try {
+    await Farm.findByIdAndUpdate(req.params.id, { name: req.body.name });
+    res.redirect("/admin/form");
+  } catch (err) {
+    res.status(500).send("❌ Failed to update farm");
+  }
+});
+
+// Update Field
+router.put("/fields/:id", async (req, res) => {
+  try {
+    await Field.findByIdAndUpdate(req.params.id, { name: req.body.name });
+    res.redirect("/admin/form");
+  } catch (err) {
+    res.status(500).send("❌ Failed to update field");
+  }
+});
+
+// Update Pit
+router.put("/pits/:id", async (req, res) => {
+  try {
+    await Pit.findByIdAndUpdate(req.params.id, { name: req.body.name });
+    res.redirect("/admin/form");
+  } catch (err) {
+    res.status(500).send("❌ Failed to update pit");
+  }
+});
+
+// Update Tractor (name and gallons)
+router.put("/tractors/:id", async (req, res) => {
+  try {
+    const { name, gallons } = req.body;
+    await Tractor.findByIdAndUpdate(req.params.id, {
+      name,
+      gallons: Number(gallons),
+    });
+    res.redirect("/admin/form");
+  } catch (err) {
+    res.status(500).send("❌ Failed to update tractor");
+  }
+});
+
+
 module.exports = router;
 
 
