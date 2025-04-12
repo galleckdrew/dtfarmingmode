@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Driver History</title>
+  <title>🚜 Driver Load History</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     table { border-collapse: collapse; width: 100%; margin-top: 20px; }
@@ -10,19 +10,22 @@
     .filter-form { margin-bottom: 20px; }
     .summary { margin: 20px 0; font-weight: bold; }
     .actions { display: flex; gap: 10px; justify-content: center; }
+    .actions form { display: inline; }
+    button { padding: 4px 8px; }
   </style>
 </head>
 <body>
   <h1>🚜 Driver Load History</h1>
 
+  <!-- Filter Form -->
   <form class="filter-form" method="GET" action="/driver-history">
-    <label>Date From: <input type="date" name="from"></label>
-    <label>Date To: <input type="date" name="to"></label>
+    <label>Date From: <input type="date" name="from" value="<%= from || '' %>"></label>
+    <label>Date To: <input type="date" name="to" value="<%= to || '' %>"></label>
     <label>Tractor:
       <select name="tractor">
         <option value="">All</option>
         <% tractors.forEach(t => { %>
-          <option value="<%= t._id %>"><%= t.name %></option>
+          <option value="<%= t._id %>" <%= t._id.toString() === tractor ? 'selected' : '' %>><%= t.name %></option>
         <% }) %>
       </select>
     </label>
@@ -30,7 +33,7 @@
       <select name="farm">
         <option value="">All</option>
         <% farms.forEach(f => { %>
-          <option value="<%= f._id %>"><%= f.name %></option>
+          <option value="<%= f._id %>" <%= f._id.toString() === farm ? 'selected' : '' %>><%= f.name %></option>
         <% }) %>
       </select>
     </label>
@@ -38,52 +41,43 @@
       <select name="field">
         <option value="">All</option>
         <% fields.forEach(f => { %>
-          <option value="<%= f._id %>"><%= f.name %></option>
+          <option value="<%= f._id %>" <%= f._id.toString() === field ? 'selected' : '' %>><%= f.name %></option>
         <% }) %>
       </select>
     </label>
     <button type="submit">Filter</button>
-    <button onclick="window.print()">🖨️ Print</button>
+    <button type="button" onclick="window.print()">🖨️ Print</button>
   </form>
 
+  <!-- Summary -->
   <div class="summary">
-    Total Loads: <%= totalLoads %> | Total Gallons: <%= totalGallons %> | Total Hours: <%= totalHours %>
+    Total Loads: <%= totalLoads %> |
+    Total Gallons: <%= totalGallons %> |
+    Total Hours: <%= totalHours.toFixed(2) %>
   </div>
 
+  <!-- Load Table -->
   <table>
-    <tr>
-      <th>Date</th>
-      <th>Tractor</th>
-      <th>Farm</th>
-      <th>Field</th>
-      <th>Pit</th>
-      <th>Gallons</th>
-      <th>Start Hour</th>
-      <th>End Hour</th>
-      <th>Total Hours</th>
-      <th>Actions</th>
-    </tr>
-    <% loads.forEach(load => { %>
+    <thead>
       <tr>
-        <td><%= new Date(load.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %></td>
-        <td><%= load.tractor?.name || '' %></td>
-        <td><%= load.farm?.name || '' %></td>
-        <td><%= load.field?.name || '' %></td>
-        <td><%= load.pit?.name || '' %></td>
-        <td><%= load.gallons %></td>
-        <td><%= load.startHour ?? '' %></td>
-        <td><%= load.endHour ?? '' %></td>
-        <td><%= load.totalHours ?? '' %></td>
-        <td class="actions">
-          <form method="GET" action="/driver-history/<%= load._id %>/edit" style="display:inline">
-            <button>Edit</button>
-          </form>
-          <form method="POST" action="/driver-history/<%= load._id %>?_method=DELETE" style="display:inline">
-            <button>Delete</button>
-          </form>
-        </td>
+        <th>Date & Time</th>
+        <th>Tractor</th>
+        <th>Farm</th>
+        <th>Field</th>
+        <th>Pit</th>
+        <th>Gallons</th>
+        <th>Start Hour</th>
+        <th>End Hour</th>
+        <th>Total Hours</th>
+        <th>Actions</th>
       </tr>
-    <% }) %>
-  </table>
-</body>
-</html>
+    </thead>
+    <tbody>
+      <% loads.forEach(load => { %>
+        <tr>
+          <td>
+            <%= new Date(load.timestamp).toLocaleString("en-US", {
+              timeZone: "America/New_York",
+              hour12: true,
+              year: "numeric",
+              month

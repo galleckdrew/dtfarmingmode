@@ -1,17 +1,21 @@
 const express = require("express");
 const router = express.Router();
+const moment = require("moment");
 const Load = require("./models/Load");
 const Tractor = require("./models/Tractor");
 const Farm = require("./models/Farm");
+const tractorFarmStartHours = require("./trackedHours");
 
-const tractorFarmStartHours = {}; // Track start hour per tractor + farm
-
-// GET tracked hours for frontend to display
+// =========================
+// GET tracked hours (for frontend display)
+// =========================
 router.get("/tracked-hours", (req, res) => {
   res.json(tractorFarmStartHours);
 });
 
-// Submit a load
+// =========================
+// POST / (Submit Load)
+// =========================
 router.post("/", async (req, res) => {
   try {
     const { tractor, farm, field, pit, startHour, endHour } = req.body;
@@ -23,10 +27,21 @@ router.post("/", async (req, res) => {
     const timestamp = new Date();
     const key = `${tractor}_${farm}`;
 
-    let start = startHour ? Number(startHour) : tractorFarmStartHours[key] || null;
-    let end = endHour ? Number(endHour) : null;
-    let totalHours = null;
+    // Convert start and end hours to decimal
 
+    let start = parseFloat(startHour.replace(',', '.'));
+    let end = parseFloat(endHour.replace(',', '.'));
+    let totalHours = end - start;
+
+    // Handle midnight
+    if (totalHours < 0) {
+      totalHours += 24;
+    }
+
+    // Round to 2 decimals
+    totalHours = Math.round(totalHours * 100) / 100;
+
+    // Prevent submission without startHour for that tractor+farm
     if (!start && !startHour && farm) {
       return res.send(`
         <script>
@@ -36,13 +51,14 @@ router.post("/", async (req, res) => {
       `);
     }
 
-    // Track start hour if entered
+    // Track start hour
     if (startHour) tractorFarmStartHours[key] = Number(startHour);
 
-    // Calculate total hours, handle midnight wrap
+    // Calculate totalHours and clear tracking
     if (start !== null && end !== null) {
       totalHours = end >= start ? end - start : (24 - start + end);
-      delete tractorFarmStartHours[key]; // Clear tracking after use
+      totalHours = Math.round(totalHours * 100) / 100;
+      delete tractorFarmStartHours[key];
     }
 
     const newLoad = new Load({
@@ -73,6 +89,43 @@ router.post("/", async (req, res) => {
   } catch (error) {
     console.error("❌ Error submitting load:", error);
     res.status(500).json({ error: "❌ Failed to submit load" });
+  }
+});
+
+// =========================
+// GET /load-history (Grouped view)
+// =========================
+router.get("/load-history", async (req, res) => {
+  try {
+    const allLoads = await Load.find().populate("tractor");
+
+    const grouped = {};
+
+    allLoads.forEach(load => {
+      const dateKey = moment(load.timestamp).format("YYYY-MM-DD");
+      const tractorName = load.tractor?.name || "Unknown";
+      const key = `${dateKey}-${tractorName}`;
+
+      if (!grouped[key]) {
+        grouped[key] = {
+          date: dateKey,
+          tractor: tractorName,
+          totalHours: 0,
+          totalGallons: 0,
+          loads: []
+        };
+      }
+
+      grouped[key].totalHours += load.totalHours || 0;
+      grouped[key].totalGallons += load.gallons || 0;
+      grouped[key].loads.push(load);
+    });
+
+    const history = Object.values(grouped);
+    res.render("load-history", { history, moment });
+  } catch (error) {
+    console.error("❌ Error generating load history:", error);
+    res.status(500).send("Server error");
   }
 });
 
