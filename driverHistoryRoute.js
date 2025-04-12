@@ -1,48 +1,52 @@
 const express = require("express");
 const router = express.Router();
-const methodOverride = require("method-override");
-router.use(methodOverride("_method"));
-
 const Load = require("./models/Load");
 const Tractor = require("./models/Tractor");
 const Farm = require("./models/Farm");
 const Field = require("./models/Field");
 const Pit = require("./models/Pit");
 
-// View history with filters
+// View driver history with filters
 router.get("/driver-history", async (req, res) => {
-  const { from, to, tractor, farm, field } = req.query;
-  let query = {};
+  const { date, tractor, farm, field } = req.query;
 
-  if (from || to) {
-    query.timestamp = {};
-    if (from) query.timestamp.$gte = new Date(from + "T00:00:00");
-    if (to) query.timestamp.$lte = new Date(to + "T23:59:59");
+  const filters = {};
+  if (date) {
+    const start = new Date(date + "T00:00:00.000Z");
+    const end = new Date(date + "T23:59:59.999Z");
+    filters.timestamp = { $gte: start, $lte: end };
   }
+  if (tractor) filters.tractor = tractor;
+  if (farm) filters.farm = farm;
+  if (field) filters.field = field;
 
-  if (tractor) query.tractor = tractor;
-  if (farm) query.farm = farm;
-  if (field) query.field = field;
-
-  const loads = await Load.find(query)
-    .populate("tractor farm field pit")
+  const loads = await Load.find(filters)
+    .populate("tractor")
+    .populate("farm")
+    .populate("field")
+    .populate("pit")
     .sort({ timestamp: -1 });
 
-  const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0);
   const tractors = await Tractor.find();
   const farms = await Farm.find();
   const fields = await Field.find();
+
+  const totalLoads = loads.length;
+  const totalGallons = loads.reduce((sum, load) => sum + (load.gallons || 0), 0);
+  const totalHours = loads.reduce((sum, load) => sum + (load.totalHours || 0), 0);
 
   res.render("driver-history", {
     loads,
     tractors,
     farms,
     fields,
+    totalLoads,
     totalGallons,
+    totalHours
   });
 });
 
-// Edit load form
+// Show edit form
 router.get("/driver-history/:id/edit", async (req, res) => {
   const load = await Load.findById(req.params.id);
   const tractors = await Tractor.find();
@@ -50,31 +54,41 @@ router.get("/driver-history/:id/edit", async (req, res) => {
   const fields = await Field.find();
   const pits = await Pit.find();
 
-  res.render("edit-load", { load, tractors, farms, fields, pits });
+  res.render("edit-load", {
+    load,
+    tractors,
+    farms,
+    fields,
+    pits
+  });
 });
 
-// Update load
+// Handle update
 router.put("/driver-history/:id", async (req, res) => {
   const { tractor, farm, field, pit, startHour, endHour } = req.body;
-  const tractorData = await Tractor.findById(tractor);
-  const gallons = tractorData?.gallons || 0;
-  const totalHours = (startHour && endHour) ? endHour - startHour : null;
 
-  await Load.findByIdAndUpdate(req.params.id, {
-    tractor,
-    farm,
-    field,
-    pit,
-    gallons,
-    startHour,
-    endHour,
-    totalHours,
-  });
+  const start = startHour ? Number(startHour) : null;
+  const end = endHour ? Number(endHour) : null;
+  const totalHours = start !== null && end !== null ? end - start : null;
+
+  await Load.findByIdAndUpdate(
+    req.params.id,
+    {
+      tractor,
+      farm,
+      field,
+      pit,
+      startHour: start,
+      endHour: end,
+      totalHours
+    },
+    { new: true }
+  );
 
   res.redirect("/driver-history");
 });
 
-// Delete load
+// Handle delete
 router.delete("/driver-history/:id", async (req, res) => {
   await Load.findByIdAndDelete(req.params.id);
   res.redirect("/driver-history");
