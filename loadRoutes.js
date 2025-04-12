@@ -97,6 +97,62 @@ router.post("/", async (req, res) => {
 });
 
 // =========================
+// POST /submit-end-hour (Update endHour only)
+// =========================
+router.post("/submit-end-hour", async (req, res) => {
+  try {
+    const { tractor, farm, field, endHour } = req.body;
+
+    if (!tractor || !farm || !field || !endHour) {
+      return res.send(`<script>alert("⚠️ All fields are required."); window.location.href='/submit-load';</script>`);
+    }
+
+    const parsedEnd = parseFloat(endHour.replace(',', '.'));
+    const key = `${tractor}_${farm}`;
+    const start = tractorFarmStartHours[key];
+
+    if (!start || isNaN(start)) {
+      return res.send(`<script>alert("⚠️ No start hour tracked for this tractor and farm. Please submit a start hour first."); window.location.href='/submit-load';</script>`);
+    }
+
+    let totalHours = parsedEnd >= start ? parsedEnd - start : (24 - start + parsedEnd);
+    totalHours = Math.round(totalHours * 100) / 100;
+
+    const latestLoad = await Load.findOne({
+      tractor,
+      farm,
+      field,
+      endHour: { $exists: false }
+    }).sort({ timestamp: -1 });
+
+    if (!latestLoad) {
+      return res.send(`<script>alert("⚠️ No matching load found without an end hour."); window.location.href='/submit-load';</script>`);
+    }
+
+    latestLoad.endHour = parsedEnd;
+    latestLoad.totalHours = totalHours;
+    await latestLoad.save();
+
+    delete tractorFarmStartHours[key];
+
+    res.send(`
+      <html>
+        <head>
+          <meta http-equiv="refresh" content="4; URL=/submit-load" />
+        </head>
+        <body>
+          <h2>✅ End hour submitted and load updated successfully!</h2>
+          <p>Redirecting to the load form...</p>
+        </body>
+      </html>
+    `);
+  } catch (err) {
+    console.error("❌ Error submitting end hour:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// =========================
 // GET /load-history (Grouped view)
 // =========================
 router.get("/load-history", async (req, res) => {
