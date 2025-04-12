@@ -47,7 +47,7 @@
   </form>
 
   <div class="summary">
-    Total Loads: <%= loads.length %> | Total Gallons: <%= totalGallons %> | Total Hours: <%= totalHours %>
+    Total Loads: <%= totalLoads %> | Total Gallons: <%= totalGallons %> | Total Hours: <%= totalHours %>
   </div>
 
   <table>
@@ -75,7 +75,7 @@
         <td><%= load.endHour ?? '' %></td>
         <td><%= load.totalHours ?? '' %></td>
         <td class="actions">
-          <form method="GET" action="/driver-history/<%= load._id %>" style="display:inline">
+          <form method="GET" action="/driver-history/<%= load._id %>/edit" style="display:inline">
             <button>Edit</button>
           </form>
           <form method="POST" action="/driver-history/<%= load._id %>?_method=DELETE" style="display:inline">
