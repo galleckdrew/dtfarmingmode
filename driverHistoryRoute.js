@@ -8,13 +8,14 @@ const Pit = require("./models/Pit");
 
 // View driver history with filters
 router.get("/driver-history", async (req, res) => {
-  const { date, tractor, farm, field } = req.query;
+  const { from, to, tractor, farm, field } = req.query;
 
   const filters = {};
-  if (date) {
-    const start = new Date(date + "T00:00:00.000Z");
-    const end = new Date(date + "T23:59:59.999Z");
-    filters.timestamp = { $gte: start, $lte: end };
+  if (from && to) {
+    filters.timestamp = {
+      $gte: new Date(from + "T00:00:00.000Z"),
+      $lte: new Date(to + "T23:59:59.999Z")
+    };
   }
   if (tractor) filters.tractor = tractor;
   if (farm) filters.farm = farm;
@@ -42,7 +43,12 @@ router.get("/driver-history", async (req, res) => {
     fields,
     totalLoads,
     totalGallons,
-    totalHours
+    totalHours,
+    from,
+    to,
+    tractor,
+    farm,
+    field
   });
 });
 
@@ -69,7 +75,12 @@ router.put("/driver-history/:id", async (req, res) => {
 
   const start = startHour ? Number(startHour) : null;
   const end = endHour ? Number(endHour) : null;
-  const totalHours = start !== null && end !== null ? end - start : null;
+
+  let totalHours = null;
+  if (start !== null && end !== null) {
+    totalHours = end >= start ? end - start : (24 - start + end);
+    totalHours = Math.round(totalHours * 100) / 100;
+  }
 
   await Load.findByIdAndUpdate(
     req.params.id,
