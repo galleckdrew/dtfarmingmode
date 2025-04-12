@@ -2,14 +2,15 @@ const express = require("express");
 const path = require("path");
 const session = require("express-session");
 const methodOverride = require("method-override");
-const nodemailer = require("nodemailer");
+const { sendLoadReportEmail } = require("./emailReport"); // ✅ Email function
+
 require("dotenv").config();
-require("./db"); // MongoDB connection
+require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Session
+// ✅ Session Setup
 app.use(session({
   secret: process.env.SESSION_SECRET || "tractorsecret",
   resave: false,
@@ -17,9 +18,9 @@ app.use(session({
 }));
 
 // ✅ Middleware
+app.use(methodOverride("_method"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
 // ✅ View Engine
@@ -33,6 +34,7 @@ const loadRoutes = require("./loadRoutes");
 const printRoutes = require("./printRoutes");
 const driverHistoryRoutes = require("./driverHistoryRoute");
 
+// ✅ Models (used in load form page)
 const Tractor = require("./models/Tractor");
 const Farm = require("./models/Farm");
 const Field = require("./models/Field");
@@ -45,13 +47,18 @@ app.use("/load", loadRoutes);
 app.use("/print-report", printRoutes);
 app.use(driverHistoryRoutes);
 
-// ✅ Require login
+// ✅ Login middleware
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect("/auth/login");
   next();
 }
 
-// ✅ Submit Load Page
+// ✅ Homepage
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
+// ✅ Load submission form
 app.get("/submit-load", requireLogin, async (req, res) => {
   try {
     const tractors = await Tractor.find();
@@ -84,33 +91,14 @@ app.get("/submit-load", requireLogin, async (req, res) => {
   }
 });
 
-// ✅ Home
-app.get("/", (req, res) => {
-  res.render("index");
-});
-
-// ✅ TEMP Test Email Route
-app.get("/test-email", async (req, res) => {
+// ✅ Test email route
+app.get("/send-test-report", async (req, res) => {
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    });
-
-    await transporter.sendMail({
-      from: `"D&T Manure Hauling" <${process.env.EMAIL_USER}>`,
-      to: "galleckdrew@gmail.com",
-      subject: "✅ Test Email from D&T Platform",
-      text: "This is a test email to confirm your email setup is working!",
-    });
-
-    res.send("✅ Test email sent! Check your inbox.");
+    await sendLoadReportEmail();
+    res.send("📬 Test email sent successfully!");
   } catch (err) {
-    console.error("❌ Email error:", err);
-    res.status(500).send("❌ Failed to send test email.");
+    console.error("❌ Failed to send test report:", err);
+    res.status(500).send("❌ Failed to send test report.");
   }
 });
 
