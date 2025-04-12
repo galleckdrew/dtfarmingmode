@@ -6,6 +6,19 @@ const Farm = require("./models/Farm");
 const Field = require("./models/Field");
 const Pit = require("./models/Pit");
 
+// emailScheduler.js
+
+const { sendLoadReportEmail } = require("./emailReport");
+
+function setupEmailScheduler() {
+  // Run on the 12th and 28th of every month at 8 AM
+  cron.schedule("0 8 12,28 * *", () => {
+    sendLoadReportEmail("galleckdrew@gmail.com");
+  });
+}
+
+module.exports = { setupEmailScheduler };
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
