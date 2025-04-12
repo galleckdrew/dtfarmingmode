@@ -1,64 +1,70 @@
-const nodemailer = require("nodemailer");
-const Load = require("./models/Load");
-const Tractor = require("./models/Tractor");
-const Farm = require("./models/Farm");
+let totalGallons = 0;
+let totalHours = 0;
 
-async function sendLoadReportEmail() {
-  const today = new Date().toISOString().split("T")[0];
-  const start = new Date(`${today}T00:00:00`);
-  const end = new Date(`${today}T23:59:59`);
-
-  const loads = await Load.find({ timestamp: { $gte: start, $lte: end } })
-    .populate("tractor")
-    .populate("farm");
-
-  const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0);
-  const totalLoads = loads.length;
-
-  const rows = loads.map(l => {
-    return `<tr>
-      <td>${new Date(l.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true })}</td>
-      <td>${l.tractor?.name || ""}</td>
-      <td>${l.farm?.name || ""}</td>
-      <td>${l.gallons}</td>
-      <td>${l.startHour ?? ""}</td>
-      <td>${l.endHour ?? ""}</td>
+const rows = loads.map(load => {
+  totalGallons += load.gallons || 0;
+  totalHours += load.totalHours || 0;
+  return `
+    <tr>
+      <td>${new Date(load.timestamp).toLocaleString("en-US", {
+        timeZone: "America/New_York",
+        hour12: true,
+      })}</td>
+      <td>${load.tractor?.name || ""}</td>
+      <td>${load.farm?.name || ""}</td>
+      <td>${load.field?.name || ""}</td>
+      <td>${load.pit?.name || ""}</td>
+      <td>${load.gallons || 0}</td>
+      <td>${load.startHour ?? ""}</td>
+      <td>${load.endHour ?? ""}</td>
+      <td>${load.totalHours ?? ""}</td>
     </tr>`;
-  }).join("");
+}).join("");
 
-  const html = `
-    <h2>D&T Load Report for ${today}</h2>
-    <table border="1" cellpadding="6" cellspacing="0">
-      <tr>
-        <th>Timestamp</th>
-        <th>Tractor</th>
-        <th>Farm</th>
-        <th>Gallons</th>
-        <th>Start Hour</th>
-        <th>End Hour</th>
-      </tr>
-      ${rows}
+const html = `
+  <div style="font-family: Arial, sans-serif; padding: 20px;">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <img src="${LOGO_URL}" alt="D&T Logo" style="max-width: 250px; border-radius: 10px;" />
+      <h2>D&T Manure Hauling - Load Report</h2>
+    </div>
+    <table style="width: 100%; border-collapse: collapse;" border="1" cellpadding="8">
+      <thead style="background-color: #f2f2f2;">
+        <tr>
+          <th>Date & Time</th>
+          <th>Tractor</th>
+          <th>Farm</th>
+          <th>Field</th>
+          <th>Pit</th>
+          <th>Gallons</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Total Hours</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
     </table>
-    <p><strong>Total Loads:</strong> ${totalLoads}</p>
-    <p><strong>Total Gallons:</strong> ${totalGallons}</p>
-  `;
+    <p style="margin-top: 20px; font-weight: bold;">
+      ✅ Total Gallons: ${totalGallons} | 🕒 Total Hours: ${totalHours}
+    </p>
+    <p style="font-size: 12px; color: #777;">
+      Sent automatically by the D&T Load Tracker.
+    </p>
+  </div>
+`;
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: "galleckdrew@yahoo.com",
-    subject: `D&T Daily Load Report - ${today}`,
-    html
-  });
+await transporter.sendMail({
+  from: `"D&T Load Tracker" <${process.env.EMAIL_USER}>`,
+  to: recipients,
+  subject: "📝 D&T Load Report",
+  html,
+});
 
-  console.log("✅ Email report sent");
-}
-
-module.exports = { sendLoadReportEmail };
+console.log("✅ Report sent to:", recipients);
