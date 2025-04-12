@@ -1,18 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login</title>
+  <title>D&T Driver Login</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: url("/dt-bg.png") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+
+    .login-container {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 30px;
+      background-color: rgba(0, 0, 0, 0.75);
+      border-radius: 15px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-size: 1.1em;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1.1em;
+      border-radius: 8px;
+      border: none;
+      margin-top: 5px;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background-color: #28a745;
+      color: white;
+      font-size: 1.1em;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 20px;
+      width: 150px;
+    }
+  </style>
 </head>
 <body>
-  <h1>🚜 Driver Login</h1>
-  <form action="/auth/login" method="POST">
-    <label for="username">Username:</label>
-    <input type="text" name="username" required><br><br>
+  <div class="login-container">
+    <img src="/dt-bg.png" alt="D&T Logo" class="logo">
+    <h1>🚜 Driver Login</h1>
+    <form action="/auth/login" method="POST">
+      <label for="username">Username:</label>
+      <input type="text" name="username" required>
 
-    <label for="password">Password:</label>
-    <input type="password" name="password" required><br><br>
+      <label for="password">Password:</label>
+      <input type="password" name="password" required>
 
-    <button type="submit">🔐 Login</button>
-  </form>
+      <button type="submit">🔐 Login</button>
+    </form>
+  </div>
 </body>
 </html>
