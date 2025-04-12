@@ -4,54 +4,65 @@
   <title>Submit Load</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
       background: url("/dt-bg.png") no-repeat center center fixed;
       background-size: cover;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
       color: white;
     }
 
     .form-container {
       background-color: rgba(0, 0, 0, 0.7);
-      max-width: 500px;
-      margin: 50px auto;
       padding: 30px;
-      border-radius: 15px;
+      max-width: 500px;
+      margin: 40px auto;
+      border-radius: 10px;
     }
 
     label {
       display: block;
       margin-top: 15px;
-      font-size: 1.1em;
+      font-size: 1.2em;
     }
 
     select, input, button {
       width: 100%;
       padding: 10px;
       font-size: 1.1em;
-      border-radius: 8px;
-      border: none;
       margin-top: 5px;
+      border-radius: 5px;
+      border: none;
     }
 
     button {
-      margin-top: 20px;
       background-color: #28a745;
       color: white;
-      font-weight: bold;
+      margin-top: 20px;
       cursor: pointer;
     }
 
     h1 {
       text-align: center;
+      margin-bottom: 20px;
       font-size: 2em;
     }
 
     .summary {
-      margin-bottom: 20px;
-      font-size: 1.2em;
       text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .form-container {
+        padding: 20px;
+        margin: 20px;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
     }
   </style>
 </head>
@@ -59,20 +70,21 @@
   <div class="form-container">
     <h1>🚜 Submit Load</h1>
 
+    <!-- Summary -->
     <div class="summary">
-      <p><strong>Total Gallons Today:</strong> <%= totalGallons %></p>
+      <p>Total Gallons Today: <%= totalGallons %></p>
       <% if (lastLoad) { %>
-        <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor?.name || "Unknown" %></p>
+        <p>Last Load: <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor?.name || "Unknown" %></p>
       <% } else { %>
-        <p><em>No loads submitted yet today.</em></p>
+        <p><em>No loads submitted today</em></p>
       <% } %>
     </div>
 
     <form action="/load" method="POST">
-      <label for="tractor">Tractor:</label>
+      <label for="tractor">Tractor/Gallons:</label>
       <select name="tractor" id="tractorSelect" required>
         <% tractors.forEach(t => { %>
-          <option value="<%= t._id %>"><%= t.name %> / <%= t.gallons %> gal</option>
+          <option value="<%= t._id %>"><%= t.name %> - <%= t.gallons %> gallons</option>
         <% }) %>
       </select>
 
@@ -98,23 +110,25 @@
       </select>
 
       <label for="startHour">Start Hour:</label>
-      <input type="number" name="startHour" id="startHour">
+      <input type="number" name="startHour" placeholder="Optional">
 
       <label for="endHour">End Hour:</label>
-      <input type="number" name="endHour">
+      <input type="number" name="endHour" placeholder="Optional">
 
       <button type="submit">Submit Load</button>
     </form>
   </div>
 
   <script>
-    const tractorStartHours = {};
-    let selectedFarm = null;
-
-    document.getElementById("farmSelect").addEventListener("change", () => {
-      const startHour = document.getElementById("startHour").value;
-      if (!startHour) {
-        alert("⚠️ Please enter a start hour before changing farm.");
+    // Alert if changing farm with no start hour
+    let previousFarm = document.getElementById("farmSelect").value;
+    document.getElementById("farmSelect").addEventListener("change", function () {
+      const startHourInput = document.querySelector("input[name='startHour']");
+      if (!startHourInput.value) {
+        alert("⚠️ Please enter a start hour before switching farms.");
+        this.value = previousFarm;
+      } else {
+        previousFarm = this.value;
       }
     });
   </script>
