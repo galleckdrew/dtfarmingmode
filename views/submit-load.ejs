@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -49,7 +50,6 @@
       border: none;
       border-radius: 5px;
       width: 100%;
-      margin-top: 20px;
       cursor: pointer;
     }
 
@@ -61,7 +61,6 @@
     }
 
     .dual-buttons form {
-      margin: 0;
       flex: 1;
     }
 
@@ -146,21 +145,19 @@
       <label for="endHour">End Hour:</label>
       <input type="number" name="endHour" placeholder="Optional">
 
-      <!-- Buttons Section -->
-      <div class="dual-buttons">
-        <!-- Submit Load -->
-        <button type="submit">Submit Load</button>
-
-        <!-- Submit End Hour -->
-        <form method="POST" action="/submit-end-hour">
-          <input type="hidden" name="tractor" value="<%= selectedTractorId || '' %>">
-          <input type="hidden" name="farm" value="<%= selectedFarmId || '' %>">
-          <input type="hidden" name="field" value="<%= selectedFieldId || '' %>">
-          <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
-          <button type="submit">Submit End Hour</button>
-        </form>
-      </div>
+      <button type="submit">Submit Load</button>
     </form>
+
+    <!-- Separate End Hour Form -->
+    <div class="dual-buttons">
+      <form method="POST" action="/submit-end-hour">
+        <input type="hidden" name="tractor" value="<%= selectedTractorId || '' %>">
+        <input type="hidden" name="farm" value="<%= selectedFarmId || '' %>">
+        <input type="hidden" name="field" value="<%= selectedFieldId || '' %>">
+        <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
+        <button type="submit">Submit End Hour</button>
+      </form>
+    </div>
   </div>
 
   <script>

@@ -45,6 +45,7 @@ app.use("/admin", require("./adminRoutes"));
 app.use("/load", require("./loadRoutes"));
 app.use("/print-report", require("./printRoutes"));
 app.use(require("./driverHistoryRoute"));
+app.use(require("./submitEndHourRoute")); // ✅ Add this to support /submit-end-hour
 
 // Test email route (optional)
 app.get("/send-test-report", async (req, res) => {
@@ -86,7 +87,7 @@ app.get("/submit-load", requireLogin, async (req, res) => {
     });
 
     const totalGallons = todayLoads.reduce((sum, l) => sum + (l.gallons || 0), 0);
-    const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor");
+    const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor farm field");
 
     res.render("load-form", {
       tractors,
@@ -95,7 +96,10 @@ app.get("/submit-load", requireLogin, async (req, res) => {
       pits,
       totalGallons,
       lastLoad,
-      trackedHours: tractorFarmStartHours, // ✅ Fix for EJS error
+      trackedHours: tractorFarmStartHours,
+      selectedTractorId: lastLoad?.tractor?._id?.toString() || '',
+      selectedFarmId: lastLoad?.farm?._id?.toString() || '',
+      selectedFieldId: lastLoad?.field?._id?.toString() || ''
     });
   } catch (err) {
     console.error("❌ Error loading form:", err);
