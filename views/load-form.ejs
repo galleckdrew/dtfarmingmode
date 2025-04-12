@@ -34,6 +34,17 @@
       border-radius: 4px;
       cursor: pointer;
     }
+    .dual-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .dual-buttons form {
+      display: inline-block;
+      margin: 0;
+      width: 48%;
+    }
     .tracked {
       background: #222;
       padding: 10px;
@@ -90,12 +101,24 @@
       </select>
 
       <label for="startHour">Start Hour (optional unless new farm):</label>
-      <input type="number" name="startHour" id="startHour" step="0.1" min="0" placeholder= optional>
+      <input type="number" name="startHour" id="startHour" step="0.1" min="0" placeholder="optional">
 
       <label for="endHour">End Hour (optional):</label>
-      <input type="number" name="endHour" id="endHour" step="0.1" min="0" placeholder= optional>
+      <input type="number" name="endHour" id="endHour" step="0.1" min="0" placeholder="optional">
 
-      <button type="submit">Submit Load</button>
+      <div class="dual-buttons">
+        <!-- Submit Load -->
+        <button type="submit">Submit Load</button>
+
+        <!-- Submit End Hour (in a separate form) -->
+        <form method="POST" action="/submit-end-hour">
+          <input type="hidden" name="tractor" value="<%= selectedTractorId || '' %>">
+          <input type="hidden" name="farm" value="<%= selectedFarmId || '' %>">
+          <input type="hidden" name="field" value="<%= selectedFieldId || '' %>">
+          <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
+          <button type="submit">Submit End Hour</button>
+        </form>
+      </div>
     </form>
 
     <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
