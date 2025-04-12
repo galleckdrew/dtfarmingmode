@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const Load = require("./models/Load");
 const Tractor = require("./models/Tractor");
+const Farm = require("./models/Farm");
 
-const tractorFarmStartHours = {}; // 🧠 Track start hour per tractor + farm combo
+const tractorFarmStartHours = {}; // 🧠 Tracks start hour for each tractor+farm combo
 
 router.post("/", async (req, res) => {
   try {
@@ -20,22 +21,23 @@ router.post("/", async (req, res) => {
     let end = endHour ? Number(endHour) : null;
     let totalHours = null;
 
-    if (startHour) {
-      tractorFarmStartHours[key] = Number(startHour);
-    }
-
-    if (start !== null && end !== null) {
-      totalHours = end - start;
-      delete tractorFarmStartHours[key];
-    }
-
-    if (!start && farm) {
+    // ⛔ Alert if switching to a new farm without entering a new start hour
+    if (!start && !startHour && farm) {
       return res.send(`
         <script>
-          alert('⚠️ Please enter a start hour for this tractor before selecting this farm. Each farm needs new start hours.');
+          alert('⚠️ Please enter a start hour for this tractor before submitting to a new farm. Each farm needs a new start hour.');
           window.location.href = '/submit-load';
         </script>
       `);
+    }
+
+    // 💾 Store start hour per tractor+farm
+    if (startHour) tractorFarmStartHours[key] = Number(startHour);
+
+    // ⏱️ Calculate total hours
+    if (start !== null && end !== null) {
+      totalHours = end >= start ? end - start : (24 - start + end); // Overnight shift support
+      delete tractorFarmStartHours[key]; // Clear after use
     }
 
     const newLoad = new Load({
@@ -58,15 +60,13 @@ router.post("/", async (req, res) => {
 
     res.send(`
       <html>
-      <head>
-        <meta http-equiv="refresh" content="5; URL=/submit-load" />
-      </head>
-      <body>
-        <h2>✅ Load submitted successfully!</h2>
-        <p>Redirecting to the load form in 5 seconds...</p>
-        <h4>🧠 Current Tracked Start Hours:</h4>
-        <ul>${trackedKeys}</ul>
-      </body>
+        <head><meta http-equiv="refresh" content="5; URL=/submit-load" /></head>
+        <body>
+          <h2>✅ Load submitted successfully!</h2>
+          <p>Redirecting to the load form in 5 seconds...</p>
+          <h4>🧠 Currently Tracked Start Hours:</h4>
+          <ul>${trackedKeys}</ul>
+        </body>
       </html>
     `);
   } catch (error) {
