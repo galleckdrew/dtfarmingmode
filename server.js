@@ -2,63 +2,74 @@ const express = require("express");
 const path = require("path");
 const session = require("express-session");
 const methodOverride = require("method-override");
-const { sendLoadReportEmail } = require("./emailReport"); // ✅ Email function
-
 require("dotenv").config();
-require("./db");
+require("./db"); // MongoDB connection
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Session Setup
-app.use(session({
-  secret: process.env.SESSION_SECRET || "tractorsecret",
-  resave: false,
-  saveUninitialized: false,
-}));
+// Email scheduler (optional)
+const setupEmailScheduler = require("./emailScheduler");
+setupEmailScheduler();
 
-// ✅ Middleware
-app.use(methodOverride("_method"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+// Memory for tracking start hours per tractor/farm
+const tractorFarmStartHours = require("./trackedHours");
 
-// ✅ View Engine
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
-// ✅ Routes
-const authRoutes = require("./auth");
-const adminRoutes = require("./adminRoutes");
-const loadRoutes = require("./loadRoutes");
-const printRoutes = require("./printRoutes");
-const driverHistoryRoutes = require("./driverHistoryRoute");
-
-// ✅ Models (used in load form page)
+// Models
 const Tractor = require("./models/Tractor");
 const Farm = require("./models/Farm");
 const Field = require("./models/Field");
 const Pit = require("./models/Pit");
 const Load = require("./models/Load");
 
-app.use("/auth", authRoutes);
-app.use("/admin", adminRoutes);
-app.use("/load", loadRoutes);
-app.use("/print-report", printRoutes);
-app.use(driverHistoryRoutes);
+// View engine setup
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
-// ✅ Login middleware
+// Middleware
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(methodOverride("_method"));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "tractorsecret",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+// Routes
+app.use("/auth", require("./auth"));
+app.use("/admin", require("./adminRoutes"));
+app.use("/load", require("./loadRoutes"));
+app.use("/print-report", require("./printRoutes"));
+app.use(require("./driverHistoryRoute"));
+
+// Test email route (optional)
+app.get("/send-test-report", async (req, res) => {
+  const { sendLoadReportEmail } = require("./emailReport");
+  try {
+    await sendLoadReportEmail();
+    res.send("✅ Test report sent to galleckdrew@gmail.com");
+  } catch (err) {
+    console.error("❌ Failed to send test report:", err);
+    res.status(500).send("❌ Failed to send test report");
+  }
+});
+
+// Login guard
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect("/auth/login");
   next();
 }
 
-// ✅ Homepage
+// Home route
 app.get("/", (req, res) => {
-  res.render("index");
+  res.redirect("/submit-load");
 });
 
-// ✅ Load submission form
+// ✅ Submit Load Form
 app.get("/submit-load", requireLogin, async (req, res) => {
   try {
     const tractors = await Tractor.find();
@@ -70,8 +81,8 @@ app.get("/submit-load", requireLogin, async (req, res) => {
     const todayLoads = await Load.find({
       timestamp: {
         $gte: new Date(`${today}T00:00:00.000Z`),
-        $lte: new Date(`${today}T23:59:59.999Z`)
-      }
+        $lte: new Date(`${today}T23:59:59.999Z`),
+      },
     });
 
     const totalGallons = todayLoads.reduce((sum, l) => sum + (l.gallons || 0), 0);
@@ -83,7 +94,8 @@ app.get("/submit-load", requireLogin, async (req, res) => {
       fields,
       pits,
       totalGallons,
-      lastLoad
+      lastLoad,
+      trackedHours: tractorFarmStartHours, // ✅ Fix for EJS error
     });
   } catch (err) {
     console.error("❌ Error loading form:", err);
@@ -91,23 +103,12 @@ app.get("/submit-load", requireLogin, async (req, res) => {
   }
 });
 
-app.get("/send-test-report", async (req, res) => {
-  try {
-    await sendLoadReportEmail();
-    res.send("✅ Test report sent to galleckdrew@gmail.com");
-  } catch (err) {
-    console.error("❌ Failed to send test report:", err);
-    res.status(500).send("❌ Failed to send test report");
-  }
-});
-
-
-// ✅ 404 fallback
+// 404 fallback
 app.get("*", (req, res) => {
   res.status(404).send("Page not found.");
 });
 
-// ✅ Start server
+// Start server
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });
