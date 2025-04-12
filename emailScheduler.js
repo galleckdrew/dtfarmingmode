@@ -1,14 +1,18 @@
 // emailScheduler.js
-
 const cron = require("node-cron");
-const sendLoadReportEmail = require("./emailReport");
+const { sendLoadReportEmail } = require("./emailReport");
 
-function setupEmailScheduler() {
-  // Run at 7:00 AM on the 12th and 28th of every month
-  cron.schedule("0 7 12,28 * *", () => {
-    console.log("📧 Running scheduled email report...");
-    sendLoadReportEmail();
+function startEmailScheduler() {
+  // Schedule to run at 8 AM EST on the 12th and 28th
+  cron.schedule("0 13 12,28 * *", async () => {
+    try {
+      console.log("📧 Running scheduled email report...");
+      await sendLoadReportEmail();
+      console.log("✅ Scheduled email sent successfully.");
+    } catch (err) {
+      console.error("❌ Error sending scheduled report:", err);
+    }
   });
 }
 
-module.exports = setupEmailScheduler;
+module.exports = startEmailScheduler;
