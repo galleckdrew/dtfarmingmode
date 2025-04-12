@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -42,9 +41,9 @@
       gap: 10px;
       margin-top: 15px;
     }
-    .dual-buttons form {
-      margin: 0;
-      width: 48%;
+    .dual-buttons form,
+    .dual-buttons button {
+      flex: 1;
     }
     .tracked {
       background: #222;
@@ -61,6 +60,11 @@
     label {
       font-weight: bold;
     }
+    @media (max-width: 600px) {
+      .dual-buttons {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -69,7 +73,7 @@
     <h3>Total Gallons Today: <%= totalGallons %></h3>
 
     <% if (lastLoad) { %>
-      <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor.name %></p>
+      <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor?.name %></p>
     <% } %>
 
     <!-- Load Submission Form -->
@@ -77,7 +81,7 @@
       <label for="tractor">Tractor:</label>
       <select name="tractor" required>
         <% tractors.forEach(t => { %>
-          <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>>
+          <option value="<%= t._id %>" <%= selectedTractorId === t._id.toString() ? 'selected' : '' %>>
             <%= t.name %> (<%= t.gallons %> gal)
           </option>
         <% }) %>
@@ -86,7 +90,7 @@
       <label for="farm">Farm:</label>
       <select name="farm" required>
         <% farms.forEach(f => { %>
-          <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>>
+          <option value="<%= f._id %>" <%= selectedFarmId === f._id.toString() ? 'selected' : '' %>>
             <%= f.name %>
           </option>
         <% }) %>
@@ -95,7 +99,7 @@
       <label for="field">Field:</label>
       <select name="field" required>
         <% fields.forEach(f => { %>
-          <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>>
+          <option value="<%= f._id %>" <%= selectedFieldId === f._id.toString() ? 'selected' : '' %>>
             <%= f.name %>
           </option>
         <% }) %>
@@ -114,16 +118,19 @@
       <label for="endHour">End Hour (optional):</label>
       <input type="number" name="endHour" id="endHour" step="0.1" min="0" placeholder="optional">
 
-      <button type="submit">Submit Load</button>
-    </form>
+      <div class="dual-buttons">
+        <!-- Submit Load -->
+        <button type="submit">Submit Load</button>
 
-    <!-- End Hour Submission Form (Separate) -->
-    <form method="POST" action="/submit-end-hour" class="dual-buttons">
-      <input type="hidden" name="tractor" value="<%= selectedTractorId || '' %>">
-      <input type="hidden" name="farm" value="<%= selectedFarmId || '' %>">
-      <input type="hidden" name="field" value="<%= selectedFieldId || '' %>">
-      <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
-      <button type="submit">Submit End Hour</button>
+        <!-- Submit End Hour (Separate Form) -->
+        <form method="POST" action="/submit-end-hour">
+          <input type="hidden" name="tractor" value="<%= selectedTractorId || '' %>">
+          <input type="hidden" name="farm" value="<%= selectedFarmId || '' %>">
+          <input type="hidden" name="field" value="<%= selectedFieldId || '' %>">
+          <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
+          <button type="submit">Submit End Hour</button>
+        </form>
+      </div>
     </form>
 
     <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
