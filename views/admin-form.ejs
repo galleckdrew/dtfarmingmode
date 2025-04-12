@@ -1,91 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Admin Management</title>
+  <title>Admin Dropdown Editor</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f7f7f7; }
+    h2 { border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+    .section { margin-bottom: 40px; background: white; padding: 20px; border-radius: 6px; box-shadow: 0 0 8px rgba(0,0,0,0.05); }
+    ul { list-style: none; padding: 0; }
+    li { margin-bottom: 8px; }
+    form { display: inline-block; margin-left: 5px; }
+    input[type="text"], input[type="number"] {
+      padding: 5px;
+      font-size: 14px;
+    }
+    button { padding: 5px 10px; font-size: 14px; }
+  </style>
 </head>
 <body>
-  <h1>Manage Farms, Fields, Pits, and Tractors</h1>
+  <h1>⚙️ Admin Panel – Manage Dropdowns</h1>
 
-  <h2>Farms</h2>
-  <form action="/admin/farms" method="POST">
-    <input type="text" name="name" placeholder="New farm name" required>
-    <button type="submit">Add Farm</button>
-  </form>
-  <ul>
-    <% farms.forEach(farm => { %>
-      <li>
-        <%= farm.name %>
-        <form action="/admin/farms/<%= farm._id %>?_method=PUT" method="POST" style="display:inline;">
-          <input type="text" name="name" placeholder="Rename">
-          <button type="submit">Update</button>
-        </form>
-        <form action="/admin/farms/<%= farm._id %>?_method=DELETE" method="POST" style="display:inline;">
-          <button type="submit">Delete</button>
-        </form>
-      </li>
-    <% }) %>
-  </ul>
+  <% const sections = [
+    { title: "Tractors", items: tractors, name: "tractor", gallonField: true },
+    { title: "Farms", items: farms, name: "farm" },
+    { title: "Fields", items: fields, name: "field" },
+    { title: "Pits", items: pits, name: "pit" }
+  ]; %>
 
-  <h2>Fields</h2>
-  <form action="/admin/fields" method="POST">
-    <input type="text" name="name" placeholder="New field name" required>
-    <button type="submit">Add Field</button>
-  </form>
-  <ul>
-    <% fields.forEach(field => { %>
-      <li>
-        <%= field.name %>
-        <form action="/admin/fields/<%= field._id %>?_method=PUT" method="POST" style="display:inline;">
-          <input type="text" name="name" placeholder="Rename">
-          <button type="submit">Update</button>
-        </form>
-        <form action="/admin/fields/<%= field._id %>?_method=DELETE" method="POST" style="display:inline;">
-          <button type="submit">Delete</button>
-        </form>
-      </li>
-    <% }) %>
-  </ul>
+  <% sections.forEach(section => { %>
+    <div class="section">
+      <h2><%= section.title %></h2>
+      <ul>
+        <% section.items.forEach(item => { %>
+          <li>
+            <form method="POST" action="/admin/<%= section.name %>s/<%= item._id %>?_method=PUT">
+              <input type="text" name="name" value="<%= item.name %>" required>
+              <% if (section.gallonField) { %>
+                <input type="number" name="gallons" value="<%= item.gallons %>" placeholder="Gallons" required>
+              <% } %>
+              <button type="submit">Save</button>
+            </form>
+            <form method="POST" action="/admin/<%= section.name %>s/<%= item._id %>?_method=DELETE" onsubmit="return confirm('Are you sure?')">
+              <button type="submit">Delete</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
 
-  <h2>Pits</h2>
-  <form action="/admin/pits" method="POST">
-    <input type="text" name="name" placeholder="New pit name" required>
-    <button type="submit">Add Pit</button>
-  </form>
-  <ul>
-    <% pits.forEach(pit => { %>
-      <li>
-        <%= pit.name %>
-        <form action="/admin/pits/<%= pit._id %>?_method=PUT" method="POST" style="display:inline;">
-          <input type="text" name="name" placeholder="Rename">
-          <button type="submit">Update</button>
-        </form>
-        <form action="/admin/pits/<%= pit._id %>?_method=DELETE" method="POST" style="display:inline;">
-          <button type="submit">Delete</button>
-        </form>
-      </li>
-    <% }) %>
-  </ul>
+      <form method="POST" action="/admin/<%= section.name %>s">
+        <input type="text" name="name" placeholder="New <%= section.title.slice(0, -1) %> Name" required>
+        <% if (section.gallonField) { %>
+          <input type="number" name="gallons" placeholder="Gallons" required>
+        <% } %>
+        <button type="submit">Add <%= section.title.slice(0, -1) %></button>
+      </form>
+    </div>
+  <% }) %>
 
-  <h2>Tractors</h2>
-  <form action="/admin/tractors" method="POST">
-    <input type="text" name="name" placeholder="New tractor name" required>
-    <input type="number" name="gallons" placeholder="Default gallons" required>
-    <button type="submit">Add Tractor</button>
-  </form>
-  <ul>
-    <% tractors.forEach(tractor => { %>
-      <li>
-        <%= tractor.name %> - <%= tractor.gallons %> gallons
-        <form action="/admin/tractors/<%= tractor._id %>?_method=PUT" method="POST" style="display:inline;">
-          <input type="text" name="name" placeholder="Rename">
-          <input type="number" name="gallons" placeholder="Gallons">
-          <button type="submit">Update</button>
-        </form>
-        <form action="/admin/tractors/<%= tractor._id %>?_method=DELETE" method="POST" style="display:inline;">
-          <button type="submit">Delete</button>
-        </form>
-      </li>
-    <% }) %>
-  </ul>
+  <% if (trackedStartHours && Object.keys(trackedStartHours).length > 0) { %>
+    <div class="section">
+      <h2>🧠 Tracked Start Hours</h2>
+      <ul>
+        <% Object.entries(trackedStartHours).forEach(([key, hour]) => { %>
+          <li>
+            <strong><%= key %></strong>: <%= hour %>
+            <form method="POST" action="/admin/reset-tracking" style="display:inline">
+              <input type="hidden" name="key" value="<%= key %>">
+              <button type="submit">❌ Clear</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+      <form method="POST" action="/admin/reset-all-tracking">
+        <button>🚫 Clear All Tracked Hours</button>
+      </form>
+    </div>
+  <% } else { %>
+    <div class="section">
+      <h2>🧠 Tracked Start Hours</h2>
+      <p>No active tracked start hours</p>
+    </div>
+  <% } %>
+
 </body>
 </html>
