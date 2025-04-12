@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Submit Load</title>
+  <title>🚜 Submit Load</title>
   <style>
     body {
       background: url("/dt-bg.png") no-repeat center center fixed;
@@ -26,7 +26,7 @@
       font-size: 1.2em;
     }
 
-    select, input, button {
+    select, input {
       width: 100%;
       padding: 10px;
       font-size: 1.1em;
@@ -35,23 +35,39 @@
       border: none;
     }
 
+    .summary {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
     button {
+      padding: 10px;
+      font-size: 1.1em;
       background-color: #28a745;
       color: white;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
       margin-top: 20px;
       cursor: pointer;
+    }
+
+    .dual-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-buttons form {
+      margin: 0;
+      flex: 1;
     }
 
     h1 {
       text-align: center;
       margin-bottom: 20px;
       font-size: 2em;
-    }
-
-    .summary {
-      text-align: center;
-      margin-bottom: 20px;
-      font-weight: bold;
     }
 
     @media (max-width: 600px) {
@@ -62,6 +78,14 @@
 
       h1 {
         font-size: 1.5em;
+      }
+
+      .dual-buttons {
+        flex-direction: column;
+      }
+
+      .dual-buttons form {
+        width: 100%;
       }
     }
   </style>
@@ -80,6 +104,7 @@
       <% } %>
     </div>
 
+    <!-- Main Load Form -->
     <form action="/load" method="POST">
       <label for="tractor">Tractor/Gallons:</label>
       <select name="tractor" id="tractorSelect" required>
@@ -115,12 +140,23 @@
       <label for="endHour">End Hour:</label>
       <input type="number" name="endHour" placeholder="Optional">
 
-      <button type="submit">Submit Load</button>
+      <div class="dual-buttons">
+        <!-- Submit Load -->
+        <button type="submit">Submit Load</button>
+
+        <!-- Submit End Hour Form -->
+        <form method="POST" action="/submit-end-hour">
+          <input type="hidden" name="tractor" value="<%= selectedTractorId || '' %>">
+          <input type="hidden" name="farm" value="<%= selectedFarmId || '' %>">
+          <input type="hidden" name="field" value="<%= selectedFieldId || '' %>">
+          <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
+          <button type="submit">Submit End Hour</button>
+        </form>
+      </div>
     </form>
   </div>
 
   <script>
-    // Alert if changing farm with no start hour
     let previousFarm = document.getElementById("farmSelect").value;
     document.getElementById("farmSelect").addEventListener("change", function () {
       const startHourInput = document.querySelector("input[name='startHour']");
