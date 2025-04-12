@@ -57,6 +57,7 @@
       display: flex;
       justify-content: space-between;
       gap: 10px;
+      margin-top: 15px;
     }
 
     .dual-buttons form {
@@ -94,7 +95,6 @@
   <div class="form-container">
     <h1>🚜 Submit Load</h1>
 
-    <!-- Summary -->
     <div class="summary">
       <p>Total Gallons Today: <%= totalGallons %></p>
       <% if (lastLoad) { %>
@@ -109,21 +109,27 @@
       <label for="tractor">Tractor/Gallons:</label>
       <select name="tractor" id="tractorSelect" required>
         <% tractors.forEach(t => { %>
-          <option value="<%= t._id %>"><%= t.name %> - <%= t.gallons %> gallons</option>
+          <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>>
+            <%= t.name %> - <%= t.gallons %> gallons
+          </option>
         <% }) %>
       </select>
 
       <label for="farm">Farm:</label>
       <select name="farm" id="farmSelect" required>
         <% farms.forEach(f => { %>
-          <option value="<%= f._id %>"><%= f.name %></option>
+          <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>>
+            <%= f.name %>
+          </option>
         <% }) %>
       </select>
 
       <label for="field">Field:</label>
       <select name="field" required>
         <% fields.forEach(fl => { %>
-          <option value="<%= fl._id %>"><%= fl.name %></option>
+          <option value="<%= fl._id %>" <%= fl._id.toString() === selectedFieldId ? 'selected' : '' %>>
+            <%= fl.name %>
+          </option>
         <% }) %>
       </select>
 
@@ -140,11 +146,12 @@
       <label for="endHour">End Hour:</label>
       <input type="number" name="endHour" placeholder="Optional">
 
+      <!-- Buttons Section -->
       <div class="dual-buttons">
         <!-- Submit Load -->
         <button type="submit">Submit Load</button>
 
-        <!-- Submit End Hour Form -->
+        <!-- Submit End Hour -->
         <form method="POST" action="/submit-end-hour">
           <input type="hidden" name="tractor" value="<%= selectedTractorId || '' %>">
           <input type="hidden" name="farm" value="<%= selectedFarmId || '' %>">
