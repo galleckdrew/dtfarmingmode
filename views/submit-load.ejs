@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Submit Load</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: url("/dt-bg.png") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+
+    .form-container {
+      background-color: rgba(0, 0, 0, 0.7);
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 30px;
+      border-radius: 15px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-size: 1.1em;
+    }
+
+    select, input, button {
+      width: 100%;
+      padding: 10px;
+      font-size: 1.1em;
+      border-radius: 8px;
+      border: none;
+      margin-top: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2em;
+    }
+
+    .summary {
+      margin-bottom: 20px;
+      font-size: 1.2em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h1>🚜 Submit Load</h1>
+
+    <div class="summary">
+      <p><strong>Total Gallons Today:</strong> <%= totalGallons %></p>
+      <% if (lastLoad) { %>
+        <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor?.name || "Unknown" %></p>
+      <% } else { %>
+        <p><em>No loads submitted yet today.</em></p>
+      <% } %>
+    </div>
+
+    <form action="/load" method="POST">
+      <label for="tractor">Tractor:</label>
+      <select name="tractor" id="tractorSelect" required>
+        <% tractors.forEach(t => { %>
+          <option value="<%= t._id %>"><%= t.name %> / <%= t.gallons %> gal</option>
+        <% }) %>
+      </select>
+
+      <label for="farm">Farm:</label>
+      <select name="farm" id="farmSelect" required>
+        <% farms.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="field">Field:</label>
+      <select name="field" required>
+        <% fields.forEach(fl => { %>
+          <option value="<%= fl._id %>"><%= fl.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="pit">Pit:</label>
+      <select name="pit" required>
+        <% pits.forEach(p => { %>
+          <option value="<%= p._id %>"><%= p.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="startHour">Start Hour:</label>
+      <input type="number" name="startHour" id="startHour">
+
+      <label for="endHour">End Hour:</label>
+      <input type="number" name="endHour">
+
+      <button type="submit">Submit Load</button>
+    </form>
+  </div>
+
+  <script>
+    const tractorStartHours = {};
+    let selectedFarm = null;
+
+    document.getElementById("farmSelect").addEventListener("change", () => {
+      const startHour = document.getElementById("startHour").value;
+      if (!startHour) {
+        alert("⚠️ Please enter a start hour before changing farm.");
+      }
+    });
+  </script>
+</body>
+</html>
