@@ -85,10 +85,49 @@ router.post("/", async (req, res) => {
           <h2>✅ Load submitted successfully!</h2>
           <p>Redirecting to the load form in 5 seconds...</p>
         </body>
-       }
-    });
-      
-        module.exports = router;
-       
+      </html>
+    `);
+  } catch (error) {
+    console.error("❌ Error submitting load:", error);
+    res.status(500).json({ error: "❌ Failed to submit load" });
+  }
+});
 
-        
+// =========================
+// GET /load-history (Grouped view)
+// =========================
+router.get("/load-history", async (req, res) => {
+  try {
+    const allLoads = await Load.find().populate("tractor");
+
+    const grouped = {};
+
+    allLoads.forEach(load => {
+      const dateKey = moment(load.timestamp).format("YYYY-MM-DD");
+      const tractorName = load.tractor?.name || "Unknown";
+      const key = `${dateKey}-${tractorName}`;
+
+      if (!grouped[key]) {
+        grouped[key] = {
+          date: dateKey,
+          tractor: tractorName,
+          totalHours: 0,
+          totalGallons: 0,
+          loads: []
+        };
+      }
+
+      grouped[key].totalHours += load.totalHours || 0;
+      grouped[key].totalGallons += load.gallons || 0;
+      grouped[key].loads.push(load);
+    });
+
+    const history = Object.values(grouped);
+    res.render("load-history", { history, moment });
+  } catch (error) {
+    console.error("❌ Error generating load history:", error);
+    res.status(500).send("Server error");
+  }
+});
+
+module.exports = router;
