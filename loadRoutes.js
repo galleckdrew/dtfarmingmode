@@ -27,13 +27,16 @@ router.post("/", async (req, res) => {
     const timestamp = new Date();
     const key = `${tractor}_${farm}`;
 
-    // Convert start and end hours to decimal (supporting comma and dot)
-    let start = parseFloat(startHour?.replace(',', '.'));
+    // Use startHour from input or from tracked memory
+    let start = startHour
+      ? parseFloat(startHour.replace(',', '.'))
+      : tractorFarmStartHours[key];
+
     let end = endHour ? parseFloat(endHour.replace(',', '.')) : null;
     let totalHours = null;
 
-    // Prevent submission without startHour for that tractor+farm
-    if ((start === undefined || isNaN(start)) && farm) {
+    // ❗ Block submission if start is missing AND no tracked value
+    if ((start === undefined || isNaN(start)) && !tractorFarmStartHours[key]) {
       return res.send(`
         <script>
           alert('⚠️ Please enter a start hour for this tractor before using this farm. Each farm needs its own start hour.');
@@ -42,12 +45,12 @@ router.post("/", async (req, res) => {
       `);
     }
 
-    // Track start hour
+    // If startHour was provided, update tracked start hour
     if (startHour) {
       tractorFarmStartHours[key] = Number(startHour);
     }
 
-    // If both start and end exist, calculate totalHours and clear tracking
+    // If both start and end exist, calculate totalHours and clear tracked
     if (start !== null && end !== null && !isNaN(start) && !isNaN(end)) {
       totalHours = end >= start ? end - start : (24 - start + end);
       totalHours = Math.round(totalHours * 100) / 100;
