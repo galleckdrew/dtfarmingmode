@@ -7,6 +7,12 @@ require("./db"); // MongoDB connection
 
 const PORT = process.env.PORT || 3000;
 
+// Serve image as static background
+app.get("/auth-bg", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "dt-bg.png"));
+});
+
+
 // ✅ Clean Session Setup (Only once)
 app.use(session({
   secret: process.env.SESSION_SECRET || "tractorsecret",
@@ -24,6 +30,12 @@ app.set("views", path.join(__dirname, "views"));
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/auth-bg", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "dt-bg.png"));
+});
+
 
 // Routes
 const authRoutes = require("./auth");
