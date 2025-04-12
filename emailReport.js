@@ -1,70 +1,67 @@
-let totalGallons = 0;
-let totalHours = 0;
+const nodemailer = require("nodemailer");
+const Load = require("./models/Load");
+const Tractor = require("./models/Tractor");
 
-const rows = loads.map(load => {
-  totalGallons += load.gallons || 0;
-  totalHours += load.totalHours || 0;
-  return `
-    <tr>
-      <td>${new Date(load.timestamp).toLocaleString("en-US", {
-        timeZone: "America/New_York",
-        hour12: true,
-      })}</td>
-      <td>${load.tractor?.name || ""}</td>
-      <td>${load.farm?.name || ""}</td>
-      <td>${load.field?.name || ""}</td>
-      <td>${load.pit?.name || ""}</td>
-      <td>${load.gallons || 0}</td>
-      <td>${load.startHour ?? ""}</td>
-      <td>${load.endHour ?? ""}</td>
-      <td>${load.totalHours ?? ""}</td>
-    </tr>`;
-}).join("");
+const EMAIL_TO = "galleckdrew@gmail.com";
 
-const html = `
-  <div style="font-family: Arial, sans-serif; padding: 20px;">
-    <div style="text-align: center; margin-bottom: 20px;">
-      <img src="${LOGO_URL}" alt="D&T Logo" style="max-width: 250px; border-radius: 10px;" />
-      <h2>D&T Manure Hauling - Load Report</h2>
-    </div>
-    <table style="width: 100%; border-collapse: collapse;" border="1" cellpadding="8">
-      <thead style="background-color: #f2f2f2;">
+async function sendLoadReportEmail() {
+  const loads = await Load.find().populate("tractor");
+
+  const today = new Date().toLocaleDateString("en-US", {
+    timeZone: "America/New_York",
+  });
+
+  const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0);
+
+  const rows = loads
+    .map((load) => {
+      return `
         <tr>
-          <th>Date & Time</th>
-          <th>Tractor</th>
-          <th>Farm</th>
-          <th>Field</th>
-          <th>Pit</th>
-          <th>Gallons</th>
-          <th>Start</th>
-          <th>End</th>
-          <th>Total Hours</th>
+          <td>${new Date(load.timestamp).toLocaleString("en-US", {
+            timeZone: "America/New_York",
+          })}</td>
+          <td>${load.tractor?.name || ""}</td>
+          <td>${load.gallons}</td>
         </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <p style="margin-top: 20px; font-weight: bold;">
-      ✅ Total Gallons: ${totalGallons} | 🕒 Total Hours: ${totalHours}
-    </p>
-    <p style="font-size: 12px; color: #777;">
-      Sent automatically by the D&T Load Tracker.
-    </p>
-  </div>
-`;
+      `;
+    })
+    .join("");
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+  const html = `
+    <html>
+      <body style="font-family: Arial, sans-serif;">
+        <h2>D&T Manure Hauling - Load Report</h2>
+        <p>Date: ${today}</p>
+        <table border="1" cellpadding="6" cellspacing="0" width="100%">
+          <tr style="background-color: #f2f2f2;">
+            <th>Date</th>
+            <th>Tractor</th>
+            <th>Gallons</th>
+          </tr>
+          ${rows}
+        </table>
+        <h3>Total Gallons: ${totalGallons}</h3>
+        <img src="https://dandt-manure-hauling.onrender.com/public/dt-bg.png" alt="D&T Logo" width="300" />
+      </body>
+    </html>
+  `;
 
-await transporter.sendMail({
-  from: `"D&T Load Tracker" <${process.env.EMAIL_USER}>`,
-  to: recipients,
-  subject: "📝 D&T Load Report",
-  html,
-});
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
 
-console.log("✅ Report sent to:", recipients);
+  await transporter.sendMail({
+    from: `"D&T Report" <${process.env.EMAIL_USER}>`,
+    to: EMAIL_TO,
+    subject: "🚜 D&T Load Report",
+    html,
+  });
+
+  console.log("✅ Email sent to:", EMAIL_TO);
+}
+
+module.exports = { sendLoadReportEmail };
