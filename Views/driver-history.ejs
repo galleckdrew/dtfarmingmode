@@ -80,4 +80,31 @@
               timeZone: "America/New_York",
               hour12: true,
               year: "numeric",
-              month
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit"
+            }) %>
+          </td>
+          <td><%= load.tractor?.name || '' %></td>
+          <td><%= load.farm?.name || '' %></td>
+          <td><%= load.field?.name || '' %></td>
+          <td><%= load.pit?.name || '' %></td>
+          <td><%= load.gallons ?? '' %></td>
+          <td><%= load.startHour ?? '' %></td>
+          <td><%= load.endHour ?? '' %></td>
+          <td><%= load.totalHours?.toFixed(2) ?? '' %></td>
+          <td class="actions">
+            <form method="GET" action="/driver-history/<%= load._id %>/edit">
+              <button>Edit</button>
+            </form>
+            <form method="POST" action="/driver-history/<%= load._id %>?_method=DELETE">
+              <button>Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>

@@ -4,10 +4,53 @@ const moment = require("moment");
 const Load = require("./models/Load");
 const Tractor = require("./models/Tractor");
 const Farm = require("./models/Farm");
+const Field = require("./models/Field");
+const Pit = require("./models/Pit");
 const tractorFarmStartHours = require("./trackedHours");
 
 // =========================
-// GET tracked hours (for frontend display)
+// GET Load Form (submit-load)
+// =========================
+router.get("/submit-load", async (req, res) => {
+  try {
+    const tractors = await Tractor.find();
+    const farms = await Farm.find();
+    const fields = await Field.find();
+    const pits = await Pit.find();
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const loadsToday = await Load.find({
+      timestamp: { $gte: todayStart, $lte: todayEnd }
+    });
+
+    const totalGallons = loadsToday.reduce((sum, load) => sum + (load.gallons || 0), 0);
+
+    const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor farm field");
+
+    res.render("load-form", {
+      tractors,
+      farms,
+      fields,
+      pits,
+      totalGallons,
+      trackedHours: tractorFarmStartHours,
+      lastLoad,
+      selectedTractorId: lastLoad?.tractor?._id?.toString() || '',
+      selectedFarmId: lastLoad?.farm?._id?.toString() || '',
+      selectedFieldId: lastLoad?.field?._id?.toString() || ''
+    });
+  } catch (error) {
+    console.error("❌ Error loading submit-load form:", error);
+    res.status(500).send("Server Error");
+  }
+});
+
+// =========================
+// GET tracked hours
 // =========================
 router.get("/tracked-hours", (req, res) => {
   res.json(tractorFarmStartHours);
@@ -19,7 +62,6 @@ router.get("/tracked-hours", (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { tractor, farm, field, pit, startHour, endHour } = req.body;
-
     const tractorData = await Tractor.findById(tractor);
     if (!tractorData) return res.status(404).json({ error: "Tractor not found" });
 
@@ -27,15 +69,12 @@ router.post("/", async (req, res) => {
     const timestamp = new Date();
     const key = `${tractor}_${farm}`;
 
-    // Use startHour from input or from tracked memory
     let start = startHour
       ? parseFloat(startHour.replace(',', '.'))
       : tractorFarmStartHours[key];
-
     let end = endHour ? parseFloat(endHour.replace(',', '.')) : null;
     let totalHours = null;
 
-    // ❗ Block submission if start is missing AND no tracked value
     if ((start === undefined || isNaN(start)) && !tractorFarmStartHours[key]) {
       return res.send(`
         <script>
@@ -45,19 +84,14 @@ router.post("/", async (req, res) => {
       `);
     }
 
-    // If startHour was provided, update tracked start hour
-    if (startHour) {
-      tractorFarmStartHours[key] = Number(startHour);
-    }
+    if (startHour) tractorFarmStartHours[key] = Number(startHour);
 
-    // If both start and end exist, calculate totalHours and clear tracked
     if (start !== null && end !== null && !isNaN(start) && !isNaN(end)) {
       totalHours = end >= start ? end - start : (24 - start + end);
       totalHours = Math.round(totalHours * 100) / 100;
       delete tractorFarmStartHours[key];
     }
 
-    // Safely build Load object
     const loadData = {
       tractor,
       farm,
@@ -68,26 +102,16 @@ router.post("/", async (req, res) => {
       timestamp
     };
 
-    if (end !== null && !isNaN(end)) {
-      loadData.endHour = end;
-    }
-
-    if (totalHours !== null && !isNaN(totalHours)) {
-      loadData.totalHours = totalHours;
-    }
+    if (end !== null && !isNaN(end)) loadData.endHour = end;
+    if (totalHours !== null && !isNaN(totalHours)) loadData.totalHours = totalHours;
 
     const newLoad = new Load(loadData);
     await newLoad.save();
 
     res.send(`
       <html>
-        <head>
-          <meta http-equiv="refresh" content="5; URL=/submit-load" />
-        </head>
-        <body>
-          <h2>✅ Load submitted successfully!</h2>
-          <p>Redirecting to the load form in 5 seconds...</p>
-        </body>
+        <head><meta http-equiv="refresh" content="5; URL=/submit-load" /></head>
+        <body><h2>✅ Load submitted successfully!</h2><p>Redirecting to the load form in 5 seconds...</p></body>
       </html>
     `);
   } catch (error) {
@@ -97,68 +121,11 @@ router.post("/", async (req, res) => {
 });
 
 // =========================
-// POST /submit-end-hour (Update endHour only)
-// =========================
-router.post("/submit-end-hour", async (req, res) => {
-  try {
-    const { tractor, farm, field, endHour } = req.body;
-
-    if (!tractor || !farm || !field || !endHour) {
-      return res.send(`<script>alert("⚠️ All fields are required."); window.location.href='/submit-load';</script>`);
-    }
-
-    const parsedEnd = parseFloat(endHour.replace(',', '.'));
-    const key = `${tractor}_${farm}`;
-    const start = tractorFarmStartHours[key];
-
-    if (!start || isNaN(start)) {
-      return res.send(`<script>alert("⚠️ No start hour tracked for this tractor and farm. Please submit a start hour first."); window.location.href='/submit-load';</script>`);
-    }
-
-    let totalHours = parsedEnd >= start ? parsedEnd - start : (24 - start + parsedEnd);
-    totalHours = Math.round(totalHours * 100) / 100;
-
-    const latestLoad = await Load.findOne({
-      tractor,
-      farm,
-      field,
-      endHour: { $exists: false }
-    }).sort({ timestamp: -1 });
-
-    if (!latestLoad) {
-      return res.send(`<script>alert("⚠️ No matching load found without an end hour."); window.location.href='/submit-load';</script>`);
-    }
-
-    latestLoad.endHour = parsedEnd;
-    latestLoad.totalHours = totalHours;
-    await latestLoad.save();
-
-    delete tractorFarmStartHours[key];
-
-    res.send(`
-      <html>
-        <head>
-          <meta http-equiv="refresh" content="4; URL=/submit-load" />
-        </head>
-        <body>
-          <h2>✅ End hour submitted and load updated successfully!</h2>
-          <p>Redirecting to the load form...</p>
-        </body>
-      </html>
-    `);
-  } catch (err) {
-    console.error("❌ Error submitting end hour:", err);
-    res.status(500).send("Server error");
-  }
-});
-
-// =========================
-// GET /load-history (Grouped view)
+// GET load-history (Grouped view)
 // =========================
 router.get("/load-history", async (req, res) => {
   try {
     const allLoads = await Load.find().populate("tractor");
-
     const grouped = {};
 
     allLoads.forEach(load => {
