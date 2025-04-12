@@ -1,3 +1,4 @@
+// Add this route inside your server.js or loadRoutes.js if not already there
 const express = require("express");
 const router = express.Router();
 const Load = require("./models/Load");
@@ -26,8 +27,8 @@ router.post("/submit-end-hour", async (req, res) => {
       tractor,
       farm,
       field,
-      endHour: end,
       startHour,
+      endHour: end, // Ensure only one endHour field is stored
       totalHours,
       timestamp: new Date(),
     });
