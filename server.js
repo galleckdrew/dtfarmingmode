@@ -91,16 +91,16 @@ app.get("/submit-load", requireLogin, async (req, res) => {
   }
 });
 
-// ✅ Test email route
 app.get("/send-test-report", async (req, res) => {
   try {
     await sendLoadReportEmail();
-    res.send("📬 Test email sent successfully!");
+    res.send("✅ Test report sent to galleckdrew@gmail.com");
   } catch (err) {
     console.error("❌ Failed to send test report:", err);
-    res.status(500).send("❌ Failed to send test report.");
+    res.status(500).send("❌ Failed to send test report");
   }
 });
+
 
 // ✅ 404 fallback
 app.get("*", (req, res) => {
