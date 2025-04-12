@@ -45,7 +45,7 @@ app.use("/admin", require("./adminRoutes"));
 app.use("/load", require("./loadRoutes"));
 app.use("/print-report", require("./printRoutes"));
 app.use(require("./driverHistoryRoute"));
-app.use(require("./submitEndHourRoute")); // ✅ Add this to support /submit-end-hour
+app.use(require("./routes/submitEndHourRoute")); // ✅ Correct route import
 
 // Test email route (optional)
 app.get("/send-test-report", async (req, res) => {
@@ -70,7 +70,7 @@ app.get("/", (req, res) => {
   res.redirect("/submit-load");
 });
 
-// ✅ Submit Load Form
+// Submit Load Form
 app.get("/submit-load", requireLogin, async (req, res) => {
   try {
     const tractors = await Tractor.find();
