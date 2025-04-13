@@ -41,6 +41,15 @@
     label {
       font-weight: bold;
     }
+    .tracked {
+      background: #222;
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 6px;
+    }
+    .tracked ul {
+      padding-left: 20px;
+    }
   </style>
 </head>
 <body>
@@ -49,7 +58,7 @@
     <h3>Total Gallons Today: <%= totalGallons %></h3>
 
     <% if (lastLoad) { %>
-      <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor.name %></p>
+      <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor?.name %></p>
     <% } %>
 
     <!-- Main Load Submission Form -->
@@ -61,4 +70,56 @@
             <%= t.name %> (<%= t.gallons %> gal)
           </option>
         <% }) %>
-      </select
+      </select>
+
+      <label for="farm">Farm:</label>
+      <select name="farm" required>
+        <% farms.forEach(f => { %>
+          <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>>
+            <%= f.name %>
+          </option>
+        <% }) %>
+      </select>
+
+      <label for="field">Field:</label>
+      <select name="field" required>
+        <% fields.forEach(f => { %>
+          <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>>
+            <%= f.name %>
+          </option>
+        <% }) %>
+      </select>
+
+      <label for="pit">Pit:</label>
+      <select name="pit" required>
+        <% pits.forEach(p => { %>
+          <option value="<%= p._id %>"><%= p.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="startHour">Start Hour (optional unless new farm):</label>
+      <input type="number" name="startHour" step="0.1" min="0" placeholder="Enter start hour">
+
+      <button type="submit">Submit Load</button>
+    </form>
+
+    <!-- End Hour Only Form -->
+    <form method="POST" action="/submit-end-hour">
+      <label for="endHour">Submit End Hour Only:</label>
+      <input type="number" name="endHour" step="0.1" min="0" placeholder="Enter end hour" required>
+      <button type="submit">Submit End Hour Only</button>
+    </form>
+
+    <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
+      <div class="tracked">
+        <h3>✅ Tracked Start Hours</h3>
+        <ul>
+          <% for (let key in trackedHours) { %>
+            <li><strong><%= key %></strong>: <%= trackedHours[key] %></li>
+          <% } %>
+        </ul>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>
