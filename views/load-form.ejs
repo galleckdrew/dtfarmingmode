@@ -12,7 +12,7 @@
       color: #fff;
     }
     .container {
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.75);
       padding: 20px;
       max-width: 600px;
       margin: 40px auto;
@@ -52,7 +52,7 @@
       <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor.name %></p>
     <% } %>
 
-    <!-- Main Load Submission Form -->
+    <!-- Submit Load Form -->
     <form method="POST" action="/load">
       <label for="tractor">Tractor:</label>
       <select name="tractor" required>
@@ -89,18 +89,36 @@
       </select>
 
       <label for="startHour">Start Hour (optional unless new farm):</label>
-      <input type="number" name="startHour" id="startHour" step="0.1" min="0" placeholder="Start Hour">
+      <input type="number" name="startHour" step="0.1" min="0" placeholder="Start Hour">
 
       <button type="submit">Submit Load</button>
     </form>
 
     <!-- Submit End Hour Only Form -->
     <form method="POST" action="/submit-end-hour">
-      <label for="endHourOnly">Submit End Hour Only:</label>
+      <h3>Submit End Hour Only</h3>
+
+      <label for="tractor">Tractor:</label>
+      <select name="tractor" required>
+        <% tractors.forEach(t => { %>
+          <option value="<%= t._id %>"><%= t.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="farm">Farm:</label>
+      <select name="farm" required>
+        <% farms.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="endHour">End Hour:</label>
       <input type="number" name="endHour" step="0.1" min="0" placeholder="Enter end hour" required>
-      <button type="submit">Submit End Hour Only</button>
+
+      <button type="submit">✅ Submit End Hour Only</button>
     </form>
 
+    <!-- Tracked Hours Display -->
     <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
       <div class="tracked">
         <h3>✅ Tracked Start Hours</h3>
