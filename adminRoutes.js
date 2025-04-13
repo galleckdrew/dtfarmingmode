@@ -5,10 +5,10 @@ const Farm = require("./models/Farm");
 const Field = require("./models/Field");
 const Pit = require("./models/Pit");
 
-// Memory tracking (shared from loadRoutes)
+// Load memory tracking
 const { tractorFarmStartHours } = require("./loadRoutes");
 
-// Load Admin Form
+// GET Admin Panel
 router.get("/form", async (req, res) => {
   try {
     const tractors = await Tractor.find();
@@ -16,22 +16,33 @@ router.get("/form", async (req, res) => {
     const fields = await Field.find();
     const pits = await Pit.find();
 
+    // Enhanced trackedStartHours display
+    const trackedStartHoursDisplay = {};
+    for (const key in tractorFarmStartHours) {
+      const [tractorId, farmId] = key.split("_");
+      const tractor = tractors.find(t => t._id.toString() === tractorId);
+      const farm = farms.find(f => f._id.toString() === farmId);
+      const label = tractor
+        ? `${tractor.name} (${tractor.gallons} gal)`
+        : tractorId;
+      const farmName = farm ? farm.name : farmId;
+      trackedStartHoursDisplay[`${label} → ${farmName}`] = tractorFarmStartHours[key];
+    }
+
     res.render("admin-form", {
       tractors,
       farms,
       fields,
       pits,
-      trackedStartHours: tractorFarmStartHours,
+      trackedStartHours: trackedStartHoursDisplay,
     });
-  } catch (error) {
-    console.error("❌ Error loading admin form:", error);
-    res.status(500).send("Error loading admin panel");
+  } catch (err) {
+    console.error("❌ Error loading admin form:", err);
+    res.status(500).send("Failed to load admin form");
   }
 });
 
-// --------------------
-// TRACTORS
-// --------------------
+// 🔧 TRACTOR Routes
 router.post("/tractors", async (req, res) => {
   const { name, gallons } = req.body;
   await Tractor.create({ name, gallons });
@@ -49,18 +60,14 @@ router.delete("/tractors/:id", async (req, res) => {
   res.redirect("/admin/form");
 });
 
-// --------------------
-// FARMS
-// --------------------
+// 🧑‍🌾 FARM Routes
 router.post("/farms", async (req, res) => {
-  const { name } = req.body;
-  await Farm.create({ name });
+  await Farm.create({ name: req.body.name });
   res.redirect("/admin/form");
 });
 
 router.put("/farms/:id", async (req, res) => {
-  const { name } = req.body;
-  await Farm.findByIdAndUpdate(req.params.id, { name });
+  await Farm.findByIdAndUpdate(req.params.id, { name: req.body.name });
   res.redirect("/admin/form");
 });
 
@@ -69,18 +76,14 @@ router.delete("/farms/:id", async (req, res) => {
   res.redirect("/admin/form");
 });
 
-// --------------------
-// FIELDS
-// --------------------
+// 🌾 FIELD Routes
 router.post("/fields", async (req, res) => {
-  const { name } = req.body;
-  await Field.create({ name });
+  await Field.create({ name: req.body.name });
   res.redirect("/admin/form");
 });
 
 router.put("/fields/:id", async (req, res) => {
-  const { name } = req.body;
-  await Field.findByIdAndUpdate(req.params.id, { name });
+  await Field.findByIdAndUpdate(req.params.id, { name: req.body.name });
   res.redirect("/admin/form");
 });
 
@@ -89,18 +92,14 @@ router.delete("/fields/:id", async (req, res) => {
   res.redirect("/admin/form");
 });
 
-// --------------------
-// PITS
-// --------------------
+// 💧 PIT Routes
 router.post("/pits", async (req, res) => {
-  const { name } = req.body;
-  await Pit.create({ name });
+  await Pit.create({ name: req.body.name });
   res.redirect("/admin/form");
 });
 
 router.put("/pits/:id", async (req, res) => {
-  const { name } = req.body;
-  await Pit.findByIdAndUpdate(req.params.id, { name });
+  await Pit.findByIdAndUpdate(req.params.id, { name: req.body.name });
   res.redirect("/admin/form");
 });
 
@@ -109,9 +108,7 @@ router.delete("/pits/:id", async (req, res) => {
   res.redirect("/admin/form");
 });
 
-// --------------------
-// TRACKING RESET
-// --------------------
+// 🧠 TRACKING RESET
 router.post("/reset-tracking", (req, res) => {
   const key = req.body.key;
   if (key && tractorFarmStartHours[key]) {
@@ -121,7 +118,7 @@ router.post("/reset-tracking", (req, res) => {
 });
 
 router.post("/reset-all-tracking", (req, res) => {
-  for (const key in tractorFarmStartHours) {
+  for (let key in tractorFarmStartHours) {
     delete tractorFarmStartHours[key];
   }
   res.redirect("/admin/form");
