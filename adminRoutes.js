@@ -4,28 +4,9 @@ const Tractor = require("./models/Tractor");
 const Farm = require("./models/Farm");
 const Field = require("./models/Field");
 const Pit = require("./models/Pit");
+
+// Memory tracking
 const { tractorFarmStartHours } = require("./loadRoutes");
-
-// Helper to get names from IDs
-async function getReadableTrackedHours() {
-  const tractors = await Tractor.find();
-  const farms = await Farm.find();
-
-  const readable = {};
-
-  for (const key in tractorFarmStartHours) {
-    const [tractorId, farmId] = key.split("_");
-    const tractor = tractors.find(t => t._id.toString() === tractorId);
-    const farm = farms.find(f => f._id.toString() === farmId);
-
-    const tractorName = tractor ? `${tractor.name} (${tractor.gallons} gal)` : tractorId;
-    const farmName = farm ? farm.name : farmId;
-
-    readable[`${tractorName} - ${farmName}`] = tractorFarmStartHours[key];
-  }
-
-  return readable;
-}
 
 // GET Admin Form
 router.get("/form", async (req, res) => {
@@ -35,51 +16,131 @@ router.get("/form", async (req, res) => {
     const fields = await Field.find();
     const pits = await Pit.find();
 
-    // Create ID-to-name maps for tracked start hours display
-    const tractorMap = {};
-    tractors.forEach(t => {
-      tractorMap[t._id] = `${t.name} – ${t.gallons} gal`;
-    });
+    // Convert tracked start hours into readable format
+    const trackedStartHoursReadable = {};
+    for (const key in tractorFarmStartHours) {
+      const [tractorId, farmId] = key.split("_");
+      const tractor = tractors.find(t => t._id.toString() === tractorId);
+      const farm = farms.find(f => f._id.toString() === farmId);
 
-    const farmMap = {};
-    farms.forEach(f => {
-      farmMap[f._id] = f.name;
-    });
+      const tractorLabel = tractor ? `${tractor.name} (${tractor.gallons} gal)` : tractorId;
+      const farmLabel = farm ? `${farm.name}` : farmId;
+
+      const displayKey = `${tractorLabel} / ${farmLabel}`;
+      trackedStartHoursReadable[displayKey] = tractorFarmStartHours[key];
+    }
 
     res.render("admin-form", {
       tractors,
       farms,
       fields,
       pits,
-      trackedStartHours: tractorFarmStartHours,
-      tractorMap,
-      farmMap,
+      trackedStartHours: trackedStartHoursReadable,
     });
   } catch (error) {
     console.error("❌ Error loading admin form:", error);
-    res.status(500).send("Failed to load admin panel");
+    res.status(500).send("Error loading admin panel");
   }
 });
 
-// Reset a specific start hour
+// ----------------------
+// TRACTORS
+// ----------------------
+router.post("/tractors", async (req, res) => {
+  const { name, gallons } = req.body;
+  await Tractor.create({ name, gallons });
+  res.redirect("/admin/form");
+});
+
+router.put("/tractors/:id", async (req, res) => {
+  const { name, gallons } = req.body;
+  await Tractor.findByIdAndUpdate(req.params.id, { name, gallons });
+  res.redirect("/admin/form");
+});
+
+router.delete("/tractors/:id", async (req, res) => {
+  await Tractor.findByIdAndDelete(req.params.id);
+  res.redirect("/admin/form");
+});
+
+// ----------------------
+// FARMS
+// ----------------------
+router.post("/farms", async (req, res) => {
+  const { name } = req.body;
+  await Farm.create({ name });
+  res.redirect("/admin/form");
+});
+
+router.put("/farms/:id", async (req, res) => {
+  const { name } = req.body;
+  await Farm.findByIdAndUpdate(req.params.id, { name });
+  res.redirect("/admin/form");
+});
+
+router.delete("/farms/:id", async (req, res) => {
+  await Farm.findByIdAndDelete(req.params.id);
+  res.redirect("/admin/form");
+});
+
+// ----------------------
+// FIELDS
+// ----------------------
+router.post("/fields", async (req, res) => {
+  const { name } = req.body;
+  await Field.create({ name });
+  res.redirect("/admin/form");
+});
+
+router.put("/fields/:id", async (req, res) => {
+  const { name } = req.body;
+  await Field.findByIdAndUpdate(req.params.id, { name });
+  res.redirect("/admin/form");
+});
+
+router.delete("/fields/:id", async (req, res) => {
+  await Field.findByIdAndDelete(req.params.id);
+  res.redirect("/admin/form");
+});
+
+// ----------------------
+// PITS
+// ----------------------
+router.post("/pits", async (req, res) => {
+  const { name } = req.body;
+  await Pit.create({ name });
+  res.redirect("/admin/form");
+});
+
+router.put("/pits/:id", async (req, res) => {
+  const { name } = req.body;
+  await Pit.findByIdAndUpdate(req.params.id, { name });
+  res.redirect("/admin/form");
+});
+
+router.delete("/pits/:id", async (req, res) => {
+  await Pit.findByIdAndDelete(req.params.id);
+  res.redirect("/admin/form");
+});
+
+// ----------------------
+// TRACKING RESET
+// ----------------------
 router.post("/reset-tracking", (req, res) => {
   const key = req.body.key;
-  for (const storedKey in tractorFarmStartHours) {
-    if (storedKey.includes(key)) {
-      delete tractorFarmStartHours[storedKey];
+  for (let k in tractorFarmStartHours) {
+    if (k.includes(key)) {
+      delete tractorFarmStartHours[k];
     }
   }
   res.redirect("/admin/form");
 });
 
-// Reset all
 router.post("/reset-all-tracking", (req, res) => {
   for (const key in tractorFarmStartHours) {
     delete tractorFarmStartHours[key];
   }
   res.redirect("/admin/form");
 });
-
-// Add/update/delete routes omitted for brevity...
 
 module.exports = router;
