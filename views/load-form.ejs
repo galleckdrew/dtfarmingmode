@@ -41,6 +41,11 @@
     label {
       font-weight: bold;
     }
+    .section {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 2px solid #888;
+    }
   </style>
 </head>
 <body>
@@ -52,31 +57,35 @@
       <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor.name %></p>
     <% } %>
 
+    <!-- 🚜 Main Load Form -->
     <form method="POST" action="/load">
-      <label for="tractor">Tractor:</label>
+      <label for="tractor">Tractor / Gallons / Crawler / Pump:</label>
       <select name="tractor" required>
         <% tractors.forEach(t => { %>
-          <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>><%= t.name %> (<%= t.gallons %> gal)</option>
+          <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>>
+            <%= t.name %> (<%= t.gallons %> gal)
+          </option>
         <% }) %>
       </select>
 
-      <label for="pump">Pump:</label>
-      <input type="text" name="pump" placeholder="Pump (optional)">
-
-      <label for="crawler">Crawler:</label>
       <input type="text" name="crawler" placeholder="Crawler (optional)">
+      <input type="text" name="pump" placeholder="Pump (optional)">
 
       <label for="farm">Farm:</label>
       <select name="farm" required>
         <% farms.forEach(f => { %>
-          <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>><%= f.name %></option>
+          <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>>
+            <%= f.name %>
+          </option>
         <% }) %>
       </select>
 
       <label for="field">Field:</label>
       <select name="field" required>
         <% fields.forEach(f => { %>
-          <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>><%= f.name %></option>
+          <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>>
+            <%= f.name %>
+          </option>
         <% }) %>
       </select>
 
@@ -88,13 +97,50 @@
       </select>
 
       <label for="startHour">Start Hour (optional unless new farm):</label>
-      <input type="number" name="startHour" id="startHour" step="0.1" min="0" placeholder="optional">
+      <input type="number" name="startHour" id="startHour" step="0.1" min="0" placeholder="Start Hour">
 
       <button type="submit">Submit Load</button>
     </form>
 
+    <!-- ✅ Submit End Hour Only -->
+    <form method="POST" action="/submit-end-hour" class="section">
+      <h3>Submit End Hour Only</h3>
+
+      <label for="tractor">Tractor:</label>
+      <select name="tractor" required>
+        <% tractors.forEach(t => { %>
+          <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>>
+            <%= t.name %>
+          </option>
+        <% }) %>
+      </select>
+
+      <label for="farm">Farm:</label>
+      <select name="farm" required>
+        <% farms.forEach(f => { %>
+          <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>>
+            <%= f.name %>
+          </option>
+        <% }) %>
+      </select>
+
+      <label for="field">Field:</label>
+      <select name="field" required>
+        <% fields.forEach(fl => { %>
+          <option value="<%= fl._id %>" <%= fl._id.toString() === selectedFieldId ? 'selected' : '' %>>
+            <%= fl.name %>
+          </option>
+        <% }) %>
+      </select>
+
+      <label for="endHour">End Hour:</label>
+      <input type="number" name="endHour" step="0.1" min="0" placeholder="Enter End Hour" required>
+
+      <button type="submit">Submit End Hour Only</button>
+    </form>
+
     <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
-      <div class="tracked">
+      <div class="tracked section">
         <h3>✅ Tracked Start Hours</h3>
         <ul>
           <% for (let key in trackedHours) { %>
