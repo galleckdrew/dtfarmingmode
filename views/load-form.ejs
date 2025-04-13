@@ -103,12 +103,14 @@
       <button type="submit">Submit Load</button>
     </form>
 
-    <!-- End Hour Only Form -->
-    <form method="POST" action="/submit-end-hour">
-      <label for="endHour">Submit End Hour Only:</label>
-      <input type="number" name="endHour" step="0.1" min="0" placeholder="Enter end hour" required>
-      <button type="submit">Submit End Hour Only</button>
-    </form>
+  <!-- Submit End Hour Only Form -->
+<form method="POST" action="/submit-end-hour">
+  <input type="hidden" name="tractor" value="<%= selectedTractorId %>">
+  <input type="hidden" name="farm" value="<%= selectedFarmId %>">
+  <label for="endHourOnly">Submit End Hour Only:</label>
+  <input type="number" name="endHour" step="0.1" min="0" placeholder="Enter end hour" required>
+  <button type="submit">Submit End Hour Only</button>
+</form>
 
     <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
       <div class="tracked">
