@@ -104,7 +104,7 @@
 
     <!-- Main Load Form -->
     <form action="/load" method="POST">
-      <label for="tractor">Tractor/Gallons:</label>
+      <label for="tractor">Tractor/Gallons/Pump/Crawler:</label>
       <select name="tractor" id="tractorSelect" required>
         <% tractors.forEach(t => { %>
           <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>>
