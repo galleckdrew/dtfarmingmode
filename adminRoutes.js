@@ -29,19 +29,36 @@ async function getReadableTrackedHours() {
 
 // GET Admin Form
 router.get("/form", async (req, res) => {
-  const tractors = await Tractor.find();
-  const farms = await Farm.find();
-  const fields = await Field.find();
-  const pits = await Pit.find();
-  const readableTrackedHours = await getReadableTrackedHours();
+  try {
+    const tractors = await Tractor.find();
+    const farms = await Farm.find();
+    const fields = await Field.find();
+    const pits = await Pit.find();
 
-  res.render("admin-form", {
-    tractors,
-    farms,
-    fields,
-    pits,
-    trackedStartHours: readableTrackedHours,
-  });
+    // Create ID-to-name maps for tracked start hours display
+    const tractorMap = {};
+    tractors.forEach(t => {
+      tractorMap[t._id] = `${t.name} – ${t.gallons} gal`;
+    });
+
+    const farmMap = {};
+    farms.forEach(f => {
+      farmMap[f._id] = f.name;
+    });
+
+    res.render("admin-form", {
+      tractors,
+      farms,
+      fields,
+      pits,
+      trackedStartHours: tractorFarmStartHours,
+      tractorMap,
+      farmMap,
+    });
+  } catch (error) {
+    console.error("❌ Error loading admin form:", error);
+    res.status(500).send("Failed to load admin panel");
+  }
 });
 
 // Reset a specific start hour
