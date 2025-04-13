@@ -12,7 +12,7 @@
       color: #fff;
     }
     .container {
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.75);
       padding: 20px;
       max-width: 600px;
       margin: 40px auto;
@@ -41,14 +41,10 @@
     label {
       font-weight: bold;
     }
-    .tracked {
+    .tracked ul {
       background: #222;
       padding: 10px;
-      margin-top: 20px;
       border-radius: 6px;
-    }
-    .tracked ul {
-      padding-left: 20px;
     }
   </style>
 </head>
@@ -58,10 +54,10 @@
     <h3>Total Gallons Today: <%= totalGallons %></h3>
 
     <% if (lastLoad) { %>
-      <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor?.name %></p>
+      <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor.name %></p>
     <% } %>
 
-    <!-- Main Load Submission Form -->
+    <!-- ✅ Submit Full Load -->
     <form method="POST" action="/load">
       <label for="tractor">Tractor:</label>
       <select name="tractor" required>
@@ -75,18 +71,14 @@
       <label for="farm">Farm:</label>
       <select name="farm" required>
         <% farms.forEach(f => { %>
-          <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>>
-            <%= f.name %>
-          </option>
+          <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>><%= f.name %></option>
         <% }) %>
       </select>
 
       <label for="field">Field:</label>
       <select name="field" required>
         <% fields.forEach(f => { %>
-          <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>>
-            <%= f.name %>
-          </option>
+          <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>><%= f.name %></option>
         <% }) %>
       </select>
 
@@ -100,32 +92,38 @@
       <label for="startHour">Start Hour (optional unless new farm):</label>
       <input type="number" name="startHour" step="0.1" min="0" placeholder="Enter start hour">
 
-      <button type="submit">Submit Load</button>
+      <button type="submit">✅ Submit Load</button>
     </form>
 
- <!-- Submit End Hour Only Form -->
-<form method="POST" action="/submit-end-hour">
-  <input type="hidden" name="tractor" value="<%= selectedTractorId || '' %>">
-  <input type="hidden" name="farm" value="<%= selectedFarmId || '' %>">
-  <label for="endHourOnly">Submit End Hour Only:</label>
-  <input type="number" name="endHour" step="0.1" min="0" placeholder="Enter end hour" required>
-  <button type="submit">Submit End Hour Only</button>
-</form>
+    <!-- ✅ Submit End Hour Only -->
+    <form method="POST" action="/submit-end-hour">
+      <label for="tractor">Tractor:</label>
+      <select name="tractor" required>
+        <% tractors.forEach(t => { %>
+          <option value="<%= t._id %>"><%= t.name %></option>
+        <% }) %>
+      </select>
 
+      <label for="farm">Farm:</label>
+      <select name="farm" required>
+        <% farms.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="endHour">End Hour Only:</label>
+      <input type="number" name="endHour" step="0.1" min="0" placeholder="Enter end hour" required>
+
+      <button type="submit">⏱️ Submit End Hour Only</button>
+    </form>
 
     <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
       <div class="tracked">
         <h3>✅ Tracked Start Hours</h3>
         <ul>
-        <% for (let key in trackedHours) {
-     const [tractorId, farmId] = key.split('_');
-     const tractorObj = tractors.find(t => t._id.toString() === tractorId);
-     const farmObj = farms.find(f => f._id.toString() === farmId);
-     const label = `${tractorObj?.name || tractorId} (${tractorObj?.gallons || '?'} gal) at ${farmObj?.name || farmId}`;
-%>
-  <li><strong><%= label %></strong>: <%= trackedHours[key] %></li>
-<% } %>
-
+          <% for (let key in trackedHours) { %>
+            <li><strong><%= key %></strong>: <%= trackedHours[key] %></li>
+          <% } %>
         </ul>
       </div>
     <% } %>
