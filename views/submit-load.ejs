@@ -4,117 +4,86 @@
   <title>🚜 Submit Load</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
       background: url("/dt-bg.png") no-repeat center center fixed;
       background-size: cover;
-      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      color: white;
+      color: #fff;
     }
-
-    .form-container {
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 30px;
-      max-width: 500px;
+    .container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      max-width: 600px;
       margin: 40px auto;
       border-radius: 10px;
     }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-size: 1.2em;
-    }
-
     select, input {
       width: 100%;
       padding: 10px;
-      font-size: 1.1em;
-      margin-top: 5px;
-      border-radius: 5px;
+      margin: 10px 0;
+      border-radius: 4px;
       border: none;
     }
-
-    .summary {
-      text-align: center;
-      margin-bottom: 20px;
-      font-weight: bold;
-    }
-
     button {
-      padding: 10px;
-      font-size: 1.1em;
-      background-color: #28a745;
-      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #4CAF50;
       border: none;
-      border-radius: 5px;
-      width: 100%;
+      color: white;
+      border-radius: 4px;
       cursor: pointer;
+      width: 100%;
     }
-
     .dual-buttons {
       display: flex;
       justify-content: space-between;
       gap: 10px;
       margin-top: 15px;
     }
-
     .dual-buttons form {
-      flex: 1;
+      margin: 0;
+      width: 48%;
     }
-
-    h1 {
+    .tracked {
+      background: #222;
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 6px;
+    }
+    .tracked ul {
+      padding-left: 20px;
+    }
+    h1, h2, h3 {
       text-align: center;
-      margin-bottom: 20px;
-      font-size: 2em;
     }
-
-    @media (max-width: 600px) {
-      .form-container {
-        padding: 20px;
-        margin: 20px;
-      }
-
-      h1 {
-        font-size: 1.5em;
-      }
-
-      .dual-buttons {
-        flex-direction: column;
-      }
-
-      .dual-buttons form {
-        width: 100%;
-      }
+    label {
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="form-container">
+  <div class="container">
     <h1>🚜 Submit Load</h1>
+    <h3>Total Gallons Today: <%= totalGallons %></h3>
 
-    <div class="summary">
-      <p>Total Gallons Today: <%= totalGallons %></p>
-      <% if (lastLoad) { %>
-        <p>Last Load: <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor?.name || "Unknown" %></p>
-      <% } else { %>
-        <p><em>No loads submitted today</em></p>
-      <% } %>
-    </div>
+    <% if (lastLoad) { %>
+      <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor.name %></p>
+    <% } %>
 
-    <!-- Main Load Form -->
-    <form action="/load" method="POST">
-      <label for="tractor">Tractor/Gallons:</label>
-      <select name="tractor" id="tractorSelect" required>
+    <!-- Load Submission Form -->
+    <form method="POST" action="/load">
+      <label for="tractor">Tractor:</label>
+      <select name="tractor" required>
         <% tractors.forEach(t => { %>
           <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>>
-            <%= t.name %> - <%= t.gallons %> gallons
+            <%= t.name %> (<%= t.gallons %> gal)
           </option>
         <% }) %>
       </select>
 
       <label for="farm">Farm:</label>
-      <select name="farm" id="farmSelect" required>
+      <select name="farm" required>
         <% farms.forEach(f => { %>
           <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>>
             <%= f.name %>
@@ -124,9 +93,9 @@
 
       <label for="field">Field:</label>
       <select name="field" required>
-        <% fields.forEach(fl => { %>
-          <option value="<%= fl._id %>" <%= fl._id.toString() === selectedFieldId ? 'selected' : '' %>>
-            <%= fl.name %>
+        <% fields.forEach(f => { %>
+          <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>>
+            <%= f.name %>
           </option>
         <% }) %>
       </select>
@@ -138,35 +107,31 @@
         <% }) %>
       </select>
 
-      <label for="startHour">Start Hour:</label>
-      <input type="number" name="startHour" placeholder="Optional">
+      <label for="startHour">Start Hour (optional unless new farm):</label>
+      <input type="number" name="startHour" id="startHour" step="0.1" min="0" placeholder="optional">
 
       <button type="submit">Submit Load</button>
     </form>
 
-    <!-- Separate End Hour Form -->
-    <div class="dual-buttons">
-      <form method="POST" action="/submit-end-hour">
-        <input type="hidden" name="tractor" value="<%= selectedTractorId || '' %>">
-        <input type="hidden" name="farm" value="<%= selectedFarmId || '' %>">
-        <input type="hidden" name="field" value="<%= selectedFieldId || '' %>">
-        <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
-        <button type="submit">Submit End Hour</button>
-      </form>
-    </div>
-  </div>
+    <!-- End Hour Submission Form -->
+    <form method="POST" action="/submit-end-hour" class="dual-buttons">
+      <input type="hidden" name="tractor" value="<%= selectedTractorId || '' %>">
+      <input type="hidden" name="farm" value="<%= selectedFarmId || '' %>">
+      <input type="hidden" name="field" value="<%= selectedFieldId || '' %>">
+      <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
+      <button type="submit">Submit End Hour</button>
+    </form>
 
-  <script>
-    let previousFarm = document.getElementById("farmSelect").value;
-    document.getElementById("farmSelect").addEventListener("change", function () {
-      const startHourInput = document.querySelector("input[name='startHour']");
-      if (!startHourInput.value) {
-        alert("⚠️ Please enter a start hour before switching farms.");
-        this.value = previousFarm;
-      } else {
-        previousFarm = this.value;
-      }
-    });
-  </script>
+    <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
+      <div class="tracked">
+        <h3>✅ Tracked Start Hours</h3>
+        <ul>
+          <% for (let key in trackedHours) { %>
+            <li><strong><%= key %></strong>: <%= trackedHours[key] %></li>
+          <% } %>
+        </ul>
+      </div>
+    <% } %>
+  </div>
 </body>
 </html>
