@@ -1,7 +1,8 @@
+// Add this route inside your server.js or loadRoutes.js if not already there
 const express = require("express");
 const router = express.Router();
-const Load = require("../models/Load"); // ✅ fixed path
-const tractorFarmStartHours = require("../trackedHours"); // ✅ fixed path
+const Load = require("../models/Load");
+const tractorFarmStartHours = require("../trackedHours");
 
 router.post("/submit-end-hour", async (req, res) => {
   try {
@@ -22,17 +23,27 @@ router.post("/submit-end-hour", async (req, res) => {
     let totalHours = end >= startHour ? end - startHour : (24 - startHour + end);
     totalHours = Math.round(totalHours * 100) / 100;
 
-    const newLoad = new Load({
+    // Update the most recent load that has the matching tractor, farm, and no endHour yet
+    const recentLoad = await Load.findOne({
       tractor,
       farm,
       field,
-      startHour,
-      endHour: end, // ✅ only one endHour field stored
-      totalHours,
-      timestamp: new Date(),
-    });
+      endHour: { $exists: false }
+    }).sort({ timestamp: -1 });
 
-    await newLoad.save();
+    if (!recentLoad) {
+      return res.send(`
+        <script>
+          alert('❌ No matching load found to update.');
+          window.location.href = '/submit-load';
+        </script>
+      `);
+    }
+
+    recentLoad.endHour = end;
+    recentLoad.totalHours = totalHours;
+    await recentLoad.save();
+
     delete tractorFarmStartHours[key];
 
     res.send(`
