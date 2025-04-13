@@ -1,7 +1,7 @@
 // Add this route inside your server.js or loadRoutes.js if not already there
 const express = require("express");
 const router = express.Router();
-const Load = require("./models/Load");
+const Load = require("../models/Load");
 const tractorFarmStartHours = require("./trackedHours");
 
 router.post("/submit-end-hour", async (req, res) => {
