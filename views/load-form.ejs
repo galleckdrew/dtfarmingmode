@@ -117,9 +117,15 @@
       <div class="tracked">
         <h3>✅ Tracked Start Hours</h3>
         <ul>
-          <% for (let key in trackedHours) { %>
-            <li><strong><%= key %></strong>: <%= trackedHours[key] %></li>
-          <% } %>
+        <% for (let key in trackedHours) {
+     const [tractorId, farmId] = key.split('_');
+     const tractorObj = tractors.find(t => t._id.toString() === tractorId);
+     const farmObj = farms.find(f => f._id.toString() === farmId);
+     const label = `${tractorObj?.name || tractorId} (${tractorObj?.gallons || '?'} gal) at ${farmObj?.name || farmId}`;
+%>
+  <li><strong><%= label %></strong>: <%= trackedHours[key] %></li>
+<% } %>
+
         </ul>
       </div>
     <% } %>
