@@ -38,8 +38,10 @@ router.post("/submit-end-hour", async (req, res) => {
     const readableKey = `${tractorData?.name || 'Tractor'} (${gallons} gal) | ${farmData?.name || 'Farm'}`;
 
     // Remove old raw ID key, set readable key
-    delete tractorFarmStartHours[key];
+    if (tractorFarmStartHours[key]) delete tractorFarmStartHours[key];
+    const readableKey = `${tractorData?.name} (${gallons} gal) – ${farmData?.name}`;
     tractorFarmStartHours[readableKey] = startHour;
+
 
     const newLoad = new Load({
       tractor,
