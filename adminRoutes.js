@@ -4,22 +4,32 @@ const Tractor = require("./models/Tractor");
 const Farm = require("./models/Farm");
 const Field = require("./models/Field");
 const Pit = require("./models/Pit");
-
 const { tractorFarmStartHours } = require("./loadRoutes");
 
-// Admin Form
+// Admin Form with readable tracked start hours
 router.get("/form", async (req, res) => {
   const tractors = await Tractor.find();
   const farms = await Farm.find();
   const fields = await Field.find();
   const pits = await Pit.find();
 
+  const readableTrackedHours = {};
+
+  for (const key in tractorFarmStartHours) {
+    const [tractorId, farmId] = key.split("_");
+    const tractor = tractors.find(t => t._id.toString() === tractorId);
+    const farm = farms.find(f => f._id.toString() === farmId);
+
+    const label = `${tractor?.name || tractorId} (${tractor?.gallons || "?"} gal) – ${farm?.name || farmId}`;
+    readableTrackedHours[label] = tractorFarmStartHours[key];
+  }
+
   res.render("admin-form", {
     tractors,
     farms,
     fields,
     pits,
-    trackedStartHours: tractorFarmStartHours,
+    trackedStartHours: readableTrackedHours,
   });
 });
 
@@ -105,5 +115,5 @@ router.post("/reset-all-tracking", (req, res) => {
   res.redirect("/admin/form");
 });
 
-// ✅ FIX: Add this line to EXPORT the router!
+// ✅ Export the router
 module.exports = router;
