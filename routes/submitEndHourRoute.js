@@ -1,3 +1,4 @@
+
 const express = require("express");
 const router = express.Router();
 const Load = require("../models/Load");
@@ -44,9 +45,12 @@ router.post("/submit-end-hour", async (req, res) => {
     });
 
     await newLoad.save();
-    delete tractorFarmStartHours[key];
 
-    // Use readable label for logging or display
+    // 🔄 Replace ID-based key with readable label key
+    if (tractorFarmStartHours[key]) {
+      delete tractorFarmStartHours[key];
+    }
+
     const readableLabel = `${tractorData?.name} (${gallons} gal) – ${farmData?.name}`;
     tractorFarmStartHours[readableLabel] = startHour;
 
