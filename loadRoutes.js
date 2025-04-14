@@ -28,7 +28,6 @@ router.get("/submit-load", async (req, res) => {
     });
 
     const totalGallons = loadsToday.reduce((sum, load) => sum + (load.gallons || 0), 0);
-
     const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor farm field");
 
     res.render("load-form", {
@@ -50,46 +49,43 @@ router.get("/submit-load", async (req, res) => {
 });
 
 // =========================
-// GET tracked hours
-// =========================
-router.get("/tracked-hours", (req, res) => {
-  res.json(tractorFarmStartHours);
-});
-
-// =========================
 // POST / (Submit Load)
 // =========================
 router.post("/", async (req, res) => {
   try {
     const { tractor, farm, field, pit, startHour, endHour } = req.body;
     const tractorData = await Tractor.findById(tractor);
-    if (!tractorData) return res.status(404).json({ error: "Tractor not found" });
+    const farmData = await Farm.findById(farm);
+    if (!tractorData || !farmData) return res.status(404).send("Tractor or Farm not found");
 
     const gallons = tractorData.gallons;
     const timestamp = new Date();
     const key = `${tractor}_${farm}`;
+    const readableKey = `${tractorData.name} (${gallons} gal) – ${farmData.name}`;
 
-    let start = startHour
-      ? parseFloat(startHour.replace(',', '.'))
-      : tractorFarmStartHours[key];
+    let start = startHour ? parseFloat(startHour.replace(',', '.')) : tractorFarmStartHours[key];
     let end = endHour ? parseFloat(endHour.replace(',', '.')) : null;
     let totalHours = null;
 
     if ((start === undefined || isNaN(start)) && !tractorFarmStartHours[key]) {
       return res.send(`
         <script>
-          alert('⚠️ Please enter a start hour for this tractor before using this farm. Each farm needs its own start hour.');
+          alert('⚠️ Please enter a start hour for this tractor before using this farm.');
           window.location.href = '/submit-load';
         </script>
       `);
     }
 
-    if (startHour) tractorFarmStartHours[key] = Number(startHour);
+    if (startHour) {
+      tractorFarmStartHours[key] = Number(startHour);
+      tractorFarmStartHours[readableKey] = Number(startHour);
+    }
 
     if (start !== null && end !== null && !isNaN(start) && !isNaN(end)) {
       totalHours = end >= start ? end - start : (24 - start + end);
       totalHours = Math.round(totalHours * 100) / 100;
       delete tractorFarmStartHours[key];
+      delete tractorFarmStartHours[readableKey];
     }
 
     const loadData = {
@@ -116,7 +112,7 @@ router.post("/", async (req, res) => {
     `);
   } catch (error) {
     console.error("❌ Error submitting load:", error);
-    res.status(500).json({ error: "❌ Failed to submit load" });
+    res.status(500).send("❌ Failed to submit load");
   }
 });
 
@@ -139,15 +135,14 @@ router.post("/submit-end-hour", async (req, res) => {
     }
 
     const end = parseFloat(endHour.replace(',', '.'));
-    let totalHours = end >= startHour ? end - startHour : (24 - startHour + end);
-    totalHours = Math.round(totalHours * 100) / 100;
+    const totalHours = Math.round((end >= startHour ? end - startHour : (24 - startHour + end)) * 100) / 100;
 
     const newLoad = new Load({
       tractor,
       farm,
       field,
-      endHour: end,
       startHour,
+      endHour: end,
       totalHours,
       timestamp: new Date(),
     });
@@ -168,7 +163,7 @@ router.post("/submit-end-hour", async (req, res) => {
 });
 
 // =========================
-// GET load-history (Grouped view)
+// GET /load-history
 // =========================
 router.get("/load-history", async (req, res) => {
   try {
