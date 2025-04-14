@@ -9,7 +9,7 @@ const Pit = require("./models/Pit");
 const tractorFarmStartHours = require("./trackedHours");
 
 // =========================
-// GET Load Form (submit-load)
+// GET Load Form
 // =========================
 router.get("/submit-load", async (req, res) => {
   try {
@@ -60,14 +60,13 @@ router.post("/", async (req, res) => {
 
     const gallons = tractorData.gallons;
     const timestamp = new Date();
-    const key = `${tractor}_${farm}`;
     const readableKey = `${tractorData.name} (${gallons} gal) – ${farmData.name}`;
 
-    let start = startHour ? parseFloat(startHour.replace(',', '.')) : tractorFarmStartHours[key];
+    let start = startHour ? parseFloat(startHour.replace(',', '.')) : tractorFarmStartHours[readableKey];
     let end = endHour ? parseFloat(endHour.replace(',', '.')) : null;
     let totalHours = null;
 
-    if ((start === undefined || isNaN(start)) && !tractorFarmStartHours[key]) {
+    if ((start === undefined || isNaN(start)) && !tractorFarmStartHours[readableKey]) {
       return res.send(`
         <script>
           alert('⚠️ Please enter a start hour for this tractor before using this farm.');
@@ -77,14 +76,12 @@ router.post("/", async (req, res) => {
     }
 
     if (startHour) {
-      tractorFarmStartHours[key] = Number(startHour);
       tractorFarmStartHours[readableKey] = Number(startHour);
     }
 
     if (start !== null && end !== null && !isNaN(start) && !isNaN(end)) {
       totalHours = end >= start ? end - start : (24 - start + end);
       totalHours = Math.round(totalHours * 100) / 100;
-      delete tractorFarmStartHours[key];
       delete tractorFarmStartHours[readableKey];
     }
 
@@ -122,8 +119,11 @@ router.post("/", async (req, res) => {
 router.post("/submit-end-hour", async (req, res) => {
   try {
     const { tractor, farm, field, endHour } = req.body;
-    const key = `${tractor}_${farm}`;
-    const startHour = tractorFarmStartHours[key];
+    const tractorData = await Tractor.findById(tractor);
+    const farmData = await Farm.findById(farm);
+    const gallons = tractorData?.gallons || 0;
+    const readableKey = `${tractorData?.name} (${gallons} gal) – ${farmData?.name}`;
+    const startHour = tractorFarmStartHours[readableKey];
 
     if (!startHour || isNaN(startHour)) {
       return res.send(`
@@ -144,11 +144,12 @@ router.post("/submit-end-hour", async (req, res) => {
       startHour,
       endHour: end,
       totalHours,
+      gallons,
       timestamp: new Date(),
     });
 
     await newLoad.save();
-    delete tractorFarmStartHours[key];
+    delete tractorFarmStartHours[readableKey];
 
     res.send(`
       <html>
