@@ -9,31 +9,26 @@
       margin: 0;
       padding: 0;
     }
-
     header {
       background-color: #1f2a40;
       color: #fff;
       padding: 20px;
       text-align: center;
     }
-
     header img {
       height: 60px;
       display: block;
       margin: 0 auto 10px;
     }
-
     h1 {
       margin: 0;
       font-size: 24px;
     }
-
     .container {
       max-width: 900px;
       margin: 30px auto;
       padding: 20px;
     }
-
     .section {
       background: #fff;
       padding: 20px;
@@ -41,35 +36,29 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       margin-bottom: 30px;
     }
-
     h2 {
       margin-bottom: 15px;
       border-bottom: 2px solid #eee;
       padding-bottom: 5px;
     }
-
     ul {
       list-style: none;
       padding: 0;
       margin-bottom: 15px;
     }
-
     li {
       margin-bottom: 8px;
     }
-
     form {
       display: inline-block;
       margin: 4px 4px 0 0;
     }
-
     input[type="text"], input[type="number"] {
       padding: 6px;
       font-size: 14px;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-
     button {
       padding: 6px 12px;
       font-size: 14px;
@@ -79,15 +68,12 @@
       color: white;
       cursor: pointer;
     }
-
     button:hover {
       background: #1b5e20;
     }
-
     .clear-btn {
       background: #c62828;
     }
-
     .clear-btn:hover {
       background: #8e0000;
     }
@@ -140,20 +126,18 @@
 
     <div class="section">
       <h2>⏱️ Tracked Start Hours</h2>
-      <% if (trackedStartHours && Object.keys(trackedStartHours).length > 0) { %>
+      <% const readableKeys = Object.keys(trackedStartHours).filter(key => !key.includes("_")); %>
+      <% if (readableKeys.length > 0) { %>
         <ul>
-          <% Object.entries(trackedStartHours).forEach(([key, hour]) => {
-              if (!key.match(/^[a-f0-9]{24}_[a-f0-9]{24}$/)) {
-                const [tractorName, farmName] = key.split(" | ");
-          %>
+          <% readableKeys.forEach(key => { %>
             <li>
-              <strong><%= tractorName %> – <%= farmName %></strong>: <%= hour %>
+              <strong><%= key %></strong>: <%= trackedStartHours[key] %>
               <form method="POST" action="/admin/reset-tracking" style="display:inline">
                 <input type="hidden" name="key" value="<%= key %>">
                 <button class="clear-btn" type="submit">❌ Clear</button>
               </form>
             </li>
-          <% } }) %>
+          <% }) %>
         </ul>
         <form method="POST" action="/admin/reset-all-tracking">
           <button class="clear-btn">🚫 Clear All Tracked Hours</button>
