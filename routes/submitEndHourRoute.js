@@ -34,15 +34,18 @@ router.post("/submit-end-hour", async (req, res) => {
     const farmData = await Farm.findById(farm);
     const gallons = tractorData?.gallons || 0;
 
-    const readableKey = `${tractorData?.name || 'Tractor'} (${gallons} gal) – ${farmData?.name || 'Farm'}`;
+    // Generate readable key for admin display
+    const readableKey = `${tractorData?.name || 'Tractor'} (${gallons} gal) | ${farmData?.name || 'Farm'}`;
+
+    // Remove old raw ID key, set readable key
     delete tractorFarmStartHours[key];
     tractorFarmStartHours[readableKey] = startHour;
 
     const newLoad = new Load({
       tractor,
       farm,
-      field,
-      pit,
+      field: field || undefined,
+      pit: pit || undefined,
       startHour,
       endHour: end,
       totalHours,
@@ -55,7 +58,10 @@ router.post("/submit-end-hour", async (req, res) => {
     res.send(`
       <html>
         <head><meta http-equiv="refresh" content="5; URL=/submit-load" /></head>
-        <body><h2>✅ End hour submitted successfully!</h2><p>Redirecting to the load form in 5 seconds...</p></body>
+        <body>
+          <h2>✅ End hour submitted successfully!</h2>
+          <p>Redirecting to the load form in 5 seconds...</p>
+        </body>
       </html>
     `);
   } catch (error) {

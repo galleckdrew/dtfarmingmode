@@ -142,20 +142,18 @@
       <h2>⏱️ Tracked Start Hours</h2>
       <% if (trackedStartHours && Object.keys(trackedStartHours).length > 0) { %>
         <ul>
-          <% Object.entries(trackedStartHours).forEach(([key, hour]) => { 
-  const [tractorId, farmId] = key.split('_');
-  const label = `${tractorMap[tractorId] || tractorId} @ ${farmMap[farmId] || farmId}`;
+            <% Object.entries(trackedStartHours).forEach(([key, hour]) => { 
+     const [tractorName, farmName] = key.split(" | ");
 %>
   <li>
-    <strong><%= label %></strong>: <%= hour %>
-
-              <form method="POST" action="/admin/reset-tracking" style="display:inline">
-                <input type="hidden" name="key" value="<%= key %>">
-                <button class="clear-btn" type="submit">❌ Clear</button>
-              </form>
-            </li>
-          <% }) %>
-        </ul>
+    <strong><%= tractorName %> – <%= farmName %></strong>: <%= hour %>
+    <form method="POST" action="/admin/reset-tracking" style="display:inline">
+      <input type="hidden" name="key" value="<%= key %>">
+      <button class="clear-btn" type="submit">❌ Clear</button>
+    </form>
+  </li>
+<% }) %>
+      </ul>
         <form method="POST" action="/admin/reset-all-tracking">
           <button class="clear-btn">🚫 Clear All Tracked Hours</button>
         </form>
