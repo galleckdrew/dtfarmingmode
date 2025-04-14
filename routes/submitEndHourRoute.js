@@ -31,7 +31,12 @@ router.post("/submit-end-hour", async (req, res) => {
     totalHours = Math.round(totalHours * 100) / 100;
 
     const tractorData = await Tractor.findById(tractor);
+    const farmData = await Farm.findById(farm);
     const gallons = tractorData?.gallons || 0;
+
+    const readableKey = `${tractorData?.name || 'Tractor'} (${gallons} gal) – ${farmData?.name || 'Farm'}`;
+    delete tractorFarmStartHours[key];
+    tractorFarmStartHours[readableKey] = startHour;
 
     const newLoad = new Load({
       tractor,
@@ -46,7 +51,6 @@ router.post("/submit-end-hour", async (req, res) => {
     });
 
     await newLoad.save();
-    delete tractorFarmStartHours[key];
 
     res.send(`
       <html>
