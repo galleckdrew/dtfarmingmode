@@ -5,7 +5,6 @@ const Farm = require("./models/Farm");
 const Field = require("./models/Field");
 const Pit = require("./models/Pit");
 
-// Memory tracking
 const { tractorFarmStartHours } = require("./loadRoutes");
 
 // GET Admin Form
@@ -16,18 +15,16 @@ router.get("/form", async (req, res) => {
     const fields = await Field.find();
     const pits = await Pit.find();
 
-    // Convert tracked start hours into readable format
-    const trackedStartHoursReadable = {};
+    // Build a human-readable version of tracked start hours
+    const displayTrackedHours = {};
     for (const key in tractorFarmStartHours) {
       const [tractorId, farmId] = key.split("_");
+
       const tractor = tractors.find(t => t._id.toString() === tractorId);
       const farm = farms.find(f => f._id.toString() === farmId);
 
-      const tractorLabel = tractor ? `${tractor.name} (${tractor.gallons} gal)` : tractorId;
-      const farmLabel = farm ? `${farm.name}` : farmId;
-
-      const displayKey = `${tractorLabel} / ${farmLabel}`;
-      trackedStartHoursReadable[displayKey] = tractorFarmStartHours[key];
+      const readableKey = `${tractor?.name || tractorId} (${tractor?.gallons || '?'} gal) – ${farm?.name || farmId}`;
+      displayTrackedHours[readableKey] = tractorFarmStartHours[key];
     }
 
     res.render("admin-form", {
@@ -35,7 +32,7 @@ router.get("/form", async (req, res) => {
       farms,
       fields,
       pits,
-      trackedStartHours: trackedStartHoursReadable,
+      trackedStartHours: displayTrackedHours,
     });
   } catch (error) {
     console.error("❌ Error loading admin form:", error);
@@ -43,9 +40,7 @@ router.get("/form", async (req, res) => {
   }
 });
 
-// ----------------------
 // TRACTORS
-// ----------------------
 router.post("/tractors", async (req, res) => {
   const { name, gallons } = req.body;
   await Tractor.create({ name, gallons });
@@ -63,9 +58,7 @@ router.delete("/tractors/:id", async (req, res) => {
   res.redirect("/admin/form");
 });
 
-// ----------------------
 // FARMS
-// ----------------------
 router.post("/farms", async (req, res) => {
   const { name } = req.body;
   await Farm.create({ name });
@@ -83,9 +76,7 @@ router.delete("/farms/:id", async (req, res) => {
   res.redirect("/admin/form");
 });
 
-// ----------------------
 // FIELDS
-// ----------------------
 router.post("/fields", async (req, res) => {
   const { name } = req.body;
   await Field.create({ name });
@@ -103,9 +94,7 @@ router.delete("/fields/:id", async (req, res) => {
   res.redirect("/admin/form");
 });
 
-// ----------------------
 // PITS
-// ----------------------
 router.post("/pits", async (req, res) => {
   const { name } = req.body;
   await Pit.create({ name });
@@ -123,24 +112,12 @@ router.delete("/pits/:id", async (req, res) => {
   res.redirect("/admin/form");
 });
 
-// ----------------------
 // TRACKING RESET
-// ----------------------
 router.post("/reset-tracking", (req, res) => {
   const key = req.body.key;
-  for (let k in tractorFarmStartHours) {
-    if (k.includes(key)) {
-      delete tractorFarmStartHours[k];
-    }
-  }
-  res.redirect("/admin/form");
-});
-
-router.post("/reset-all-tracking", (req, res) => {
-  for (const key in tractorFarmStartHours) {
-    delete tractorFarmStartHours[key];
-  }
-  res.redirect("/admin/form");
-});
-
-module.exports = router;
+  if (key) {
+    // Match against internal ID-based keys
+    for (const internalKey in tractorFarmStartHours) {
+      if (internalKey.includes(key)) {
+        delete tractorFarmStartHours[internalKey];
+      }

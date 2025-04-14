@@ -1,16 +1,23 @@
-// Add this route inside your server.js or loadRoutes.js if not already there
 const express = require("express");
 const router = express.Router();
 const Load = require("../models/Load");
+const Tractor = require("../models/Tractor");
+const Farm = require("../models/Farm");
+const Field = require("../models/Field");
+const Pit = require("../models/Pit");
 const tractorFarmStartHours = require("../trackedHours");
 
+// 🚜 Submit End Hour Route
 router.post("/submit-end-hour", async (req, res) => {
   try {
-    const { tractor, farm, field, endHour } = req.body;
+    const { tractor, farm, field, pit, endHour } = req.body;
     const key = `${tractor}_${farm}`;
     const startHour = tractorFarmStartHours[key];
 
-    if (!startHour || isNaN(startHour)) {
+    console.log("🚜 Tracked Hours:", tractorFarmStartHours);
+    console.log("🔍 Looking for key:", key);
+
+    if (startHour === undefined || isNaN(startHour)) {
       return res.send(`
         <script>
           alert('⚠️ No start hour found for this tractor and farm. Please submit a start hour first.');
@@ -23,33 +30,33 @@ router.post("/submit-end-hour", async (req, res) => {
     let totalHours = end >= startHour ? end - startHour : (24 - startHour + end);
     totalHours = Math.round(totalHours * 100) / 100;
 
-    // Update the most recent load that has the matching tractor, farm, and no endHour yet
-    const recentLoad = await Load.findOne({
+    const tractorData = await Tractor.findById(tractor);
+    const farmData = await Farm.findById(farm);
+    const gallons = tractorData?.gallons || 0;
+
+    const newLoad = new Load({
       tractor,
       farm,
-      field,
-      endHour: { $exists: false }
-    }).sort({ timestamp: -1 });
+      field: field || undefined,  // optional
+      pit: pit || undefined,      // optional
+      startHour,
+      endHour: end,
+      totalHours,
+      gallons,
+      timestamp: new Date(),
+    });
 
-    if (!recentLoad) {
-      return res.send(`
-        <script>
-          alert('❌ No matching load found to update.');
-          window.location.href = '/submit-load';
-        </script>
-      `);
-    }
-
-    recentLoad.endHour = end;
-    recentLoad.totalHours = totalHours;
-    await recentLoad.save();
+    await newLoad.save();
 
     delete tractorFarmStartHours[key];
 
     res.send(`
       <html>
         <head><meta http-equiv="refresh" content="5; URL=/submit-load" /></head>
-        <body><h2>✅ End hour submitted successfully!</h2><p>Redirecting to the load form in 5 seconds...</p></body>
+        <body>
+          <h2>✅ End hour submitted successfully!</h2>
+          <p>Redirecting to the load form in 5 seconds...</p>
+        </body>
       </html>
     `);
   } catch (error) {
