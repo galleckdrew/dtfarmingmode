@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 const setupEmailScheduler = require("./emailScheduler");
 setupEmailScheduler();
 
-// Memory for tracking start hours per tractor/farm
+// Memory store for start hours
 const tractorFarmStartHours = require("./trackedHours");
 
 // Models
@@ -22,7 +22,7 @@ const Field = require("./models/Field");
 const Pit = require("./models/Pit");
 const Load = require("./models/Load");
 
-// View engine setup
+// View engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -42,12 +42,11 @@ app.use(
 // Routes
 app.use("/auth", require("./auth"));
 app.use("/admin", require("./adminRoutes"));
-app.use("/load", require("./loadRoutes"));
+app.use("/load", require("./routes/loadRoutes"));
 app.use("/print-report", require("./printRoutes"));
 app.use(require("./driverHistoryRoute"));
-app.use(require("./routes/submitEndHourRoute")); // ✅ Correct route import
 
-// Test email route (optional)
+// Test email report
 app.get("/send-test-report", async (req, res) => {
   const { sendLoadReportEmail } = require("./emailReport");
   try {
@@ -59,18 +58,18 @@ app.get("/send-test-report", async (req, res) => {
   }
 });
 
-// Login guard
+// Login check middleware
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect("/auth/login");
   next();
 }
 
-// Home route
+// Home redirect
 app.get("/", (req, res) => {
   res.redirect("/submit-load");
 });
 
-// Submit Load Form
+// Submit Load Page
 app.get("/submit-load", requireLogin, async (req, res) => {
   try {
     const tractors = await Tractor.find();
@@ -95,8 +94,8 @@ app.get("/submit-load", requireLogin, async (req, res) => {
       fields,
       pits,
       totalGallons,
-      lastLoad,
       trackedHours: tractorFarmStartHours,
+      lastLoad,
       selectedTractorId: lastLoad?.tractor?._id?.toString() || '',
       selectedFarmId: lastLoad?.farm?._id?.toString() || '',
       selectedFieldId: lastLoad?.field?._id?.toString() || ''
