@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>🚜 Driver Load History</title>
+  <title>🚜 Driver Load & Fuel History</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     table { border-collapse: collapse; width: 100%; margin-top: 20px; }
@@ -12,10 +12,11 @@
     .actions { display: flex; gap: 10px; justify-content: center; }
     .actions form { display: inline; }
     button { padding: 4px 8px; }
+    .fuel-row { background-color: #fffbe6; font-style: italic; }
   </style>
 </head>
 <body>
-  <h1>🚜 Driver Load History</h1>
+  <h1>🚜 Driver Load & Fuel History</h1>
 
   <!-- Filter Form -->
   <form class="filter-form" method="GET" action="/driver-history">
@@ -53,7 +54,8 @@
   <div class="summary">
     Total Loads: <%= totalLoads %> |
     Total Gallons: <%= totalGallons %> |
-    Total Hours: <%= totalHours.toFixed(2) %>
+    Total Hours: <%= totalHours.toFixed(2) %> |
+    Total Fuel: <%= totalFuel.toFixed(2) %> gal
   </div>
 
   <!-- Load Table -->
@@ -69,40 +71,68 @@
         <th>Start Hour</th>
         <th>End Hour</th>
         <th>Total Hours</th>
+        <th>Fuel</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      <% loads.forEach(load => { %>
-        <tr>
-          <td>
-            <%= new Date(load.timestamp).toLocaleString("en-US", {
-              timeZone: "America/New_York",
-              hour12: true,
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit"
-            }) %>
-          </td>
-          <td><%= load.tractor?.name || '' %></td>
-          <td><%= load.farm?.name || '' %></td>
-          <td><%= load.field?.name || '' %></td>
-          <td><%= load.pit?.name || '' %></td>
-          <td><%= load.gallons ?? '' %></td>
-          <td><%= load.startHour ?? '' %></td>
-          <td><%= load.endHour ?? '' %></td>
-          <td><%= load.totalHours?.toFixed(2) ?? '' %></td>
-          <td class="actions">
-            <form method="GET" action="/driver-history/<%= load._id %>/edit">
-              <button>Edit</button>
-            </form>
-            <form method="POST" action="/driver-history/<%= load._id %>?_method=DELETE">
-              <button>Delete</button>
-            </form>
-          </td>
-        </tr>
+      <% allEntries.forEach(entry => { %>
+        <% if (entry.type === 'load') { const load = entry.data; %>
+          <tr>
+            <td>
+              <%= new Date(load.timestamp).toLocaleString("en-US", {
+                timeZone: "America/New_York",
+                hour12: true,
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+              }) %>
+            </td>
+            <td><%= load.tractor?.name || '' %></td>
+            <td><%= load.farm?.name || '' %></td>
+            <td><%= load.field?.name || '' %></td>
+            <td><%= load.pit?.name || '' %></td>
+            <td><%= load.gallons ?? '' %></td>
+            <td><%= load.startHour ?? '' %></td>
+            <td><%= load.endHour ?? '' %></td>
+            <td><%= load.totalHours?.toFixed(2) ?? '' %></td>
+            <td></td>
+            <td class="actions">
+              <form method="GET" action="/driver-history/<%= load._id %>/edit">
+                <button>Edit</button>
+              </form>
+              <form method="POST" action="/driver-history/<%= load._id %>?_method=DELETE">
+                <button>Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% } else if (entry.type === 'fuel') { const fuel = entry.data; %>
+          <tr class="fuel-row">
+            <td>
+              <%= new Date(fuel.timestamp).toLocaleString("en-US", {
+                timeZone: "America/New_York",
+                hour12: true,
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+              }) %>
+            </td>
+            <td><%= fuel.tractor?.name || '' %></td>
+            <td></td>
+            <td><%= fuel.field?.name || '' %></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong><%= fuel.amount %> gal</strong></td>
+            <td></td>
+          </tr>
+        <% } %>
       <% }) %>
     </tbody>
   </table>

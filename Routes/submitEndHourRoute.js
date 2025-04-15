@@ -14,9 +14,6 @@ router.post("/submit-end-hour", async (req, res) => {
     const key = `${tractor}_${farm}`;
     const startHour = tractorFarmStartHours[key];
 
-    console.log("🚜 Tracked Hours:", tractorFarmStartHours);
-    console.log("🔍 Looking for key:", key);
-
     if (startHour === undefined || isNaN(startHour)) {
       return res.send(`
         <script>
@@ -34,11 +31,18 @@ router.post("/submit-end-hour", async (req, res) => {
     const farmData = await Farm.findById(farm);
     const gallons = tractorData?.gallons || 0;
 
+    // ✅ Remove raw key before saving readable version
+    delete tractorFarmStartHours[key];
+
+    // ✅ Save readable key
+    const readableLabel = `${tractorData?.name} (${gallons} gal) – ${farmData?.name}`;
+    tractorFarmStartHours[readableLabel] = startHour;
+
     const newLoad = new Load({
       tractor,
       farm,
-      field: field || undefined,  // optional
-      pit: pit || undefined,      // optional
+      field: field || undefined,
+      pit: pit || undefined,
       startHour,
       endHour: end,
       totalHours,
@@ -48,15 +52,10 @@ router.post("/submit-end-hour", async (req, res) => {
 
     await newLoad.save();
 
-    delete tractorFarmStartHours[key];
-
     res.send(`
       <html>
         <head><meta http-equiv="refresh" content="5; URL=/submit-load" /></head>
-        <body>
-          <h2>✅ End hour submitted successfully!</h2>
-          <p>Redirecting to the load form in 5 seconds...</p>
-        </body>
+        <body><h2>✅ End hour submitted successfully!</h2><p>Redirecting to the load form in 5 seconds...</p></body>
       </html>
     `);
   } catch (error) {
