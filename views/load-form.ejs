@@ -12,7 +12,7 @@
       color: #fff;
     }
     .container {
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.75);
       padding: 20px;
       max-width: 600px;
       margin: 40px auto;
@@ -41,70 +41,105 @@
     label {
       font-weight: bold;
     }
+    .section {
+      margin-bottom: 30px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🚜 Submit Load</h1>
     <h3>Total Gallons Today: <%= totalGallons %></h3>
+    <h3>Total Fuel Used Today: <%= totalFuel %></h3>
 
     <% if (lastLoad) { %>
       <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor.name %></p>
     <% } %>
 
-    <!-- Main Load Submission Form -->
-    <form method="POST" action="/load">
-      <label for="tractor">Tractor:</label>
-      <select name="tractor" required>
-        <% tractors.forEach(t => { %>
-          <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>>
-            <%= t.name %> (<%= t.gallons %> gal)
-          </option>
-        <% }) %>
-      </select>
+    <!-- Main Load Form -->
+    <div class="section">
+      <form method="POST" action="/load">
+        <label for="tractor">Tractor:</label>
+        <select name="tractor" required>
+          <% tractors.forEach(t => { %>
+            <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>>
+              <%= t.name %> (<%= t.gallons %> gal)
+            </option>
+          <% }) %>
+        </select>
 
-      <label for="farm">Farm:</label>
-      <select name="farm" required>
-        <% farms.forEach(f => { %>
-          <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>>
-            <%= f.name %>
-          </option>
-        <% }) %>
-      </select>
+        <label for="farm">Farm:</label>
+        <select name="farm" required>
+          <% farms.forEach(f => { %>
+            <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>>
+              <%= f.name %>
+            </option>
+          <% }) %>
+        </select>
 
-      <label for="field">Field:</label>
-      <select name="field" required>
-        <% fields.forEach(f => { %>
-          <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>>
-            <%= f.name %>
-          </option>
-        <% }) %>
-      </select>
+        <label for="field">Field:</label>
+        <select name="field" required>
+          <% fields.forEach(f => { %>
+            <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>>
+              <%= f.name %>
+            </option>
+          <% }) %>
+        </select>
 
-      <label for="pit">Pit:</label>
-      <select name="pit" required>
-        <% pits.forEach(p => { %>
-          <option value="<%= p._id %>"><%= p.name %></option>
-        <% }) %>
-      </select>
+        <label for="pit">Pit:</label>
+        <select name="pit" required>
+          <% pits.forEach(p => { %>
+            <option value="<%= p._id %>"><%= p.name %></option>
+          <% }) %>
+        </select>
 
-      <label for="startHour">Start Hour (optional unless new farm):</label>
-      <input type="number" name="startHour" step="0.1" min="0" placeholder="Start Hour">
+        <label for="startHour">Start Hour (optional unless new farm):</label>
+        <input type="number" name="startHour" id="startHour" step="0.1" min="0" placeholder="Start Hour">
 
-      <button type="submit">Submit Load</button>
-    </form>
+        <button type="submit">Submit Load</button>
+      </form>
+    </div>
 
-    <!-- Submit End Hour Only Form -->
-    <form method="POST" action="/submit-end-hour">
-      <input type="hidden" name="tractor" value="<%= selectedTractorId %>">
-      <input type="hidden" name="farm" value="<%= selectedFarmId %>">
-      <label for="endHourOnly">Submit End Hour Only:</label>
-      <input type="number" name="endHour" step="0.1" min="0" placeholder="Enter end hour" required>
-      <button type="submit">Submit End Hour Only</button>
-    </form>
+    <!-- End Hour Form -->
+    <div class="section">
+      <form method="POST" action="/submit-end-hour">
+        <label for="endHourOnly">Submit End Hour Only:</label>
+        <input type="number" name="endHour" step="0.1" min="0" placeholder="Enter end hour" required>
+        <input type="hidden" name="tractor" value="<%= selectedTractorId %>">
+        <input type="hidden" name="farm" value="<%= selectedFarmId %>">
+        <input type="hidden" name="field" value="<%= selectedFieldId %>">
+        <button type="submit">Submit End Hour Only</button>
+      </form>
+    </div>
 
+    <!-- ✅ Fuel Submission Section -->
+    <div class="section">
+      <h2>⛽ Fuel Submission</h2>
+      <form method="POST" action="/submit-fuel">
+        <label for="fuel-tractor">Tractor:</label>
+        <select name="tractor" id="fuel-tractor" required>
+          <% tractors.forEach(t => { %>
+            <option value="<%= t._id %>"><%= t.name %></option>
+          <% }) %>
+        </select>
+
+        <label for="fuel-field">Field:</label>
+        <select name="field" id="fuel-field" required>
+          <% fields.forEach(f => { %>
+            <option value="<%= f._id %>"><%= f.name %></option>
+          <% }) %>
+        </select>
+
+        <label for="amount">Fuel Used (gallons):</label>
+        <input type="number" name="amount" step="0.1" min="0" placeholder="Enter fuel amount" required>
+
+        <button type="submit">Submit Fuel</button>
+      </form>
+    </div>
+
+    <!-- Tracked Start Hours -->
     <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
-      <div class="tracked">
+      <div class="section">
         <h3>✅ Tracked Start Hours</h3>
         <ul>
           <% for (let key in trackedHours) { %>
@@ -113,6 +148,7 @@
         </ul>
       </div>
     <% } %>
+
   </div>
 </body>
 </html>
