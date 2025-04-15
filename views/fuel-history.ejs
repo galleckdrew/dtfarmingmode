@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>⛽ Fuel History</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1, h2 { text-align: center; }
+    form { margin-bottom: 20px; text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #f4f4f4; }
+    button { padding: 4px 8px; margin: 2px; }
+  </style>
+</head>
+<body>
+  <h1>⛽ Fuel History</h1>
+
+  <form method="GET" action="/fuel-history">
+    <label>From: <input type="date" name="from" value="<%= from || '' %>"></label>
+    <label>To: <input type="date" name="to" value="<%= to || '' %>"></label>
+    <label>Tractor:
+      <select name="tractor">
+        <option value="">All</option>
+        <% tractors.forEach(t => { %>
+          <option value="<%= t._id %>" <%= tractor === t._id.toString() ? 'selected' : '' %>><%= t.name %></option>
+        <% }) %>
+      </select>
+    </label>
+    <label>Field:
+      <select name="field">
+        <option value="">All</option>
+        <% fields.forEach(f => { %>
+          <option value="<%= f._id %>" <%= field === f._id.toString() ? 'selected' : '' %>><%= f.name %></option>
+        <% }) %>
+      </select>
+    </label>
+    <button type="submit">Filter</button>
+    <button type="button" onclick="window.print()">🖨️ Print</button>
+  </form>
+
+  <h2>Total Fuel: <%= totalFuel.toFixed(2) %> gallons</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Tractor</th>
+        <th>Field</th>
+        <th>Gallons</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% fuels.forEach(fuel => { %>
+        <tr>
+          <td><%= new Date(fuel.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %></td>
+          <td><%= fuel.tractor?.name || '' %></td>
+          <td><%= fuel.field?.name || '' %></td>
+          <td><%= fuel.amount %></td>
+          <td>
+            <form method="GET" action="/fuel-history/<%= fuel._id %>/edit" style="display:inline">
+              <button>Edit</button>
+            </form>
+            <form method="POST" action="/fuel-history/<%= fuel._id %>?_method=DELETE" style="display:inline">
+              <button>Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>
