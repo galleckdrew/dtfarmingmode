@@ -10,7 +10,7 @@ const Pit = require("../models/Pit");
 const tractorFarmStartHours = require("../trackedHours");
 
 // =========================
-// GET Load Form (submit-load)
+// GET Load Form
 // =========================
 router.get("/submit-load", async (req, res) => {
   try {
@@ -162,64 +162,45 @@ router.post("/submit-fuel", async (req, res) => {
 });
 
 // =========================
-// GET Load + Fuel History
+// GET Fuel History
 // =========================
-router.get("/load-history", async (req, res) => {
+router.get("/fuel-history", async (req, res) => {
   try {
-    const allLoads = await Load.find().populate("tractor");
-    const allFuels = await Fuel.find().populate("tractor field");
+    const { from, to, tractor, field } = req.query;
+    const query = {};
 
-    const grouped = {};
-
-    // Group Loads
-    allLoads.forEach(load => {
-      const dateKey = moment(load.timestamp).format("YYYY-MM-DD");
-      const tractorName = load.tractor?.name || "Unknown";
-      const key = `${dateKey}-${tractorName}`;
-
-      if (!grouped[key]) {
-        grouped[key] = {
-          date: dateKey,
-          tractor: tractorName,
-          totalHours: 0,
-          totalGallons: 0,
-          loads: [],
-          fuels: []
-        };
+    if (from || to) {
+      query.timestamp = {};
+      if (from) query.timestamp.$gte = new Date(from);
+      if (to) {
+        const toDate = new Date(to);
+        toDate.setHours(23, 59, 59, 999);
+        query.timestamp.$lte = toDate;
       }
+    }
 
-      grouped[key].totalHours += load.totalHours || 0;
-      grouped[key].totalGallons += load.gallons || 0;
-      grouped[key].loads.push(load);
+    if (tractor) query.tractor = tractor;
+    if (field) query.field = field;
+
+    const fuels = await Fuel.find(query).populate("tractor field").sort({ timestamp: -1 });
+    const totalFuel = fuels.reduce((sum, fuel) => sum + (fuel.amount || 0), 0);
+
+    const tractors = await Tractor.find();
+    const fields = await Field.find();
+
+    res.render("fuel-history", {
+      fuels,
+      tractors,
+      fields,
+      totalFuel,
+      from,
+      to,
+      selectedTractor: tractor,
+      selectedField: field
     });
-
-    // Group Fuels
-    allFuels.forEach(fuel => {
-      const dateKey = moment(fuel.timestamp).format("YYYY-MM-DD");
-      const tractorName = fuel.tractor?.name || "Unknown";
-      const key = `${dateKey}-${tractorName}`;
-
-      if (!grouped[key]) {
-        grouped[key] = {
-          date: dateKey,
-          tractor: tractorName,
-          totalHours: 0,
-          totalGallons: 0,
-          loads: [],
-          fuels: []
-        };
-      }
-
-      grouped[key].fuels.push(fuel);
-    });
-
-    const history = Object.values(grouped);
-    const totalFuelAllTime = allFuels.reduce((sum, f) => sum + (f.amount || 0), 0);
-
-    res.render("load-history", { history, moment, totalFuelAllTime });
   } catch (error) {
-    console.error("❌ Error generating load history:", error);
-    res.status(500).send("Server error");
+    console.error("❌ Error loading fuel history:", error);
+    res.status(500).send("❌ Failed to load fuel history");
   }
 });
 
