@@ -38,7 +38,7 @@
     <button type="button" onclick="window.print()">🖨️ Print</button>
   </form>
 
-  <h2>Total Fuel: <%= totalFuel.toFixed(2) %> gallons</h2>
+  <h2>Total Fuel: <%= typeof totalFuel !== 'undefined' ? totalFuel.toFixed(2) : '0.00' %> gallons</h2>
 
   <table>
     <thead>
