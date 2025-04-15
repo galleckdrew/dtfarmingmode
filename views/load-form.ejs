@@ -5,146 +5,121 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: url('/fendt-tractor-bg.jpg') no-repeat center center fixed;
-      background-size: cover;
       margin: 0;
-      padding: 0;
+      background: url('/dt-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+
+    .form-container {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 900px;
+      margin: 40px auto;
+    }
+
+    h1, h3, label {
       color: #fff;
     }
 
-    header {
-      text-align: center;
-      padding: 20px;
-    }
-
-    header img {
-      height: 80px;
-    }
-
-    .container {
-      max-width: 850px;
-      background: rgba(0, 0, 0, 0.7);
-      margin: 30px auto;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.6);
-    }
-
-    h1, h3 {
-      text-align: center;
-      color: #c8f7c5;
-    }
-
-    label {
-      color: #eee;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    select, input[type="text"], input[type="number"] {
-      padding: 10px;
+    input, select {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
       border-radius: 6px;
       border: none;
-      font-size: 16px;
     }
 
     button {
-      background-color: #2ecc71;
+      background-color: #2e7d32;
       color: white;
       border: none;
-      padding: 12px;
       border-radius: 6px;
-      font-size: 16px;
+      padding: 10px 16px;
+      margin-top: 10px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
 
     button:hover {
-      background-color: #27ae60;
+      background-color: #1b5e20;
     }
 
-    .last-load {
-      font-size: 14px;
+    .logo {
       text-align: center;
-      color: #eee;
+      margin-top: 20px;
     }
 
-    hr {
-      margin: 30px 0;
-      border-color: #444;
+    .logo img {
+      height: 80px;
+    }
+
+    .section {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="/dt-logo.png" alt="D&T Logo">
-  </header>
 
-  <div class="container">
+  <div class="logo">
+    <img src="/dt-bg.png" alt="D&T Logo">
+  </div>
+
+  <div class="form-container">
     <h1>🚜 Submit Load</h1>
     <h3>Total Gallons Today: <%= totalGallons %></h3>
     <h3>Total Fuel Used Today: <%= totalFuel %></h3>
 
     <% if (lastLoad) { %>
-      <p class="last-load"><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor.name %></p>
+      <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor.name %></p>
     <% } %>
 
-    <form action="/load" method="POST">
-      <label>Tractor</label>
-      <select name="tractor" required>
-        <% tractors.forEach(t => { %>
-          <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>><%= t.name %></option>
-        <% }) %>
-      </select>
+    <!-- Load Submission Form -->
+    <form method="POST" action="/load">
+      <div class="section">
+        <label>Tractor</label>
+        <select name="tractor" required>
+          <% tractors.forEach(t => { %>
+            <option value="<%= t._id %>" <%= selectedTractorId === t._id.toString() ? 'selected' : '' %>><%= t.name %></option>
+          <% }) %>
+        </select>
 
-      <label>Farm</label>
-      <select name="farm" required>
-        <% farms.forEach(f => { %>
-          <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>><%= f.name %></option>
-        <% }) %>
-      </select>
+        <label>Farm</label>
+        <select name="farm" required>
+          <% farms.forEach(f => { %>
+            <option value="<%= f._id %>" <%= selectedFarmId === f._id.toString() ? 'selected' : '' %>><%= f.name %></option>
+          <% }) %>
+        </select>
 
-      <label>Field</label>
-      <select name="field">
-        <% fields.forEach(field => { %>
-          <option value="<%= field._id %>" <%= field._id.toString() === selectedFieldId ? 'selected' : '' %>><%= field.name %></option>
-        <% }) %>
-      </select>
+        <label>Field</label>
+        <select name="field">
+          <option value="">Optional</option>
+          <% fields.forEach(field => { %>
+            <option value="<%= field._id %>" <%= selectedFieldId === field._id.toString() ? 'selected' : '' %>><%= field.name %></option>
+          <% }) %>
+        </select>
 
-      <label>Pit</label>
-      <select name="pit">
-        <% pits.forEach(pit => { %>
-          <option value="<%= pit._id %>"><%= pit.name %></option>
-        <% }) %>
-      </select>
+        <label>Pit</label>
+        <select name="pit">
+          <option value="">Optional</option>
+          <% pits.forEach(pit => { %>
+            <option value="<%= pit._id %>"><%= pit.name %></option>
+          <% }) %>
+        </select>
 
-      <label>Start Hour</label>
-      <input type="text" name="startHour" placeholder="e.g., 7.5 for 7:30 AM">
+        <label>Start Hour</label>
+        <input type="text" name="startHour" placeholder="Ex: 6.5">
 
-      <label>End Hour</label>
-      <input type="text" name="endHour" placeholder="e.g., 15.25 for 3:15 PM">
+        <label>End Hour</label>
+        <input type="text" name="endHour" placeholder="Ex: 14.25">
 
-      <button type="submit">Submit Load</button>
+        <button type="submit">✅ Submit Load</button>
+      </div>
     </form>
 
-    <form action="/load/submit-end-hour" method="POST">
-      <input type="hidden" name="tractor" value="<%= selectedTractorId %>">
-      <input type="hidden" name="farm" value="<%= selectedFarmId %>">
-      <input type="hidden" name="field" value="<%= selectedFieldId %>">
-      <label>Submit End Hour Only</label>
-      <input type="text" name="endHour" placeholder="Enter End Hour">
-      <button type="submit">Submit End Hour</button>
-    </form>
-
-    <hr>
-
-    <form action="/load/submit-fuel" method="POST">
+    <!-- Fuel Submission Form -->
+    <form method="POST" action="/load/submit-fuel" class="section">
       <h3>⛽ Submit Fuel Usage</h3>
-
       <label>Tractor</label>
       <select name="tractor" required>
         <% tractors.forEach(t => { %>
@@ -154,16 +129,31 @@
 
       <label>Field</label>
       <select name="field" required>
-        <% fields.forEach(f => { %>
-          <option value="<%= f._id %>"><%= f.name %></option>
+        <% fields.forEach(field => { %>
+          <option value="<%= field._id %>"><%= field.name %></option>
         <% }) %>
       </select>
 
-      <label>Fuel Gallons Used</label>
-      <input type="number" name="amount" step="0.01" required placeholder="e.g., 15.5">
+      <label>Gallons</label>
+      <input type="number" name="amount" placeholder="Fuel amount" required step="0.1">
 
-      <button type="submit">Submit Fuel</button>
+      <button type="submit">💾 Submit Fuel</button>
     </form>
+
+    <!-- Tracked Start Hours -->
+    <div class="section">
+      <h3>✅ Tracked Start Hours</h3>
+      <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
+        <ul>
+          <% Object.entries(trackedHours).forEach(([key, hour]) => { %>
+            <li><strong><%= key %></strong>: <%= hour %></li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p>No active start hours tracked.</p>
+      <% } %>
+    </div>
   </div>
+
 </body>
 </html>
