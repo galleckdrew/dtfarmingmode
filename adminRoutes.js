@@ -4,7 +4,8 @@ const Tractor = require("./models/Tractor");
 const Farm = require("./models/Farm");
 const Field = require("./models/Field");
 const Pit = require("./models/Pit");
-const { tractorFarmStartHours } = require("./loadRoutes");
+const { tractorFarmStartHours } = require("./routes/loadRoutes");
+
 
 // Admin Form with readable tracked start hours
 router.get("/form", async (req, res) => {
