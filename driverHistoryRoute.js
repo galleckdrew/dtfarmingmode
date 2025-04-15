@@ -1,108 +1,78 @@
+// driverHistoryRoute.js
 const express = require("express");
 const router = express.Router();
+const moment = require("moment");
 const Load = require("./models/Load");
+const Fuel = require("./models/Fuel");
 const Tractor = require("./models/Tractor");
 const Farm = require("./models/Farm");
 const Field = require("./models/Field");
-const Pit = require("./models/Pit");
 
-// View driver history with filters
 router.get("/driver-history", async (req, res) => {
-  const { from, to, tractor, farm, field } = req.query;
+  try {
+    const { from, to, tractor, farm, field } = req.query;
 
-  const filters = {};
-  if (from && to) {
-    filters.timestamp = {
-      $gte: new Date(from + "T00:00:00.000Z"),
-      $lte: new Date(to + "T23:59:59.999Z")
-    };
-  }
-  if (tractor) filters.tractor = tractor;
-  if (farm) filters.farm = farm;
-  if (field) filters.field = field;
+    const query = {};
+    const fuelQuery = {};
 
-  const loads = await Load.find(filters)
-    .populate("tractor")
-    .populate("farm")
-    .populate("field")
-    .populate("pit")
-    .sort({ timestamp: -1 });
+    if (from || to) {
+      query.timestamp = {};
+      fuelQuery.timestamp = {};
+      if (from) {
+        query.timestamp.$gte = new Date(from);
+        fuelQuery.timestamp.$gte = new Date(from);
+      }
+      if (to) {
+        const toDate = new Date(to);
+        toDate.setHours(23, 59, 59, 999);
+        query.timestamp.$lte = toDate;
+        fuelQuery.timestamp.$lte = toDate;
+      }
+    }
 
-  const tractors = await Tractor.find();
-  const farms = await Farm.find();
-  const fields = await Field.find();
+    if (tractor) query.tractor = tractor;
+    if (farm) query.farm = farm;
+    if (field) query.field = field;
+    if (tractor) fuelQuery.tractor = tractor;
+    if (field) fuelQuery.field = field;
 
-  const totalLoads = loads.length;
-  const totalGallons = loads.reduce((sum, load) => sum + (load.gallons || 0), 0);
-  const totalHours = loads.reduce((sum, load) => sum + (load.totalHours || 0), 0);
+    const [loads, fuels, tractors, farms, fields] = await Promise.all([
+      Load.find(query).populate("tractor farm field pit"),
+      Fuel.find(fuelQuery).populate("tractor field"),
+      Tractor.find(),
+      Farm.find(),
+      Field.find()
+    ]);
 
-  res.render("driver-history", {
-    loads,
-    tractors,
-    farms,
-    fields,
-    totalLoads,
-    totalGallons,
-    totalHours,
-    from,
-    to,
-    tractor,
-    farm,
-    field
-  });
-});
+    const allEntries = [
+      ...loads.map(l => ({ type: "load", data: l })),
+      ...fuels.map(f => ({ type: "fuel", data: f }))
+    ].sort((a, b) => new Date(a.data.timestamp) - new Date(b.data.timestamp));
 
-// Show edit form
-router.get("/driver-history/:id/edit", async (req, res) => {
-  const load = await Load.findById(req.params.id);
-  const tractors = await Tractor.find();
-  const farms = await Farm.find();
-  const fields = await Field.find();
-  const pits = await Pit.find();
+    const totalLoads = loads.length;
+    const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0);
+    const totalHours = loads.reduce((sum, l) => sum + (l.totalHours || 0), 0);
+    const totalFuel = fuels.reduce((sum, f) => sum + (f.amount || 0), 0);
 
-  res.render("edit-load", {
-    load,
-    tractors,
-    farms,
-    fields,
-    pits
-  });
-});
-
-// Handle update
-router.put("/driver-history/:id", async (req, res) => {
-  const { tractor, farm, field, pit, startHour, endHour } = req.body;
-
-  const start = startHour ? Number(startHour) : null;
-  const end = endHour ? Number(endHour) : null;
-
-  let totalHours = null;
-  if (start !== null && end !== null) {
-    totalHours = end >= start ? end - start : (24 - start + end);
-    totalHours = Math.round(totalHours * 100) / 100;
-  }
-
-  await Load.findByIdAndUpdate(
-    req.params.id,
-    {
+    res.render("driver-history", {
+      tractors,
+      farms,
+      fields,
+      from,
+      to,
       tractor,
       farm,
       field,
-      pit,
-      startHour: start,
-      endHour: end,
-      totalHours
-    },
-    { new: true }
-  );
-
-  res.redirect("/driver-history");
-});
-
-// Handle delete
-router.delete("/driver-history/:id", async (req, res) => {
-  await Load.findByIdAndDelete(req.params.id);
-  res.redirect("/driver-history");
+      allEntries,
+      totalLoads,
+      totalGallons,
+      totalHours,
+      totalFuel
+    });
+  } catch (err) {
+    console.error("❌ Error loading driver history:", err);
+    res.status(500).send("Internal server error");
+  }
 });
 
 module.exports = router;
