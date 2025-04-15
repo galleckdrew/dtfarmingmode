@@ -3,16 +3,16 @@ const path = require("path");
 const session = require("express-session");
 const methodOverride = require("method-override");
 require("dotenv").config();
-require("./db"); // MongoDB connection
+require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Email scheduler (optional)
+// Email scheduler
 const setupEmailScheduler = require("./emailScheduler");
 setupEmailScheduler();
 
-// Memory store for start hours
+// Tracked hours memory
 const tractorFarmStartHours = require("./trackedHours");
 
 // Models
@@ -21,6 +21,7 @@ const Farm = require("./models/Farm");
 const Field = require("./models/Field");
 const Pit = require("./models/Pit");
 const Load = require("./models/Load");
+const Fuel = require("./models/Fuel");
 
 // View engine
 app.set("view engine", "ejs");
@@ -45,8 +46,10 @@ app.use("/admin", require("./adminRoutes"));
 app.use("/load", require("./routes/loadRoutes"));
 app.use("/print-report", require("./printRoutes"));
 app.use(require("./driverHistoryRoute"));
+app.use(require("./routes/submitEndHourRoute"));
+app.use(require("./routes/fuelHistoryRoute")); // ✅ fuel history route
 
-// Test email report
+// Email test route
 app.get("/send-test-report", async (req, res) => {
   const { sendLoadReportEmail } = require("./emailReport");
   try {
@@ -58,18 +61,18 @@ app.get("/send-test-report", async (req, res) => {
   }
 });
 
-// Login check middleware
+// Login guard
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect("/auth/login");
   next();
 }
 
-// Home redirect
+// Home
 app.get("/", (req, res) => {
   res.redirect("/submit-load");
 });
 
-// Submit Load Page
+// ✅ Submit Load Form with totalFuel
 app.get("/submit-load", requireLogin, async (req, res) => {
   try {
     const tractors = await Tractor.find();
@@ -77,16 +80,25 @@ app.get("/submit-load", requireLogin, async (req, res) => {
     const fields = await Field.find();
     const pits = await Pit.find();
 
-    const today = new Date().toISOString().split("T")[0];
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
     const todayLoads = await Load.find({
-      timestamp: {
-        $gte: new Date(`${today}T00:00:00.000Z`),
-        $lte: new Date(`${today}T23:59:59.999Z`),
-      },
+      timestamp: { $gte: todayStart, $lte: todayEnd },
+    });
+
+    const todayFuels = await Fuel.find({
+      timestamp: { $gte: todayStart, $lte: todayEnd },
     });
 
     const totalGallons = todayLoads.reduce((sum, l) => sum + (l.gallons || 0), 0);
-    const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor farm field");
+    const totalFuel = todayFuels.reduce((sum, f) => sum + (f.amount || 0), 0);
+
+    const lastLoad = await Load.findOne()
+      .sort({ timestamp: -1 })
+      .populate("tractor farm field");
 
     res.render("load-form", {
       tractors,
@@ -94,8 +106,9 @@ app.get("/submit-load", requireLogin, async (req, res) => {
       fields,
       pits,
       totalGallons,
-      trackedHours: tractorFarmStartHours,
+      totalFuel, // ✅ FIXED: this was missing
       lastLoad,
+      trackedHours: tractorFarmStartHours,
       selectedTractorId: lastLoad?.tractor?._id?.toString() || '',
       selectedFarmId: lastLoad?.farm?._id?.toString() || '',
       selectedFieldId: lastLoad?.field?._id?.toString() || ''
@@ -106,7 +119,7 @@ app.get("/submit-load", requireLogin, async (req, res) => {
   }
 });
 
-// 404 fallback
+// 404
 app.get("*", (req, res) => {
   res.status(404).send("Page not found.");
 });
