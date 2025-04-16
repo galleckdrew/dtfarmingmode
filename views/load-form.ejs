@@ -80,8 +80,10 @@
     <h1>D&T Manure Hauling</h1>
 
     <div class="totals">
-      Total Gallons Today: <%= totalGallons %> | Total Fuel: <%= totalFuel %>
-    </div>
+  <span style="font-size: 1.4em; font-weight: bold; color: #000; background-color: rgba(255,255,255,0.8); padding: 8px 12px; border-radius: 6px;">
+    🚜 Total Gallons Today: <%= totalGallons %> | ⛽ Total Fuel Used: <%= totalFuel %>
+  </span>
+</div>
 
     <!-- Submit Load -->
     <form action="/load" method="POST">
