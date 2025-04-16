@@ -109,9 +109,6 @@
       <label for="startHour">Start Hour</label>
       <input type="text" name="startHour" placeholder="Optional (for first load only)">
 
-      <label for="endHour">End Hour</label>
-      <input type="text" name="endHour" placeholder="Optional (if ending load)">
-
       <button type="submit">Submit Load</button>
     </form>
 
@@ -119,27 +116,6 @@
     <div class="section">
       <h2>Submit End Hour Only</h2>
       <form action="/load/submit-end-hour" method="POST">
-        <label for="tractor">Tractor</label>
-        <select name="tractor" required>
-          <% tractors.forEach(t => { %>
-            <option value="<%= t._id %>"><%= t.name %></option>
-          <% }) %>
-        </select>
-
-        <label for="farm">Farm</label>
-        <select name="farm" required>
-          <% farms.forEach(f => { %>
-            <option value="<%= f._id %>"><%= f.name %></option>
-          <% }) %>
-        </select>
-
-        <label for="field">Field</label>
-        <select name="field" required>
-          <% fields.forEach(f => { %>
-            <option value="<%= f._id %>"><%= f.name %></option>
-          <% }) %>
-        </select>
-
         <label for="endHour">End Hour</label>
         <input type="text" name="endHour" required placeholder="e.g. 15.5">
 
