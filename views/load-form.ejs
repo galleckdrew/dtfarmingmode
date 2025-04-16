@@ -163,7 +163,7 @@
       </form>
     </div>
 
- <!-- Submit Transfer/Hauling Hours -->
+<!-- Submit Transfer/Hauling Hours -->
 <div class="form-section">
   <h2>Submit Transfer/Hauling Hours</h2>
   <form action="/load/submit-transfer" method="POST">
@@ -174,30 +174,30 @@
       <% }) %>
     </select>
 
+    <label for="pump">Pump</label>
+    <input type="text" name="pump" placeholder="Pump" />
+
     <label for="farmer">Farmer</label>
-    <input type="text" name="farmer" placeholder="Enter Farmer Name">
+    <input type="text" name="farmer" placeholder="Enter Farmer Name" required />
 
     <label for="trailer">Trailer</label>
-    <input type="text" name="trailer" placeholder="Trailer (optional)">
+    <input type="text" name="trailer" placeholder="Trailer" />
 
     <label for="sand">Sand</label>
-    <input type="text" name="sand" placeholder="Sand (optional)">
-
-    <label for="pump">Pump</label>
-    <input type="text" name="pump" placeholder="Pump (optional)">
+    <input type="text" name="sand" placeholder="Sand" />
 
     <label for="startHour">Start Hour</label>
-    <input type="text" name="startHour" placeholder="(Start Hours)">
+    <input type="text" name="startHour" placeholder="Start Hours" />
 
     <label for="endHour">End Hour</label>
-    <input type="text" name="endHour" placeholder="(End Hours)">
+    <input type="text" name="endHour" placeholder="End Hours" />
 
     <button type="submit">Submit Transfer Hours</button>
   </form>
 </div>
 
-  
-<!-- ✅ Tracked Start Hours -->
+
+ <!-- ✅ Tracked Start Hours -->
 <div class="form-section">
   <h2>Tracked Start Hours</h2>
   <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
