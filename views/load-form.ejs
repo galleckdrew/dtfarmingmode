@@ -63,6 +63,12 @@
       border-top: 2px solid #ccc;
       padding-top: 30px;
     }
+    .totals {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 20px;
+      font-size: 1.2em;
+    }
     @media (max-width: 600px) {
       h1 {
         font-size: 1.5em;
@@ -76,6 +82,10 @@
 <body>
   <div class="container">
     <h1><img src="/dt-logo.png" alt="D&T Logo"> Submit Load</h1>
+
+    <div class="totals">
+      Total Gallons Today: <%= totalGallons %> | Total Fuel Used: <%= totalFuel %>
+    </div>
 
     <form action="/load" method="POST">
       <label for="tractor">Tractor</label>
