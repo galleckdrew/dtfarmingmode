@@ -47,7 +47,7 @@ app.use("/load", require("./routes/loadRoutes"));
 app.use("/print-report", require("./printRoutes"));
 app.use(require("./driverHistoryRoute"));
 app.use(require("./routes/submitEndHourRoute"));
-app.use(require("./routes/fuelHistoryRoute")); // ✅ fuel history route
+app.use(require("./routes/fuelHistoryRoute"));
 app.use(require("./routes/transferHistoryRoute"));
 
 // Email test route
@@ -73,7 +73,7 @@ app.get("/", (req, res) => {
   res.redirect("/submit-load");
 });
 
-// ✅ Submit Load Form with totalFuel
+// ✅ Submit Load Form with totalFuel and formatted trackedHours
 app.get("/submit-load", requireLogin, async (req, res) => {
   try {
     const tractors = await Tractor.find();
@@ -91,7 +91,6 @@ app.get("/submit-load", requireLogin, async (req, res) => {
 
     const totalGallons = todayLoads.reduce((sum, l) => sum + (l.gallons || 0), 0);
 
-    const Fuel = require("./models/Fuel");
     const todayFuel = await Fuel.find({
       timestamp: {
         $gte: new Date(`${today}T00:00:00.000Z`),
@@ -115,21 +114,34 @@ app.get("/submit-load", requireLogin, async (req, res) => {
         })
       : "N/A";
 
+    // Format trackedHours nicely
+    const trackedHours = {};
+    for (const key in tractorFarmStartHours) {
+      const [tractorId, farmId] = key.split("_");
+      const tractor = tractors.find(t => t._id.toString() === tractorId);
+      const farm = farms.find(f => f._id.toString() === farmId);
+
+      if (tractor && farm) {
+        const label = `${tractor.name} (${tractor.gallons} gal) – ${farm.name}`;
+        trackedHours[label] = tractorFarmStartHours[key];
+      }
+    }
+
     res.render("load-form", {
-       tractors,
-  farms,
-  fields,
-  pits,
-  totalGallons,
-  totalFuel,
-  lastLoadTractor,
-  lastLoadGallons,
-  lastLoadTime,
-  trackedHours: tractorFarmStartHours,
-  selectedTractorId: lastLoad?.tractor?._id?.toString() || '',
-  selectedFarmId: '',
-  selectedFieldId: ''
-});
+      tractors,
+      farms,
+      fields,
+      pits,
+      totalGallons,
+      totalFuel,
+      lastLoadTractor,
+      lastLoadGallons,
+      lastLoadTime,
+      trackedHours,
+      selectedTractorId: lastLoad?.tractor?._id?.toString() || '',
+      selectedFarmId: '',
+      selectedFieldId: ''
+    });
 
   } catch (err) {
     console.error("❌ Error loading form:", err);
@@ -140,4 +152,3 @@ app.get("/submit-load", requireLogin, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
-
