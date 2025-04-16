@@ -157,6 +157,34 @@
         <button type="submit">Submit Fuel</button>
       </form>
     </div>
+
+    <!-- Submit Transfer Hours / Hauling -->
+    <div class="section">
+      <h2>Submit Transfer Hours / Hauling</h2>
+      <form action="/load/submit-transfer" method="POST">
+        <label for="tractor">Tractor</label>
+        <select name="tractor" required>
+          <% tractors.forEach(t => { %>
+            <option value="<%= t._id %>"><%= t.name %></option>
+          <% }) %>
+        </select>
+
+        <label for="pump">Pump</label>
+        <input type="text" name="pump" placeholder="Pump name or ID" required>
+
+        <label for="farmer">Farmer</label>
+        <input type="text" name="farmer" placeholder="Farmer name" required>
+
+        <label for="startHour">Start Hour</label>
+        <input type="text" name="startHour" placeholder="e.g. 8.0" required>
+
+        <label for="endHour">End Hour</label>
+        <input type="text" name="endHour" placeholder="e.g. 15.5" required>
+
+        <button type="submit">Submit Transfer Hours</button>
+      </form>
+    </div>
+
   </div>
 </body>
 </html>
