@@ -121,7 +121,7 @@
         </select>
 
         <label for="startHour">Start Hour (optional)</label>
-        <input type="text" name="startHour" placeholder="e.g. 8.0" />
+        <input type="text" name="startHour" placeholder="Start Hours" />
 
         <button type="submit">Submit Load</button>
       </form>
@@ -132,7 +132,7 @@
       <h2>Submit End Hour</h2>
       <form action="/load/submit-end-hour" method="POST">
         <label for="endHour">End Hour</label>
-        <input type="text" name="endHour" placeholder="e.g. 15.5" required />
+        <input type="text" name="endHour" placeholder="End Hours" required />
         <button type="submit">Submit End Hour</button>
       </form>
     </div>
@@ -178,10 +178,10 @@
   <input type="text" name="farmer" placeholder="Farmer name" required />
 
   <label for="startHour">Start Hour</label>
-  <input type="text" name="startHour" placeholder="e.g. 8.0 (optional)" />
+  <input type="text" name="startHour" placeholder="Start Hours (optional)" />
 
   <label for="endHour">End Hour</label>
-  <input type="text" name="endHour" placeholder="e.g. 15.5 (optional)" />
+  <input type="text" name="endHour" placeholder="End Hours (optional)" />
 
   <button type="submit">Submit Transfer Hours</button>
 </form>
