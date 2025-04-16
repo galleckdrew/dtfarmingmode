@@ -81,25 +81,39 @@ app.get("/submit-load", requireLogin, async (req, res) => {
     const fields = await Field.find();
     const pits = await Pit.find();
 
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-
+    const today = new Date().toISOString().split("T")[0];
     const todayLoads = await Load.find({
-      timestamp: { $gte: todayStart, $lte: todayEnd },
-    });
-
-    const todayFuels = await Fuel.find({
-      timestamp: { $gte: todayStart, $lte: todayEnd },
+      timestamp: {
+        $gte: new Date(`${today}T00:00:00.000Z`),
+        $lte: new Date(`${today}T23:59:59.999Z`),
+      },
     });
 
     const totalGallons = todayLoads.reduce((sum, l) => sum + (l.gallons || 0), 0);
-    const totalFuel = todayFuels.reduce((sum, f) => sum + (f.amount || 0), 0);
 
-    const lastLoad = await Load.findOne()
-      .sort({ timestamp: -1 })
-      .populate("tractor farm field");
+    const Fuel = require("./models/Fuel");
+    const todayFuel = await Fuel.find({
+      timestamp: {
+        $gte: new Date(`${today}T00:00:00.000Z`),
+        $lte: new Date(`${today}T23:59:59.999Z`),
+      },
+    });
+    const totalFuel = todayFuel.reduce((sum, f) => sum + (f.amount || 0), 0);
+
+    const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor");
+
+    const lastLoadTractor = lastLoad?.tractor?.name || "N/A";
+    const lastLoadGallons = lastLoad?.gallons || "0";
+    const lastLoadTime = lastLoad
+      ? new Date(lastLoad.timestamp).toLocaleString("en-US", {
+          timeZone: "America/New_York",
+          hour12: true,
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        })
+      : "N/A";
 
     res.render("load-form", {
       tractors,
@@ -107,12 +121,13 @@ app.get("/submit-load", requireLogin, async (req, res) => {
       fields,
       pits,
       totalGallons,
-      totalFuel, // ✅ FIXED: this was missing
-      lastLoad,
-      trackedHours: tractorFarmStartHours,
+      totalFuel,
+      lastLoadTractor,
+      lastLoadGallons,
+      lastLoadTime,
       selectedTractorId: lastLoad?.tractor?._id?.toString() || '',
-      selectedFarmId: lastLoad?.farm?._id?.toString() || '',
-      selectedFieldId: lastLoad?.field?._id?.toString() || ''
+      selectedFarmId: '',
+      selectedFieldId: ''
     });
   } catch (err) {
     console.error("❌ Error loading form:", err);
@@ -120,12 +135,3 @@ app.get("/submit-load", requireLogin, async (req, res) => {
   }
 });
 
-// 404
-app.get("*", (req, res) => {
-  res.status(404).send("Page not found.");
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-});
