@@ -162,30 +162,39 @@
       </form>
     </div>
 
-     <!-- Transfer Hours -->
-<form action="/load/submit-transfer" method="POST">
-  <label for="tractor">Tractor</label>
-  <select name="tractor" required>
-    <% tractors.forEach(t => { %>
-      <option value="<%= t._id %>"><%= t.name %></option>
-    <% }) %>
-  </select>
+ <!-- Submit Transfer/Hauling Hours -->
+<div class="form-section">
+  <h2>Submit Transfer/Hauling Hours</h2>
+  <form action="/load/submit-transfer" method="POST">
+    <label for="tractor">Tractor</label>
+    <select name="tractor" required>
+      <% tractors.forEach(t => { %>
+        <option value="<%= t._id %>"><%= t.name %></option>
+      <% }) %>
+    </select>
 
-  <label for="pump">Pump</label>
-  <input type="text" name="pump" placeholder="Pump name or ID (optional)" />
+    <label for="farmer">Farmer</label>
+    <input type="text" name="farmer" placeholder="Enter Farmer Name">
 
-  <label for="farmer">Farmer</label>
-  <input type="text" name="farmer" placeholder="Farmer name" required />
+    <label for="trailer">Trailer</label>
+    <input type="text" name="trailer" placeholder="Trailer (optional)">
 
-  <label for="startHour">Start Hour</label>
-  <input type="text" name="startHour" placeholder="Start Hours (optional)" />
+    <label for="sand">Sand</label>
+    <input type="text" name="sand" placeholder="Sand (optional)">
 
-  <label for="endHour">End Hour</label>
-  <input type="text" name="endHour" placeholder="End Hours (optional)" />
+    <label for="pump">Pump</label>
+    <input type="text" name="pump" placeholder="Pump (optional)">
 
-  <button type="submit">Submit Transfer Hours</button>
-</form>
-   </div>
+    <label for="startHour">Start Hour</label>
+    <input type="text" name="startHour" placeholder="Start Hour (Start Hours)">
+
+    <label for="endHour">End Hour</label>
+    <input type="text" name="endHour" placeholder="End Hour (End Hours)">
+
+    <button type="submit">Submit Transfer Hours</button>
+  </form>
+</div>
+
   
 <!-- ✅ Tracked Start Hours -->
 <div class="form-section">
