@@ -48,6 +48,7 @@ app.use("/print-report", require("./printRoutes"));
 app.use(require("./driverHistoryRoute"));
 app.use(require("./routes/submitEndHourRoute"));
 app.use(require("./routes/fuelHistoryRoute")); // ✅ fuel history route
+app.use(require("./routes/transferHistoryRoute"));
 
 // Email test route
 app.get("/send-test-report", async (req, res) => {
