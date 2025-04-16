@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,36 +10,55 @@
       background: url('/dt-bg.png') no-repeat center center fixed;
       background-size: cover;
     }
+
     .container {
-      background-color: rgba(255, 255, 255, 0.85);
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      background-color: rgba(255, 255, 255, 0.75);
+      max-width: 850px;
+      margin: 30px auto;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.25);
     }
+
     h1 {
       text-align: center;
-      font-size: 2em;
-      margin-bottom: 20px;
+      font-size: 1.8em;
+      margin-bottom: 10px;
     }
+
+    .totals {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.3em;
+      margin-bottom: 15px;
+    }
+
+    .last-load {
+      text-align: center;
+      font-size: 1.1em;
+      margin-bottom: 25px;
+    }
+
     form {
       margin-bottom: 30px;
     }
+
     label {
       display: block;
       margin: 10px 0 5px;
       font-weight: bold;
     }
+
     select, input[type="number"], input[type="text"] {
       width: 100%;
-      padding: 10px;
-      font-size: 1.1em;
+      padding: 8px;
+      font-size: 1em;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 4px;
     }
+
     button {
-      margin-top: 15px;
+      margin-top: 12px;
       width: 100%;
       padding: 10px;
       font-size: 1em;
@@ -48,57 +66,46 @@
       background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
     }
+
     button:hover {
       background-color: #45a049;
     }
+
     .section {
       margin-top: 40px;
       border-top: 2px solid #ccc;
-      padding-top: 30px;
+      padding-top: 25px;
     }
-    .totals {
-      text-align: center;
-      font-weight: bold;
-      margin-bottom: 10px;
-      font-size: 1.3em;
-    }
+
     @media (max-width: 600px) {
-      h1 {
-        font-size: 1.5em;
-      }
-      select, input, button {
-        font-size: 1.1em;
-      }
+      h1 { font-size: 1.4em; }
+      .totals { font-size: 1.1em; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Submit Load</h1>
+    <h1>🚜 Submit Load</h1>
 
     <div class="totals">
-      Total Gallons Today: <%= totalGallons %> 
+      Total Gallons Today: <%= totalGallons %>
       Total Fuel Used: <%= totalFuel %>
     </div>
 
     <% if (lastLoad) { %>
-      <div class="totals" style="margin-top: 10px;">
+      <div class="last-load">
         <strong>Last Load:</strong>
         <%= new Date(lastLoad.timestamp).toLocaleString("en-US", {
-          timeZone: "America/New_York",
-          hour12: true,
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
-        }) %> — <%= lastLoad.tractor?.name %> (<%= lastLoad.gallons %> gal)
+          timeZone: "America/New_York", hour12: true
+        }) %>
+        – <%= lastLoad.tractor?.name %> – <%= lastLoad.gallons ?? '' %> gal
       </div>
     <% } %>
 
+    <!-- Submit Load -->
     <form action="/load" method="POST">
       <label for="tractor">Tractor</label>
       <select name="tractor" required>
@@ -129,14 +136,14 @@
       </select>
 
       <label for="startHour">Start Hour</label>
-      <input type="text" name="startHour" placeholder="Optional (for first load only)">
+      <input type="text" name="startHour" placeholder="Optional (e.g. 8.0)">
 
       <button type="submit">Submit Load</button>
     </form>
 
     <!-- Submit End Hour -->
     <div class="section">
-      <h2>Submit End Hour Only</h2>
+      <h2>Submit End Hour</h2>
       <form action="/load/submit-end-hour" method="POST">
         <label for="endHour">End Hour</label>
         <input type="text" name="endHour" required placeholder="e.g. 15.5">
@@ -144,7 +151,7 @@
       </form>
     </div>
 
-    <!-- Fuel Form -->
+    <!-- Submit Fuel -->
     <div class="section">
       <h2>Submit Fuel Usage</h2>
       <form action="/load/submit-fuel" method="POST">
@@ -169,7 +176,7 @@
       </form>
     </div>
 
-    <!-- Transfer Hours -->
+    <!-- Submit Transfer Hours -->
     <div class="section">
       <h2>Submit Transfer Hours / Hauling</h2>
       <form action="/load/submit-transfer" method="POST">
@@ -181,26 +188,27 @@
         </select>
 
         <label for="pump">Pump</label>
-        <input type="text" name="pump" required>
+        <input type="text" name="pump" placeholder="Pump name or ID" required>
 
         <label for="farmer">Farmer</label>
-        <input type="text" name="farmer" required>
+        <input type="text" name="farmer" placeholder="Farmer name" required>
 
         <label for="trailer">Trailer</label>
-        <input type="text" name="trailer">
+        <input type="text" name="trailer" placeholder="Optional">
 
         <label for="sand">Sand</label>
-        <input type="text" name="sand">
+        <input type="text" name="sand" placeholder="Optional">
 
         <label for="startHour">Start Hour</label>
-        <input type="text" name="startHour" required>
+        <input type="text" name="startHour" placeholder="e.g. 8.0" required>
 
         <label for="endHour">End Hour</label>
-        <input type="text" name="endHour" required>
+        <input type="text" name="endHour" placeholder="e.g. 15.5" required>
 
         <button type="submit">Submit Transfer Hours</button>
       </form>
     </div>
+
   </div>
 </body>
 </html>
