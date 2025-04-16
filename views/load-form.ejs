@@ -155,8 +155,9 @@
           <% }) %>
         </select>
 
-        <label for="amount">Fuel Amount (gal)</label>
-        <input type="number" step="0.1" name="amount" required />
+        <label for="amount">Fuel Amount</label>
+        <input type="number" step="0.1" name="amount" required placeholder="Gallons">
+
 
         <button type="submit">Submit Fuel</button>
       </form>
@@ -186,10 +187,10 @@
     <input type="text" name="pump" placeholder="Pump (optional)">
 
     <label for="startHour">Start Hour</label>
-    <input type="text" name="startHour" placeholder="Start Hour (Start Hours)">
+    <input type="text" name="startHour" placeholder="(Start Hours)">
 
     <label for="endHour">End Hour</label>
-    <input type="text" name="endHour" placeholder="End Hour (End Hours)">
+    <input type="text" name="endHour" placeholder="(End Hours)">
 
     <button type="submit">Submit Transfer Hours</button>
   </form>
