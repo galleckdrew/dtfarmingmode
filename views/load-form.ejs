@@ -194,6 +194,19 @@
         <button type="submit">Submit Transfer Hours</button>
       </form>
     </div>
+  
+<!-- ✅ Tracked Start Hours -->
+  <div class="form-section">
+    <h2>Tracked Start Hours</h2>
+    <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
+      <ul style="list-style: none; padding: 0;">
+        <% Object.entries(trackedHours).forEach(([tractorName, startHour]) => { %>
+          <li><strong><%= tractorName %></strong>: <%= startHour %> hrs</li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>No tractors currently have tracked start hours.</p>
+    <% } %>
   </div>
 </body>
 </html>

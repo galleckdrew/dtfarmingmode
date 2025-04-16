@@ -116,19 +116,21 @@ app.get("/submit-load", requireLogin, async (req, res) => {
       : "N/A";
 
     res.render("load-form", {
-      tractors,
-      farms,
-      fields,
-      pits,
-      totalGallons,
-      totalFuel,
-      lastLoadTractor,
-      lastLoadGallons,
-      lastLoadTime,
-      selectedTractorId: lastLoad?.tractor?._id?.toString() || '',
-      selectedFarmId: '',
-      selectedFieldId: ''
-    });
+       tractors,
+  farms,
+  fields,
+  pits,
+  totalGallons,
+  totalFuel,
+  lastLoadTractor,
+  lastLoadGallons,
+  lastLoadTime,
+  trackedHours: tractorFarmStartHours,
+  selectedTractorId: lastLoad?.tractor?._id?.toString() || '',
+  selectedFarmId: '',
+  selectedFieldId: ''
+});
+
   } catch (err) {
     console.error("❌ Error loading form:", err);
     res.status(500).send("Internal Server Error while loading the form.");
