@@ -5,33 +5,25 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 20px;
       background: url('/login-bg.png') no-repeat center center fixed;
       background-size: cover;
-      margin: 0;
-      padding: 0;
-      color: #fff;
+      color: #000;
     }
     .container {
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 30px;
-      margin: 50px auto;
-      max-width: 1000px;
+      background-color: rgba(255,255,255,0.92);
       border-radius: 10px;
+      padding: 20px;
     }
     h1 {
       text-align: center;
-      margin-bottom: 20px;
-    }
-    .summary {
-      font-weight: bold;
-      font-size: 1.2em;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 20px;
       background-color: #fff;
-      color: #000;
     }
     th, td {
       border: 1px solid #ccc;
@@ -41,31 +33,54 @@
     th {
       background-color: #f2f2f2;
     }
-    .fuel-row {
-      background-color: #fffbe6;
-      font-style: italic;
+    .filter-form {
+      margin-bottom: 20px;
     }
-    .transfer-row {
-      background-color: #e6f5ff;
-      font-style: italic;
+    .summary {
+      margin: 20px 0;
+      font-weight: bold;
     }
     .actions {
       display: flex;
       gap: 10px;
       justify-content: center;
     }
+    .actions form {
+      display: inline;
+    }
     button {
       padding: 4px 8px;
     }
-    .filter-form {
-      margin-bottom: 20px;
+    .fuel-row {
+      background-color: #fffbe6;
+      font-style: italic;
+    }
+    .transfer-row {
+      background-color: #e8f4ff;
+      font-style: italic;
+    }
+    .sand-row {
+      background-color: #f3f3f3;
+      font-style: italic;
+    }
+    .trailer-row {
+      background-color: #e0e0e0;
+      font-style: italic;
+    }
+    .category-label {
+      font-size: 1.1em;
+      font-weight: bold;
+      margin-top: 30px;
+      padding-top: 10px;
+      border-top: 2px solid #333;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>D&T Manure Hauling - Driver History</h1>
+    <h1>🚜 Driver Load & Fuel History</h1>
 
+    <!-- Filter Form -->
     <form class="filter-form" method="GET" action="/driver-history">
       <label>Date From: <input type="date" name="from" value="<%= from || '' %>"></label>
       <label>Date To: <input type="date" name="to" value="<%= to || '' %>"></label>
@@ -97,6 +112,7 @@
       <button type="button" onclick="window.print()">🖨️ Print</button>
     </form>
 
+    <!-- Summary -->
     <div class="summary">
       Total Loads: <%= totalLoads %> |
       Total Gallons: <%= totalGallons %> |
@@ -104,6 +120,7 @@
       Total Fuel: <%= totalFuel.toFixed(2) %> gal
     </div>
 
+    <!-- Load Table -->
     <table>
       <thead>
         <tr>
@@ -116,7 +133,7 @@
           <th>Start Hour</th>
           <th>End Hour</th>
           <th>Total Hours</th>
-          <th>Fuel / Sand / Trailer</th>
+          <th>Fuel / Transfer</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -129,7 +146,7 @@
               <td><%= load.farm?.name || '' %></td>
               <td><%= load.field?.name || '' %></td>
               <td><%= load.pit?.name || '' %></td>
-              <td><%= load.gallons %></td>
+              <td><%= load.gallons ?? '' %></td>
               <td><%= load.startHour ?? '' %></td>
               <td><%= load.endHour ?? '' %></td>
               <td><%= load.totalHours?.toFixed(2) ?? '' %></td>
@@ -157,23 +174,38 @@
               <td><strong><%= fuel.amount %> gal</strong></td>
               <td></td>
             </tr>
-          <% } else if (entry.type === 'transfer') { const t = entry.data; %>
+          <% } else if (entry.type === 'transfer') { const transfer = entry.data; %>
             <tr class="transfer-row">
-              <td><%= new Date(t.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %></td>
-              <td><%= t.tractor?.name || '' %></td>
+              <td><%= new Date(transfer.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %></td>
+              <td><%= transfer.tractor?.name || '' %></td>
+              <td><%= transfer.farmer || '' %></td>
               <td></td>
               <td></td>
               <td></td>
+              <td><%= transfer.startHour || '' %></td>
+              <td><%= transfer.endHour || '' %></td>
               <td></td>
-              <td><%= t.startHour ?? '' %></td>
-              <td><%= t.endHour ?? '' %></td>
-              <td><%= t.totalHours?.toFixed(2) ?? '' %></td>
               <td>
-                <% if (t.trailer) { %>🚛 <%= t.trailer %><br><% } %>
-                <% if (t.sand) { %>🪨 <%= t.sand %><% } %>
+                <% if (transfer.startHour && !transfer.endHour) { %>
+                  Start Hour Only
+                <% } else if (transfer.startHour && transfer.endHour) { %>
+                  Start & End
+                <% } else if (transfer.endHour && !transfer.startHour) { %>
+                  End Hour Only
+                <% } %>
               </td>
               <td></td>
             </tr>
+            <% if (transfer.sand) { %>
+              <tr class="sand-row">
+                <td colspan="10">Sand: <%= transfer.sand %></td>
+              </tr>
+            <% } %>
+            <% if (transfer.trailer) { %>
+              <tr class="trailer-row">
+                <td colspan="10">Trailer: <%= transfer.trailer %></td>
+              </tr>
+            <% } %>
           <% } %>
         <% }) %>
       </tbody>
