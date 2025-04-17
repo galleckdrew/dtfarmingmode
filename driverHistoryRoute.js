@@ -55,21 +55,15 @@ router.get("/driver-history", async (req, res) => {
     const totalFuel = fuels.reduce((sum, f) => sum + (f.amount || 0), 0);
 
     res.render("driver-history", {
-      tractors,
-      farms,
-      fields,
-      from,
-      to,
-      tractor,
-      farm,
-      field,
-      allEntries,
-      totalLoads,
-      totalGallons,
-      totalHours,
-      totalFuel
-    });
-  } catch (err) {
+  loads, // ✅ Add this line
+  totalLoads,
+  totalGallons,
+  totalHours,
+  totalFuel,
+  fuelEntries,
+  transferEntries
+});
+ } catch (err) {
     console.error("❌ Error loading driver history:", err);
     res.status(500).send("Internal server error");
   }
