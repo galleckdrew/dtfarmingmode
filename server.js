@@ -45,7 +45,7 @@ app.use("/auth", require("./auth"));
 app.use("/admin", require("./adminRoutes"));
 app.use("/load", require("./routes/loadRoutes"));
 app.use("/print-report", require("./printRoutes"));
-app.use(require("./driverHistoryRoute"));
+app.use(require("./routes/driverHistoryRoute"));
 app.use(require("./routes/submitEndHourRoute"));
 app.use(require("./routes/fuelHistoryRoute"));
 app.use(require("./routes/transferHistoryRoute"));
