@@ -1,140 +1,240 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>🚜 Driver Load & Fuel History</title>
+  <title>D&T Driver History</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background-color: #f2f2f2; }
-    .filter-form { margin-bottom: 20px; }
-    .summary { margin: 20px 0; font-weight: bold; }
-    .actions { display: flex; gap: 10px; justify-content: center; }
-    .actions form { display: inline; }
-    button { padding: 4px 8px; }
-    .fuel-row { background-color: #fffbe6; font-style: italic; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: url('/login-bt.png') center center no-repeat fixed;
+      background-size: 300px;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      background-color: rgba(255, 255, 255, 0.94);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .filter-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    .filter-form label {
+      display: flex;
+      flex-direction: column;
+      font-weight: bold;
+      font-size: 0.95em;
+      color: #444;
+    }
+
+    .filter-form input,
+    .filter-form select {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+      font-size: 1em;
+      min-width: 150px;
+    }
+
+    button {
+      padding: 10px 16px;
+      font-weight: bold;
+      background-color: #3c8c3c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #327132;
+    }
+
+    .summary {
+      font-weight: bold;
+      text-align: center;
+      font-size: 1.1em;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95em;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #eaeaea;
+    }
+
+    .fuel-row {
+      background-color: #fffde6;
+      font-style: italic;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .actions form {
+      display: inline;
+    }
+
+    @media (max-width: 768px) {
+      .filter-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filter-form label {
+        width: 100%;
+      }
+
+      table {
+        font-size: 0.9em;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>🚜 Driver Load & Fuel History</h1>
+  <div class="container">
+    <h1>D&T Driver Load & Fuel History</h1>
 
-  <!-- Filter Form -->
-  <form class="filter-form" method="GET" action="/driver-history">
-    <label>Date From: <input type="date" name="from" value="<%= from || '' %>"></label>
-    <label>Date To: <input type="date" name="to" value="<%= to || '' %>"></label>
-    <label>Tractor:
-      <select name="tractor">
-        <option value="">All</option>
-        <% tractors.forEach(t => { %>
-          <option value="<%= t._id %>" <%= t._id.toString() === tractor ? 'selected' : '' %>><%= t.name %></option>
-        <% }) %>
-      </select>
-    </label>
-    <label>Farm:
-      <select name="farm">
-        <option value="">All</option>
-        <% farms.forEach(f => { %>
-          <option value="<%= f._id %>" <%= f._id.toString() === farm ? 'selected' : '' %>><%= f.name %></option>
-        <% }) %>
-      </select>
-    </label>
-    <label>Field:
-      <select name="field">
-        <option value="">All</option>
-        <% fields.forEach(f => { %>
-          <option value="<%= f._id %>" <%= f._id.toString() === field ? 'selected' : '' %>><%= f.name %></option>
-        <% }) %>
-      </select>
-    </label>
-    <button type="submit">Filter</button>
-    <button type="button" onclick="window.print()">🖨️ Print</button>
-  </form>
+    <!-- Filters -->
+    <form class="filter-form" method="GET" action="/driver-history">
+      <label>Date From: <input type="date" name="from" value="<%= from || '' %>"></label>
+      <label>Date To: <input type="date" name="to" value="<%= to || '' %>"></label>
+      <label>Tractor:
+        <select name="tractor">
+          <option value="">All</option>
+          <% tractors.forEach(t => { %>
+            <option value="<%= t._id %>" <%= t._id.toString() === tractor ? 'selected' : '' %>><%= t.name %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label>Farm:
+        <select name="farm">
+          <option value="">All</option>
+          <% farms.forEach(f => { %>
+            <option value="<%= f._id %>" <%= f._id.toString() === farm ? 'selected' : '' %>><%= f.name %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label>Field:
+        <select name="field">
+          <option value="">All</option>
+          <% fields.forEach(f => { %>
+            <option value="<%= f._id %>" <%= f._id.toString() === field ? 'selected' : '' %>><%= f.name %></option>
+          <% }) %>
+        </select>
+      </label>
+      <button type="submit">Filter</button>
+      <button type="button" onclick="window.print()">🖨️ Print</button>
+    </form>
 
-  <!-- Summary -->
-  <div class="summary">
-    Total Loads: <%= totalLoads %> |
-    Total Gallons: <%= totalGallons %> |
-    Total Hours: <%= totalHours.toFixed(2) %> |
-    Total Fuel: <%= totalFuel.toFixed(2) %> gal
+    <!-- Totals -->
+    <div class="summary">
+      Total Loads: <%= totalLoads %> |
+      Total Gallons: <%= totalGallons %> |
+      Total Hours: <%= totalHours.toFixed(2) %> |
+      Total Fuel: <%= totalFuel.toFixed(2) %>
+    </div>
+
+    <!-- Data Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Date & Time</th>
+          <th>Tractor</th>
+          <th>Farm</th>
+          <th>Field</th>
+          <th>Pit</th>
+          <th>Gallons</th>
+          <th>Start Hour</th>
+          <th>End Hour</th>
+          <th>Total Hours</th>
+          <th>Fuel</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% allEntries.forEach(entry => { %>
+          <% if (entry.type === 'load') { const load = entry.data; %>
+            <tr>
+              <td><%= new Date(load.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %></td>
+              <td><%= load.tractor?.name || '' %></td>
+              <td><%= load.farm?.name || '' %></td>
+              <td><%= load.field?.name || '' %></td>
+              <td><%= load.pit?.name || '' %></td>
+              <td><%= load.gallons ?? '' %></td>
+              <td><%= load.startHour ?? '' %></td>
+              <td><%= load.endHour ?? '' %></td>
+              <td><%= load.totalHours?.toFixed(2) ?? '' %></td>
+              <td></td>
+              <td class="actions">
+                <form method="GET" action="/driver-history/<%= load._id %>/edit"><button>Edit</button></form>
+                <form method="POST" action="/driver-history/<%= load._id %>?_method=DELETE"><button>Delete</button></form>
+              </td>
+            </tr>
+          <% } else if (entry.type === 'fuel') { const fuel = entry.data; %>
+            <tr class="fuel-row">
+              <td><%= new Date(fuel.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %></td>
+              <td><%= fuel.tractor?.name || '' %></td>
+              <td><%= fuel.farm || '' %></td>
+              <td><%= fuel.field?.name || '' %></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td><strong><%= fuel.amount %></strong></td>
+              <td></td>
+            </tr>
+          <% } else if (entry.type === 'transfer') { const trans = entry.data; %>
+            <tr>
+              <td><%= new Date(trans.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %></td>
+              <td><%= trans.tractor?.name || '' %></td>
+              <td><%= trans.farmer || '' %></td>
+              <td><%= trans.trailer || '' %></td>
+              <td><%= trans.sand || '' %></td>
+              <td></td>
+              <td><%= trans.startHour ?? '' %></td>
+              <td><%= trans.endHour ?? '' %></td>
+              <td><%= trans.totalHours?.toFixed(2) ?? '' %></td>
+              <td></td>
+              <td></td>
+            </tr>
+          <% } %>
+        <% }) %>
+      </tbody>
+    </table>
   </div>
-
-  <!-- Load Table -->
-  <table>
-    <thead>
-      <tr>
-        <th>Date & Time</th>
-        <th>Tractor</th>
-        <th>Farm</th>
-        <th>Field</th>
-        <th>Pit</th>
-        <th>Gallons</th>
-        <th>Start Hour</th>
-        <th>End Hour</th>
-        <th>Total Hours</th>
-        <th>Fuel</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% allEntries.forEach(entry => { %>
-        <% if (entry.type === 'load') { const load = entry.data; %>
-          <tr>
-            <td>
-              <%= new Date(load.timestamp).toLocaleString("en-US", {
-                timeZone: "America/New_York",
-                hour12: true,
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-              }) %>
-            </td>
-            <td><%= load.tractor?.name || '' %></td>
-            <td><%= load.farm?.name || '' %></td>
-            <td><%= load.field?.name || '' %></td>
-            <td><%= load.pit?.name || '' %></td>
-            <td><%= load.gallons ?? '' %></td>
-            <td><%= load.startHour ?? '' %></td>
-            <td><%= load.endHour ?? '' %></td>
-            <td><%= load.totalHours?.toFixed(2) ?? '' %></td>
-            <td></td>
-            <td class="actions">
-              <form method="GET" action="/driver-history/<%= load._id %>/edit">
-                <button>Edit</button>
-              </form>
-              <form method="POST" action="/driver-history/<%= load._id %>?_method=DELETE">
-                <button>Delete</button>
-              </form>
-            </td>
-          </tr>
-        <% } else if (entry.type === 'fuel') { const fuel = entry.data; %>
-          <tr class="fuel-row">
-            <td>
-              <%= new Date(fuel.timestamp).toLocaleString("en-US", {
-                timeZone: "America/New_York",
-                hour12: true,
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-              }) %>
-            </td>
-            <td><%= fuel.tractor?.name || '' %></td>
-            <td></td>
-            <td><%= fuel.field?.name || '' %></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><strong><%= fuel.amount %> gal</strong></td>
-            <td></td>
-          </tr>
-        <% } %>
-      <% }) %>
-    </tbody>
-  </table>
 </body>
 </html>
