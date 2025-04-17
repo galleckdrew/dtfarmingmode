@@ -134,17 +134,27 @@ router.post("/submit-end-hour", async (req, res) => {
   }
 });
 
-// POST /submit-fuel
-router.post("/submit-fuel", async (req, res) => {
+// POST /load/submit-fuel
+router.post('/submit-fuel', async (req, res) => {
+  const { tractor, field, amount, farm } = req.body;
+
   try {
-    const { tractor, field, amount } = req.body;
-    await Fuel.create({ tractor, field, amount });
-    res.redirect("/submit-load");
+    const newFuel = new Fuel({
+      tractor,
+      field,
+      amount,
+      farm,
+      timestamp: new Date()
+    });
+
+    await newFuel.save();
+    res.redirect('/submit-load');
   } catch (err) {
-    console.error("Error submitting fuel:", err);
-    res.status(500).send("Failed to submit fuel");
+    console.error("❌ Failed to submit fuel:", err);
+    res.status(500).send("Error submitting fuel data.");
   }
 });
+
 
 // POST /submit-transfer
 router.post("/submit-transfer", async (req, res) => {
