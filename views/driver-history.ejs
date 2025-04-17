@@ -1,133 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>D&T Driver History</title>
+  <title>🚜 Driver History</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
+      background: url('/login-bg.png') no-repeat center center fixed;
+      background-size: cover;
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
-      background: url('/login-bg.png') center center no-repeat fixed;
-      background-size: 300px;
-      background-color: #f4f4f4;
+      color: #fff;
     }
-
     .container {
-      max-width: 1000px;
-      margin: 40px auto;
-      background-color: rgba(255, 255, 255, 0.94);
+      background-color: rgba(0, 0, 0, 0.7);
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+      margin: 50px auto;
+      max-width: 1000px;
+      border-radius: 10px;
     }
-
     h1 {
       text-align: center;
-      font-size: 2em;
       margin-bottom: 20px;
-      color: #333;
     }
-
-    .filter-form {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-      justify-content: center;
-    }
-
-    .filter-form label {
-      display: flex;
-      flex-direction: column;
-      font-weight: bold;
-      font-size: 0.95em;
-      color: #444;
-    }
-
-    .filter-form input,
-    .filter-form select {
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid #aaa;
-      font-size: 1em;
-      min-width: 150px;
-    }
-
-    button {
-      padding: 10px 16px;
-      font-weight: bold;
-      background-color: #3c8c3c;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #327132;
-    }
-
     .summary {
       font-weight: bold;
-      text-align: center;
-      font-size: 1.1em;
+      font-size: 1.2em;
       margin-bottom: 20px;
-      color: #333;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.95em;
-      margin-top: 20px;
+      background-color: #fff;
+      color: #000;
     }
-
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
       text-align: center;
     }
-
     th {
-      background-color: #eaeaea;
+      background-color: #f2f2f2;
     }
-
     .fuel-row {
-      background-color: #fffde6;
+      background-color: #fffbe6;
       font-style: italic;
     }
-
+    .transfer-row {
+      background-color: #e6f5ff;
+      font-style: italic;
+    }
     .actions {
       display: flex;
-      gap: 6px;
+      gap: 10px;
       justify-content: center;
     }
-
-    .actions form {
-      display: inline;
+    button {
+      padding: 4px 8px;
     }
-
-    @media (max-width: 768px) {
-      .filter-form {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .filter-form label {
-        width: 100%;
-      }
-
-      table {
-        font-size: 0.9em;
-      }
+    .filter-form {
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>D&T Driver Load & Fuel History</h1>
+    <h1>D&T Manure Hauling - Driver History</h1>
 
-    <!-- Filters -->
     <form class="filter-form" method="GET" action="/driver-history">
       <label>Date From: <input type="date" name="from" value="<%= from || '' %>"></label>
       <label>Date To: <input type="date" name="to" value="<%= to || '' %>"></label>
@@ -159,15 +97,13 @@
       <button type="button" onclick="window.print()">🖨️ Print</button>
     </form>
 
-    <!-- Totals -->
     <div class="summary">
       Total Loads: <%= totalLoads %> |
       Total Gallons: <%= totalGallons %> |
       Total Hours: <%= totalHours.toFixed(2) %> |
-      Total Fuel: <%= totalFuel.toFixed(2) %>
+      Total Fuel: <%= totalFuel.toFixed(2) %> gal
     </div>
 
-    <!-- Data Table -->
     <table>
       <thead>
         <tr>
@@ -180,7 +116,7 @@
           <th>Start Hour</th>
           <th>End Hour</th>
           <th>Total Hours</th>
-          <th>Fuel</th>
+          <th>Fuel / Sand / Trailer</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -193,14 +129,18 @@
               <td><%= load.farm?.name || '' %></td>
               <td><%= load.field?.name || '' %></td>
               <td><%= load.pit?.name || '' %></td>
-              <td><%= load.gallons ?? '' %></td>
+              <td><%= load.gallons %></td>
               <td><%= load.startHour ?? '' %></td>
               <td><%= load.endHour ?? '' %></td>
               <td><%= load.totalHours?.toFixed(2) ?? '' %></td>
               <td></td>
               <td class="actions">
-                <form method="GET" action="/driver-history/<%= load._id %>/edit"><button>Edit</button></form>
-                <form method="POST" action="/driver-history/<%= load._id %>?_method=DELETE"><button>Delete</button></form>
+                <form method="GET" action="/driver-history/<%= load._id %>/edit">
+                  <button>Edit</button>
+                </form>
+                <form method="POST" action="/driver-history/<%= load._id %>?_method=DELETE">
+                  <button>Delete</button>
+                </form>
               </td>
             </tr>
           <% } else if (entry.type === 'fuel') { const fuel = entry.data; %>
@@ -214,21 +154,24 @@
               <td></td>
               <td></td>
               <td></td>
-              <td><strong><%= fuel.amount %></strong></td>
+              <td><strong><%= fuel.amount %> gal</strong></td>
               <td></td>
             </tr>
-          <% } else if (entry.type === 'transfer') { const trans = entry.data; %>
-            <tr>
-              <td><%= new Date(trans.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %></td>
-              <td><%= trans.tractor?.name || '' %></td>
-              <td><%= trans.farmer || '' %></td>
-              <td><%= trans.trailer || '' %></td>
-              <td><%= trans.sand || '' %></td>
+          <% } else if (entry.type === 'transfer') { const t = entry.data; %>
+            <tr class="transfer-row">
+              <td><%= new Date(t.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %></td>
+              <td><%= t.tractor?.name || '' %></td>
               <td></td>
-              <td><%= trans.startHour ?? '' %></td>
-              <td><%= trans.endHour ?? '' %></td>
-              <td><%= trans.totalHours?.toFixed(2) ?? '' %></td>
               <td></td>
+              <td></td>
+              <td></td>
+              <td><%= t.startHour ?? '' %></td>
+              <td><%= t.endHour ?? '' %></td>
+              <td><%= t.totalHours?.toFixed(2) ?? '' %></td>
+              <td>
+                <% if (t.trailer) { %>🚛 <%= t.trailer %><br><% } %>
+                <% if (t.sand) { %>🪨 <%= t.sand %><% } %>
+              </td>
               <td></td>
             </tr>
           <% } %>
