@@ -8,7 +8,8 @@ const Pump = require("../models/Pump");
 const Farmer = require("../models/Farmer");
 const Trailer = require("../models/Trailer");
 const Sand = require("../models/Sand");
-const { tractorFarmStartHours } = require("./routes/loadRoutes");
+const tractorFarmStartHours = require("../trackedHours");
+
 
 // Admin Form with readable tracked start hours
 router.get("/form", async (req, res) => {
