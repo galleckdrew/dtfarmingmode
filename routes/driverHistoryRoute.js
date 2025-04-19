@@ -13,7 +13,7 @@ function requireLogin(req, res, next) {
   next();
 }
 
-router.get("/driver-history", requireLogin, async (req, res) => {
+router.get("/driver-history", async (req, res) => {
   try {
     const { from, to, tractor, farm, field } = req.query;
 
