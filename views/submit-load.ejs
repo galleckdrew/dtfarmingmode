@@ -68,44 +68,48 @@
       </p>
     <% } %>
 
-    <!-- Submit Load -->
-    <div class="form-section">
-      <h2>Submit Load</h2>
-      <form method="POST" action="/load">
-        <label for="tractor">Tractor:</label>
-        <select name="tractor" required>
-          <% tractors.forEach(t => { %>
-            <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>><%= t.name %> (<%= t.gallons %> gal)</option>
-          <% }) %>
-        </select>
+ <!-- Load Submission Form -->
+<form method="POST" action="/load">
+  <label for="tractor">Tractor:</label>
+  <select name="tractor" required>
+    <% tractors.forEach(t => { %>
+      <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>>
+        <%= t.name %> (<%= t.gallons %> gal)
+      </option>
+    <% }) %>
+  </select>
 
-        <label for="farm">Farm:</label>
-        <select name="farm" required>
-          <% farms.forEach(f => { %>
-            <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>><%= f.name %></option>
-          <% }) %>
-        </select>
+  <label for="farm">Farm:</label>
+  <select name="farm" required>
+    <% farms.forEach(f => { %>
+      <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>>
+        <%= f.name %>
+      </option>
+    <% }) %>
+  </select>
 
-        <label for="field">Field:</label>
-        <select name="field" required>
-          <% fields.forEach(f => { %>
-            <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>><%= f.name %></option>
-          <% }) %>
-        </select>
+  <label for="field">Field:</label>
+  <select name="field" required>
+    <% fields.forEach(f => { %>
+      <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>>
+        <%= f.name %>
+      </option>
+    <% }) %>
+  </select>
 
-        <label for="pit">Pit:</label>
-        <select name="pit" required>
-          <% pits.forEach(p => { %>
-            <option value="<%= p._id %>"><%= p.name %></option>
-          <% }) %>
-        </select>
+  <label for="pit">Pit:</label>
+  <select name="pit" required>
+    <% pits.forEach(p => { %>
+      <option value="<%= p._id %>"><%= p.name %></option>
+    <% }) %>
+  </select>
 
-        <label for="startHour">Start Hour (optional):</label>
-        <input type="number" name="startHour" id="startHour" step="0.1" min="0" placeholder="optional">
+  <label for="startHour">Start Hour</label>
+  <input type="number" name="startHour" id="startHour" step="0.1" min="0" placeholder="Required On First Load" required>
 
-        <button type="submit">Submit Load</button>
-      </form>
-    </div>
+  <button type="submit">Submit Load</button>
+</form>
+
 
     <!-- Submit End Hour -->
     <div class="form-section">
