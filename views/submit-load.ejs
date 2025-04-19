@@ -67,11 +67,14 @@
     <h1>🚜 Submit Load</h1>
     <h3>Total Gallons Today: <%= totalGallons %></h3>
 
-    <% if (lastLoad) { %>
-      <p><strong>Last Load:</strong> <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %> by <%= lastLoad.tractor.name %></p>
-    <% } %>
-
-    <!-- Load Submission Form -->
+     <% if (typeof lastLoad !== "undefined" && lastLoad) { %>
+  <p><strong>Last Load:</strong>
+    <%= lastLoad.timestamp ? new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) : "Unknown time" %>
+    by <%= lastLoad.tractor?.name || "Unknown Tractor" %>
+  </p>
+<% } %>
+   
+<!-- Load Submission Form -->
     <form method="POST" action="/load">
       <label for="tractor">Tractor:</label>
       <select name="tractor" required>
