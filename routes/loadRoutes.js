@@ -22,10 +22,10 @@ router.get("/submit-load", async (req, res) => {
       Farm.find(),
       Field.find(),
       Pit.find(),
-      Pump.find(),
-      Farmer.find(),
-      Trailer.find(),
-      Sand.find(),
+      require("../models/Pump").find(),
+      require("../models/Farmer").find(),
+      require("../models/Trailer").find(),
+      require("../models/Sand").find()
     ]);
 
     const todayStart = new Date();
@@ -63,6 +63,7 @@ router.get("/submit-load", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
 
 // POST /load
 router.post("/", async (req, res) => {
