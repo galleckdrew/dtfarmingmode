@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const session = require("express-session");
 const methodOverride = require("method-override");
+const adminRoutes = require("./routes/adminRoutes");
 const editRoutes = require("./routes/editRoutes");
 require("dotenv").config();
 require("./db");
@@ -44,7 +45,7 @@ app.use(
 
 // Routes
 app.use("/auth", require("./auth"));
-app.use("/admin", require("./adminRoutes"));
+app.use("/admin", require("./routes/adminRoutes"));
 app.use("/load", require("./routes/loadRoutes"));
 app.use("/print-report", require("./printRoutes"));
 app.use(require("./routes/driverHistoryRoute"));
