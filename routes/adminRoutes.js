@@ -45,6 +45,7 @@ router.get("/form", async (req, res) => {
   });
 });
 
+
 // Generic create, update, delete handlers
 const collections = {
   tractors: Tractor,
