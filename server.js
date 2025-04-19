@@ -24,6 +24,7 @@ const Field = require("./models/Field");
 const Pit = require("./models/Pit");
 const Pump = require("./models/Pump");
 const Load = require("./models/Load");
+const Trailer = require("./models/Trailer");
 const Farmer = require("./models/Farmer");
 const Fuel = require("./models/Fuel");
 
