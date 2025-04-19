@@ -58,8 +58,8 @@ router.get("/driver-history", async (req, res) => {
 
     res.render("driver-history", {
       allEntries,
-      loads,            // ✅ Added for EJS use
-      fuels,            // ✅ Added in case EJS uses fuel details
+      loads,           
+      fuelEntries: fuels,       
       tractors,
       farms,
       fields,
