@@ -130,7 +130,7 @@ app.get("/submit-load", requireLogin, async (req, res) => {
       }
     }
 
-    res.render("load-form", {
+    res.render("submit-load", {
       tractors,
       farms,
       fields,
