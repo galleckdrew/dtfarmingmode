@@ -45,7 +45,7 @@ router.get("/driver-history", async (req, res) => {
     // Push fuels
     fuels.forEach(f => allEntries.push({ type: "fuel", data: f }));
 
-    // Push transfer parts without using spread (for Render compatibility)
+    // Push transfer entries manually with _id and required fields
     transfers.forEach(t => {
       allEntries.push({
         type: "transfer-start",
