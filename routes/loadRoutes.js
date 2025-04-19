@@ -39,7 +39,7 @@ router.get("/submit-load", async (req, res) => {
     const totalGallons = loadsToday.reduce((sum, l) => sum + (l.gallons || 0), 0);
     const totalFuel = fuelsToday.reduce((sum, f) => sum + (f.amount || 0), 0);
 
-    const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor farm field");
+    const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor farm field") || null;
 
     res.render("load-form", {
       tractors,
@@ -63,8 +63,6 @@ router.get("/submit-load", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
-
 
 // POST /load
 router.post("/", async (req, res) => {
