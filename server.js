@@ -83,6 +83,7 @@ app.get("/submit-load", requireLogin, async (req, res) => {
     const farms = await Farm.find();
     const fields = await Field.find();
     const pits = await Pit.find();
+    const pumps = await Pump.find();
 
     const today = new Date().toISOString().split("T")[0];
     const todayLoads = await Load.find({
@@ -135,6 +136,7 @@ app.get("/submit-load", requireLogin, async (req, res) => {
       farms,
       fields,
       pits,
+      pumps,
       totalGallons,
       totalFuel,
       lastLoadTractor,
