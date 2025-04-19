@@ -1,4 +1,3 @@
-
 <div class="container">
   <div class="header">
     <h1>D&T Manure Hauling</h1>
@@ -7,19 +6,20 @@
       <p>Total Fuel Used Today: <%= totalFuel %></p>
     </div>
 
-<% if (typeof lastLoad !== 'undefined' && lastLoad) { %>
-   <div class="last-load">
-    Most Recent Load: <%= lastLoad.tractor?.name || 'Unknown' %> – 
-    <%= lastLoad.gallons || 0 %> gallons at 
-    <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %>
+    <% if (lastLoad) { %>
+      <div class="last-load">
+        Most Recent Load: <%= lastLoad.tractor?.name || 'Unknown' %> –
+        <%= lastLoad.gallons || 0 %> gallons at
+        <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %>
+      </div>
+    <% } else { %>
+      <div class="last-load">
+        No previous loads found.
+      </div>
+    <% } %>
   </div>
-<% } else { %>
-  <div class="last-load">
-    No previous loads found.
-  </div>
-<% } %>
 
- <!-- Submit Load -->
+  <!-- Submit Load -->
   <div class="form-section">
     <h2>Submit Load</h2>
     <form action="/load" method="POST">
@@ -120,15 +120,15 @@
       <label for="pump">Pump</label>
       <select name="pump">
         <option value="">None</option>
-        <% pumps.forEach(p => { %>
+        <% (pumps || []).forEach(p => { %>
           <option value="<%= p._id %>"><%= p.name %></option>
         <% }) %>
       </select>
 
       <label for="farmer">Farmer</label>
       <select name="farmer">
-        <option value="">None</option>   
-        <% farmers.forEach(f => { %>
+        <option value="">None</option>
+        <% (farmers || []).forEach(f => { %>
           <option value="<%= f._id %>"><%= f.name %></option>
         <% }) %>
       </select>
@@ -136,7 +136,7 @@
       <label for="trailer">Trailer</label>
       <select name="trailer">
         <option value="">None</option>
-        <% trailers.forEach(t => { %>
+        <% (trailers || []).forEach(t => { %>
           <option value="<%= t._id %>"><%= t.name %></option>
         <% }) %>
       </select>
@@ -144,7 +144,7 @@
       <label for="sand">Sand</label>
       <select name="sand">
         <option value="">None</option>
-        <% sands.forEach(s => { %>
+        <% (sands || []).forEach(s => { %>
           <option value="<%= s._id %>"><%= s.name %></option>
         <% }) %>
       </select>
@@ -173,4 +173,3 @@
     <% } %>
   </div>
 </div>
-
