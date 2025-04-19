@@ -1,58 +1,22 @@
+<<!-- views/edit-load.ejs -->
 <!DOCTYPE html>
 <html>
 <head>
   <title>Edit Load</title>
 </head>
 <body>
-  <h1✏️ Edit Load</h1>
-
-  <form action="/driver-history/<%= load._id %>?_method=PUT" method="POST">
-    <label>Tractor:</label>
-    <select name="tractor" required>
-      <% tractors.forEach(t => { %>
-        <option value="<%= t._id %>" <%= t._id.toString() === load.tractor.toString() ? "selected" : "" %>>
-          <%= t.name %> - <%= t.gallons %> gal
-        </option>
-      <% }) %>
-    </select><br><br>
-
-    <label>Farm:</label>
-    <select name="farm" required>
-      <% farms.forEach(f => { %>
-        <option value="<%= f._id %>" <%= f._id.toString() === load.farm.toString() ? "selected" : "" %>>
-          <%= f.name %>
-        </option>
-      <% }) %>
-    </select><br><br>
-
-    <label>Field:</label>
-    <select name="field" required>
-      <% fields.forEach(fl => { %>
-        <option value="<%= fl._id %>" <%= fl._id.toString() === load.field.toString() ? "selected" : "" %>>
-          <%= fl.name %>
-        </option>
-      <% }) %>
-    </select><br><br>
-
-    <label>Pit:</label>
-    <select name="pit" required>
-      <% pits.forEach(p => { %>
-        <option value="<%= p._id %>" <%= p._id.toString() === load.pit.toString() ? "selected" : "" %>>
-          <%= p.name %>
-        </option>
-      <% }) %>
-    </select><br><br>
+  <h1>Edit Load</h1>
+  <form method="POST" action="/edit-load/<%= load._id %>">
+    <label>Gallons:</label>
+    <input type="number" name="gallons" value="<%= load.gallons %>" required><br>
 
     <label>Start Hour:</label>
-    <input type="number" name="startHour" value="<%= load.startHour ?? '' %>"><br><br>
+    <input type="text" name="startHour" value="<%= load.startHour %>"><br>
 
     <label>End Hour:</label>
-    <input type="number" name="endHour" value="<%= load.endHour ?? '' %>"><br><br>
+    <input type="text" name="endHour" value="<%= load.endHour %>"><br>
 
-    <button type="submit">💾 Save Changes</button>
+    <button type="submit">Save Changes</button>
   </form>
-
-  <br>
-  <a href="/driver-history">⬅ Back to History</a>
 </body>
 </html>

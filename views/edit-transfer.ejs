@@ -1,0 +1,25 @@
+<!-- views/edit-transfer.ejs -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Transfer Entry</title>
+</head>
+<body>
+  <h1>Edit Transfer Entry</h1>
+  <form method="POST" action="/edit-transfer/<%= transfer._id %>">
+    <label>Start Hour:</label>
+    <input type="text" name="startHour" value="<%= transfer.startHour %>"><br>
+
+    <label>End Hour:</label>
+    <input type="text" name="endHour" value="<%= transfer.endHour %>"><br>
+
+    <label>Trailer:</label>
+    <input type="text" name="trailer" value="<%= transfer.trailer %>"><br>
+
+    <label>Sand:</label>
+    <input type="text" name="sand" value="<%= transfer.sand %>"><br>
+
+    <button type="submit">Save Changes</button>
+  </form>
+</body>
+</html>
