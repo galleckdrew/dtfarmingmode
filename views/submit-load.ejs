@@ -113,6 +113,89 @@
       <button type="submit">Submit Load</button>
     </form>
 
+    <!-- Transfer Form -->
+    <form method="POST" action="/submit-transfer">
+      <h2>Submit Transfer</h2>
+      <label for="field">Field (optional):</label>
+      <select name="field">
+        <option value="">None</option>
+        <% fields.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="pump">Pump:</label>
+      <select name="pump">
+        <option value="">None</option>
+        <% pumps.forEach(p => { %>
+          <option value="<%= p._id %>"><%= p.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="farmer">Farmer:</label>
+      <select name="farmer">
+        <option value="">None</option>
+        <% farmers.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="trailer">Trailer:</label>
+      <select name="trailer">
+        <option value="">None</option>
+        <% trailers.forEach(tr => { %>
+          <option value="<%= tr._id %>"><%= tr.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="sand">Sand:</label>
+      <select name="sand">
+        <option value="">None</option>
+        <% sands.forEach(s => { %>
+          <option value="<%= s._id %>"><%= s.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="startHour">Start Hour:</label>
+      <input type="text" name="startHour" required>
+
+      <label for="endHour">End Hour:</label>
+      <input type="text" name="endHour">
+
+      <button type="submit">Submit Transfer</button>
+    </form>
+
+    <!-- Submit Fuel -->
+    <form method="POST" action="/submit-fuel">
+      <h2>Submit Fuel</h2>
+      <label for="tractor">Tractor:</label>
+      <select name="tractor" required>
+        <% tractors.forEach(t => { %>
+          <option value="<%= t._id %>"><%= t.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="farm">Farm:</label>
+      <select name="farm">
+        <option value="">None</option>
+        <% farms.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="field">Field:</label>
+      <select name="field">
+        <% fields.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+
+      <label for="amount">Amount:</label>
+      <input type="number" name="amount" required>
+
+      <button type="submit">Submit Fuel</button>
+    </form>
+
     <!-- End Hour Submission Form -->
     <form method="POST" action="/submit-end-hour" class="dual-buttons">
       <input type="hidden" name="tractor" value="<%= selectedTractorId || '' %>">
