@@ -51,26 +51,28 @@ router.get("/driver-history", requireLogin, async (req, res) => {
     // Sort all entries newest first
     allEntries.sort((a, b) => new Date(b.data.timestamp) - new Date(a.data.timestamp));
 
-  const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0);
-const totalFuel = fuels.reduce((sum, f) => sum + (f.amount || 0), 0);
-const totalHours = loads.reduce((sum, l) => sum + (l.totalHours || 0), 0);
-const totalLoads = loads.length; 
+    const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0);
+    const totalFuel = fuels.reduce((sum, f) => sum + (f.amount || 0), 0);
+    const totalHours = loads.reduce((sum, l) => sum + (l.totalHours || 0), 0);
+    const totalLoads = loads.length;
 
-res.render("driver-history", {
-  allEntries,
-  tractors,
-  farms,
-  fields,
-  from,
-  to,
-  tractor,
-  farm,
-  field,
-  totalLoads,     
-  totalGallons,    
-  totalHours,       
-  totalFuel         
-});
+    res.render("driver-history", {
+      allEntries,
+      loads,            // ✅ Added for EJS use
+      fuels,            // ✅ Added in case EJS uses fuel details
+      tractors,
+      farms,
+      fields,
+      from,
+      to,
+      tractor,
+      farm,
+      field,
+      totalLoads,
+      totalGallons,
+      totalHours,
+      totalFuel
+    });
 
   } catch (err) {
     console.error("❌ Error loading driver history:", err);
