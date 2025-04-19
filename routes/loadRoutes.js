@@ -46,7 +46,7 @@ router.get("/submit-load", async (req, res) => {
       farms,
       fields,
       pits,
-      pump,
+      pumps,
       farmers,
       trailers,
       sands,
