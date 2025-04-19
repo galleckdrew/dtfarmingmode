@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Load = require("../models/Load");
 const Fuel = require("../models/Fuel");
-const Tractor = require("./models/Tractor");
-const Farm = require("./models/Farm");
-const Field = require("./models/Field");
-const Transfer = require("./models/Transfer");
+const Tractor = require("../models/Tractor");
+const Farm = require("../models/Farm");
+const Field = require("../models/Field");
+const Transfer = require("../models/Transfer");
 
 // Helper for login protection
 function requireLogin(req, res, next) {
