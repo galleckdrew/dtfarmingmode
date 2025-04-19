@@ -7,15 +7,9 @@ const Farm = require("../models/Farm");
 const Field = require("../models/Field");
 const Transfer = require("../models/Transfer");
 
-// Helper for login protection (not used currently, but ready if needed)
-function requireLogin(req, res, next) {
-  if (!req.session.user) return res.redirect("/auth/login");
-  next();
-}
-
 router.get("/driver-history", async (req, res) => {
   try {
-    const { from, to, tractor, farm, field } = req.query;
+    const { from, to, tractor, farm, field, type } = req.query;
 
     const query = {};
     if (from || to) {
@@ -36,78 +30,55 @@ router.get("/driver-history", async (req, res) => {
       Field.find(),
     ]);
 
-    // Prepare unified list
     const allEntries = [];
 
-    // Push loads
     loads.forEach(l => allEntries.push({ type: "load", data: l }));
-
-    // Push fuels
     fuels.forEach(f => allEntries.push({ type: "fuel", data: f }));
-
-    // Push transfer entries manually with _id and required fields
     transfers.forEach(t => {
-      allEntries.push({
-        type: "transfer-start",
-        data: {
-          _id: t._id,
-          tractor: t.tractor,
-          startHour: t.startHour,
-          timestamp: t.timestamp,
-          section: "start",
-          label: "Start Hour"
-        }
-      });
-      allEntries.push({
-        type: "transfer-end",
-        data: {
-          _id: t._id,
-          tractor: t.tractor,
-          endHour: t.endHour,
-          timestamp: t.timestamp,
-          section: "end",
-          label: "End Hour"
-        }
-      });
+      if (t.startHour) {
+        allEntries.push({ type: "transfer-start", data: t });
+      }
+      if (t.endHour) {
+        allEntries.push({ type: "transfer-end", data: t });
+      }
       if (t.trailer) {
-        allEntries.push({
-          type: "trailer",
-          data: {
-            _id: t._id,
-            tractor: t.tractor,
-            trailer: t.trailer,
-            timestamp: t.timestamp,
-            label: "Trailer"
-          }
-        });
+        allEntries.push({ type: "trailer", data: t });
       }
       if (t.sand) {
-        allEntries.push({
-          type: "sand",
-          data: {
-            _id: t._id,
-            tractor: t.tractor,
-            sand: t.sand,
-            timestamp: t.timestamp,
-            label: "Sand"
-          }
-        });
+        allEntries.push({ type: "sand", data: t });
       }
     });
 
-    // Sort by newest timestamp
-    allEntries.sort((a, b) => new Date(b.data.timestamp) - new Date(a.data.timestamp));
+    // Filter by type if selected
+    const filteredEntries = type ? allEntries.filter(e => e.type === type) : allEntries;
 
-    const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0);
-    const totalFuel = fuels.reduce((sum, f) => sum + (f.amount || 0), 0);
-    const totalHours = loads.reduce((sum, l) => sum + (l.totalHours || 0), 0);
-    const totalLoads = loads.length;
+    // Sort newest first
+    filteredEntries.sort((a, b) => new Date(b.data.timestamp) - new Date(a.data.timestamp));
+
+    // Totals based on filtered entries
+    const totalGallons = filteredEntries
+      .filter(e => e.type === "load")
+      .reduce((sum, e) => sum + (e.data.gallons || 0), 0);
+
+    const totalFuel = filteredEntries
+      .filter(e => e.type === "fuel")
+      .reduce((sum, e) => sum + (e.data.amount || 0), 0);
+
+    const totalHours = filteredEntries
+      .filter(e => e.type === "load")
+      .reduce((sum, e) => sum + (e.data.totalHours || 0), 0);
+
+    const totalTransferHours = filteredEntries
+      .filter(e => e.type === "transfer-start" || e.type === "transfer-end")
+      .reduce((sum, e) => {
+        const hours = parseFloat(e.data.startHour || 0) + parseFloat(e.data.endHour || 0);
+        return sum + (isNaN(hours) ? 0 : hours);
+      }, 0);
+
+    const totalLoads = filteredEntries.filter(e => e.type === "load").length;
 
     res.render("driver-history", {
-      allEntries,
-      loads,
-      fuelEntries: fuels,
-      transferEntries: transfers,
+      allEntries: filteredEntries,
       tractors,
       farms,
       fields,
@@ -116,12 +87,13 @@ router.get("/driver-history", async (req, res) => {
       tractor,
       farm,
       field,
+      type,
       totalLoads,
       totalGallons,
+      totalFuel,
       totalHours,
-      totalFuel
+      totalTransferHours,
     });
-
   } catch (err) {
     console.error("❌ Error loading driver history:", err);
     res.status(500).send("Failed to load driver history.");

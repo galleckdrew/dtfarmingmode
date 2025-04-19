@@ -37,7 +37,22 @@
       padding: 10px;
       background: rgba(200, 200, 200, 0.85);
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-around;
+    }
+    .filters {
+      width: 95%;
+      margin: 20px auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: rgba(240, 240, 240, 0.8);
+      padding: 10px;
+      border-radius: 6px;
+    }
+    .filters label {
+      font-weight: bold;
+      margin-right: 4px;
     }
     .btn {
       background-color: #444;
@@ -68,7 +83,61 @@
     <p>Total Gallons: <%= totalGallons %></p>
     <p>Total Hours: <%= totalHours %></p>
     <p>Total Fuel Used: <%= totalFuel %></p>
+    <p>Total Transfer Hours: <%= totalTransferHours %></p>
   </div>
+
+  <form class="filters" method="GET" action="/driver-history">
+    <div>
+      <label for="farm">Farm:</label>
+      <select name="farm" id="farm">
+        <option value="">All</option>
+        <% farms.forEach(f => { %>
+          <option value="<%= f._id %>" <%= farm === f._id ? 'selected' : '' %>><%= f.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div>
+      <label for="field">Field:</label>
+      <select name="field" id="field">
+        <option value="">All</option>
+        <% fields.forEach(fl => { %>
+          <option value="<%= fl._id %>" <%= field === fl._id ? 'selected' : '' %>><%= fl.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div>
+      <label for="tractor">Tractor:</label>
+      <select name="tractor" id="tractor">
+        <option value="">All</option>
+        <% tractors.forEach(t => { %>
+          <option value="<%= t._id %>" <%= tractor === t._id ? 'selected' : '' %>><%= t.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div>
+      <label for="type">Type:</label>
+      <select name="type" id="type">
+        <option value="">All</option>
+        <option value="load">Load</option>
+        <option value="fuel">Fuel</option>
+        <option value="transfer-start">Transfer Start</option>
+        <option value="transfer-end">Transfer End</option>
+        <option value="trailer">Pump</option>
+        <option value="sand">Sand</option>
+      </select>
+    </div>
+    <div>
+      <label for="from">From:</label>
+      <input type="date" name="from" id="from" value="<%= from || '' %>">
+    </div>
+    <div>
+      <label for="to">To:</label>
+      <input type="date" name="to" id="to" value="<%= to || '' %>">
+    </div>
+    <div>
+      <button type="submit" class="btn">Apply Filters</button>
+    </div>
+  </form>
 
   <table>
     <thead>
