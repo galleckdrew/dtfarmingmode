@@ -16,6 +16,11 @@ router.post("/edit-load/:id", async (req, res) => {
   res.redirect("/driver-history");
 });
 
+router.post("/edit-load/:id", async (req, res) => {
+  console.log("EDITING LOAD:", req.body); // Add this
+  ...
+});
+
 router.post("/delete-load/:id", async (req, res) => {
   await Load.findByIdAndDelete(req.params.id);
   res.redirect("/driver-history");
@@ -29,6 +34,7 @@ router.get("/edit-fuel/:id", async (req, res) => {
 
 router.post("/edit-fuel/:id", async (req, res) => {
   const { amount } = req.body;
+  console.log("EDITING FUEL:", req.params.id, req.body); // ✅ for debugging
   await Fuel.findByIdAndUpdate(req.params.id, { amount });
   res.redirect("/driver-history");
 });
