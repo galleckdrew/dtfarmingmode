@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Load = require("./models/Load");
+const Load = require("../models/Load");
 const Fuel = require("./models/Fuel");
 const Tractor = require("./models/Tractor");
 const Farm = require("./models/Farm");
