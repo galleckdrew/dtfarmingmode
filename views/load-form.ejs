@@ -7,8 +7,8 @@
       <p>Total Fuel Used Today: <%= totalFuel %></p>
     </div>
 
-<% if (lastLoad) { %>
-  <div class="last-load">
+<% if (typeof lastLoad !== 'undefined' && lastLoad) { %>
+   <div class="last-load">
     Most Recent Load: <%= lastLoad.tractor?.name || 'Unknown' %> – 
     <%= lastLoad.gallons || 0 %> gallons at 
     <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %>
