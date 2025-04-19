@@ -130,7 +130,12 @@
           <% if (section.gallonField) { %>
             <input type="number" name="gallons" placeholder="Gallons" required>
           <% } %>
-          <button type="submit">Add <%= section.title.slice(0, -1) %></button>
+          <% if (section.name === "sand") { %>
+  <button type="submit">Add Sand Spreader</button>
+<% } else { %>
+  <button type="submit">Add <%= section.title.slice(0, -1) %></button>
+<% } %>
+
         </form>
       </div>
     <% }) %>
