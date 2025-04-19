@@ -41,7 +41,7 @@ router.get("/submit-load", async (req, res) => {
 
     const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor farm field") || null;
 
-    res.render("submit-form", {
+    res.render("submit-load", {
       tractors,
       farms,
       fields,
