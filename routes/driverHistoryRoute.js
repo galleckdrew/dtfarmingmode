@@ -56,25 +56,25 @@ router.get("/driver-history", async (req, res) => {
     const totalHours = loads.reduce((sum, l) => sum + (l.totalHours || 0), 0);
     const totalLoads = loads.length;
 
-    res.render("driver-history", {
-      allEntries,
-      loads,           
-      fuelEntries: fuels,       
-      tractors,
-      farms,
-      fields,
-      from,
-      to,
-      tractor,
-      farm,
-      field,
-      totalLoads,
-      totalGallons,
-      totalHours,
-      totalFuel
-    });
-
-  } catch (err) {
+     res.render("driver-history", {
+  allEntries,
+  loads,
+  fuelEntries: fuels,
+  transferEntries: transfers,  
+  tractors,
+  farms,
+  fields,
+  from,
+  to,
+  tractor,
+  farm,
+  field,
+  totalLoads,
+  totalGallons,
+  totalHours,
+  totalFuel
+});
+ } catch (err) {
     console.error("❌ Error loading driver history:", err);
     res.status(500).send("Failed to load driver history.");
   }
