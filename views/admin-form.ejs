@@ -121,7 +121,12 @@
         </ul>
 
         <form method="POST" action="/admin/<%= section.name %>s">
-          <input type="text" name="name" placeholder="New <%= section.title.slice(0, -1) %> Name" required>
+          <% if (section.name === "sand") { %>
+  <input type="text" name="name" placeholder="Enter Spreader Name" required>
+<% } else { %>
+  <input type="text" name="name" placeholder="New <%= section.title.slice(0, -1) %> Name" required>
+<% } %>
+
           <% if (section.gallonField) { %>
             <input type="number" name="gallons" placeholder="Gallons" required>
           <% } %>
