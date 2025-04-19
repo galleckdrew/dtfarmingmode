@@ -6,12 +6,20 @@
       <p>Total Gallons Today: <%= totalGallons %></p>
       <p>Total Fuel Used Today: <%= totalFuel %></p>
     </div>
-    <div class="last-load">
-      Most Recent Load: <%= lastLoad?.tractor?.name %> – <%= lastLoad?.gallons %> gallons at <%= new Date(lastLoad?.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %>
-    </div>
-  </div>
 
-  <!-- Submit Load -->
+<% if (lastLoad) { %>
+  <div class="last-load">
+    Most Recent Load: <%= lastLoad.tractor?.name || 'Unknown' %> – 
+    <%= lastLoad.gallons || 0 %> gallons at 
+    <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %>
+  </div>
+<% } else { %>
+  <div class="last-load">
+    No previous loads found.
+  </div>
+<% } %>
+
+ <!-- Submit Load -->
   <div class="form-section">
     <h2>Submit Load</h2>
     <form action="/load" method="POST">
