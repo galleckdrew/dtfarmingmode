@@ -80,11 +80,16 @@ app.get("/", (req, res) => {
 // ✅ Submit Load Form with totalFuel and formatted trackedHours
 app.get("/submit-load", requireLogin, async (req, res) => {
   try {
-    const tractors = await Tractor.find();
-    const farms = await Farm.find();
-    const fields = await Field.find();
-    const pits = await Pit.find();
-    const pumps = await Pump.find();
+    const [tractors, farms, fields, pits, pumps, farmers, trailers, sands] = await Promise.all([
+  Tractor.find(),
+  Farm.find(),
+  Field.find(),
+  Pit.find(),
+  Pump.find(),
+  Farmer.find(),
+  Trailer.find(),
+  Sand.find()
+]);
 
     const today = new Date().toISOString().split("T")[0];
     const todayLoads = await Load.find({
@@ -138,6 +143,9 @@ app.get("/submit-load", requireLogin, async (req, res) => {
       fields,
       pits,
       pumps,
+      farmers,
+      trailers,
+      sands,
       totalGallons,
       totalFuel,
       lastLoadTractor,
