@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const Tractor = require("./models/Tractor");
-const Farm = require("./models/Farm");
-const Field = require("./models/Field");
-const Pit = require("./models/Pit");
-const Pump = require("./models/Pump");
-const Farmer = require("./models/Farmer");
-const Trailer = require("./models/Trailer");
-const Sand = require("./models/Sand");
+const Tractor = require("../models/Tractor");
+const Farm = require("../models/Farm");
+const Field = require("../models/Field");
+const Pit = require("../models/Pit");
+const Pump = require("../models/Pump");
+const Farmer = require("../models/Farmer");
+const Trailer = require("../models/Trailer");
+const Sand = require("../models/Sand");
 const { tractorFarmStartHours } = require("./routes/loadRoutes");
 
 // Admin Form with readable tracked start hours
