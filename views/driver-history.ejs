@@ -1,209 +1,69 @@
+<!-- views/driver-history.ejs -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Driver History | D&T Manure Hauling</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: url('/login-bg.png') no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      background-color: rgba(0, 0, 0, 0.7);
-      max-width: 1200px;
-      margin: auto;
-      padding: 30px;
-      border-radius: 10px;
-    }
-    h1 {
-      text-align: center;
-      font-size: 2.5em;
-      margin-bottom: 10px;
-    }
-    .summary {
-      text-align: center;
-      font-size: 1.2em;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    .print-button {
-      text-align: right;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 8px 14px;
-      font-size: 1em;
-      font-weight: bold;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      padding: 10px;
-      text-align: center;
-      border: 1px solid #ccc;
-    }
-    th {
-      background-color: #444;
-    }
-    tr.fuel {
-      background-color: #fffbe6;
-      color: #000;
-    }
-    tr.transfer {
-      background-color: #e0f3ff;
-      color: #000;
-    }
-    .category {
-      background-color: #111;
-      color: #0ff;
-      font-size: 1.1em;
-      font-weight: bold;
-      text-align: left;
-      padding: 10px;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Driver History</title>
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>D&T Manure Hauling - Driver History</h1>
+  <h1>Driver History</h1>
 
-    <div class="print-button">
-      <button onclick="window.print()">🖨️ Print</button>
-    </div>
-
-    <div class="summary">
-      Total Loads: <%= totalLoads %> |
-      Total Gallons: <%= totalGallons %> |
-      Total Hours: <%= totalHours.toFixed(2) %> |
-      Total Fuel: <%= totalFuel.toFixed(2) %> gal
-    </div>
-
-    <!-- Load Category -->
-    <div class="category">Load Submissions</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Tractor</th>
-          <th>Farm</th>
-          <th>Field</th>
-          <th>Pit</th>
-          <th>Gallons</th>
-          <th>Start Hour</th>
-          <th>End Hour</th>
-          <th>Total Hours</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% loads.forEach(load => { %>
-          <tr>
-            <td><%= new Date(load.timestamp).toLocaleString() %></td>
-            <td><%= load.tractor?.name %></td>
-            <td><%= load.farm?.name %></td>
-            <td><%= load.field?.name %></td>
-            <td><%= load.pit?.name %></td>
-            <td><%= load.gallons %></td>
-            <td><%= load.startHour ?? '' %></td>
-            <td><%= load.endHour ?? '' %></td>
-            <td><%= load.totalHours?.toFixed(2) ?? '' %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-
-    <!-- Fuel Category -->
-    <div class="category">Fuel</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Tractor</th>
-          <th>Farm</th>
-          <th>Field</th>
-          <th>Gallons</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% fuelEntries.forEach(entry => { %>
-          <tr class="fuel">
-            <td><%= new Date(entry.timestamp).toLocaleString() %></td>
-            <td><%= entry.tractor?.name %></td>
-            <td><%= entry.farm %></td>
-            <td><%= entry.field?.name %></td>
-            <td><%= entry.amount %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-
-    <!-- Transfer Start -->
-    <div class="category">Transfer/Hauling Start Hours</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Tractor</th>
-          <th>Pump</th>
-          <th>Farmer</th>
-          <th>Trailer</th>
-          <th>Sand</th>
-          <th>Start Hour</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% transferEntries.filter(e => e.startHour).forEach(entry => { %>
-          <tr class="transfer">
-            <td><%= new Date(entry.timestamp).toLocaleString() %></td>
-            <td><%= entry.tractor?.name %></td>
-            <td><%= entry.pump %></td>
-            <td><%= entry.farmer %></td>
-            <td><%= entry.trailer %></td>
-            <td><%= entry.sand %></td>
-            <td><%= entry.startHour %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-
-    <!-- Transfer End -->
-    <div class="category">Transfer/Hauling End Hours</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Tractor</th>
-          <th>Pump</th>
-          <th>Farmer</th>
-          <th>Trailer</th>
-          <th>Sand</th>
-          <th>End Hour</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% transferEntries.filter(e => e.endHour && !e.startHour).forEach(entry => { %>
-          <tr class="transfer">
-            <td><%= new Date(entry.timestamp).toLocaleString() %></td>
-            <td><%= entry.tractor?.name %></td>
-            <td><%= entry.pump %></td>
-            <td><%= entry.farmer %></td>
-            <td><%= entry.trailer %></td>
-            <td><%= entry.sand %></td>
-            <td><%= entry.endHour %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+  <div class="totals">
+    <p>Total Loads: <%= totalLoads %></p>
+    <p>Total Gallons: <%= totalGallons %></p>
+    <p>Total Hours: <%= totalHours %></p>
+    <p>Total Fuel Used: <%= totalFuel %></p>
   </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Type</th>
+        <th>Tractor</th>
+        <th>Details</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% allEntries.forEach(entry => { %>
+        <tr>
+          <td><%= new Date(entry.data.timestamp).toLocaleString() %></td>
+          <td><%= entry.type %></td>
+          <td><%= entry.data.tractor?.name || '-' %></td>
+          <td>
+            <% if (entry.type === 'load') { %>
+              Gallons: <%= entry.data.gallons %>, Hours: <%= entry.data.totalHours %><br/>
+              Farm: <%= entry.data.farm?.name %>, Field: <%= entry.data.field?.name %>, Pit: <%= entry.data.pit?.name %>
+            <% } else if (entry.type === 'fuel') { %>
+              Fuel: <%= entry.data.amount %> gal, Field: <%= entry.data.field?.name %>
+            <% } else { %>
+              <%= entry.data.label %>: <%= entry.data.startHour || entry.data.endHour || entry.data.trailer || entry.data.sand %>
+            <% } %>
+          </td>
+          <td>
+            <% if (entry.type === 'load') { %>
+              <a href="/edit-load/<%= entry.data._id %>">✏️</a>
+              <form method="POST" action="/delete-load/<%= entry.data._id %>" style="display:inline;">
+                <button type="submit">🗑️</button>
+              </form>
+            <% } else if (entry.type === 'fuel') { %>
+              <a href="/edit-fuel/<%= entry.data._id %>">✏️</a>
+              <form method="POST" action="/delete-fuel/<%= entry.data._id %>" style="display:inline;">
+                <button type="submit">🗑️</button>
+              </form>
+            <% } else { %>
+              <a href="/edit-transfer/<%= entry.data._id %>">✏️</a>
+              <form method="POST" action="/delete-transfer/<%= entry.data._id %>" style="display:inline;">
+                <button type="submit">🗑️</button>
+              </form>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
 </body>
 </html>
