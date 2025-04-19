@@ -2,10 +2,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Driver History</title>
-  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    body {
+      background: url('/images/tractor-background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+    }
+    table {
+      width: 95%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #444;
+      text-align: left;
+    }
+    th {
+      background: #1f1f1f;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .totals {
+      width: 95%;
+      margin: 10px auto;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: space-around;
+      color: #ccc;
+    }
+    .btn {
+      background-color: #444;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      text-decoration: none;
+      margin: 0 4px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #666;
+    }
+    form {
+      display: inline;
+    }
+  </style>
 </head>
 <body>
   <h1>Driver History</h1>
@@ -35,7 +87,7 @@
           <td><%= entry.data.tractor?.name || '-' %></td>
           <td>
             <% if (entry.type === 'load') { %>
-              Gallons: <%= entry.data.gallons %>, Hours: <%= entry.data.totalHours %><br/>
+              Gallons: <%= entry.data.gallons %>, Hours: <%= entry.data.totalHours %><br>
               Farm: <%= entry.data.farm?.name %>, Field: <%= entry.data.field?.name %>, Pit: <%= entry.data.pit?.name %>
             <% } else if (entry.type === 'fuel') { %>
               Fuel: <%= entry.data.amount %> gal, Field: <%= entry.data.field?.name %>
@@ -45,19 +97,19 @@
           </td>
           <td>
             <% if (entry.type === 'load') { %>
-              <a href="/edit-load/<%= entry.data._id %>">✏️</a>
-              <form method="POST" action="/delete-load/<%= entry.data._id %>" style="display:inline;">
-                <button type="submit">🗑️</button>
+              <a href="/edit-load/<%= entry.data._id %>" class="btn">Edit</a>
+              <form method="POST" action="/delete-load/<%= entry.data._id %>">
+                <button type="submit" class="btn">Delete</button>
               </form>
             <% } else if (entry.type === 'fuel') { %>
-              <a href="/edit-fuel/<%= entry.data._id %>">✏️</a>
-              <form method="POST" action="/delete-fuel/<%= entry.data._id %>" style="display:inline;">
-                <button type="submit">🗑️</button>
+              <a href="/edit-fuel/<%= entry.data._id %>" class="btn">Edit</a>
+              <form method="POST" action="/delete-fuel/<%= entry.data._id %>">
+                <button type="submit" class="btn">Delete</button>
               </form>
             <% } else { %>
-              <a href="/edit-transfer/<%= entry.data._id %>">✏️</a>
-              <form method="POST" action="/delete-transfer/<%= entry.data._id %>" style="display:inline;">
-                <button type="submit">🗑️</button>
+              <a href="/edit-transfer/<%= entry.data._id %>" class="btn">Edit</a>
+              <form method="POST" action="/delete-transfer/<%= entry.data._id %>">
+                <button type="submit" class="btn">Delete</button>
               </form>
             <% } %>
           </td>
