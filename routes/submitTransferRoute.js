@@ -4,19 +4,25 @@ const Transfer = require("../models/Transfer");
 
 router.post("/submit-transfer", async (req, res) => {
   try {
-    const { tractor, pump, farmer, trailer, sand, field, startHour, endHour } = req.body;
+    let { tractor, pump, farmer, trailer, sand, field, startHour, endHour } = req.body;
+
+    // Convert empty strings to undefined for optional ObjectId fields
+    pump = pump || undefined;
+    farmer = farmer || undefined;
+    trailer = trailer || undefined;
+    sand = sand || undefined;
+    field = field || undefined;
 
     const start = startHour ? parseFloat(startHour.replace(',', '.')) : NaN;
-    const end = endHour ? parseFloat(endHour.replace(',', '.')) : null;
+    const end = endHour ? parseFloat(endHour.replace(',', '.')) : NaN;
 
     if (isNaN(start)) {
-      return res.send(`<script>alert('Please enter a valid Start Hour'); window.location.href = '/submit-load';</script>`);
+      return res.send(`<script>alert('Start hour is required'); window.location.href = '/submit-load';</script>`);
     }
 
     let totalHours = null;
-    if (end !== null && !isNaN(end)) {
-      totalHours = end >= start ? end - start : 24 - start + end;
-      totalHours = Math.round(totalHours * 100) / 100;
+    if (!isNaN(end)) {
+      totalHours = Math.round((end >= start ? end - start : 24 - start + end) * 100) / 100;
     }
 
     await Transfer.create({
@@ -27,7 +33,7 @@ router.post("/submit-transfer", async (req, res) => {
       sand,
       field,
       startHour: start,
-      endHour: end,
+      endHour: !isNaN(end) ? end : undefined,
       totalHours,
       timestamp: new Date()
     });
