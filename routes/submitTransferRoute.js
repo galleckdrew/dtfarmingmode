@@ -6,12 +6,8 @@ router.post("/submit-transfer", async (req, res) => {
   try {
     let { tractor, pump, farmer, trailer, sand, field, startHour, endHour } = req.body;
 
-    // Convert empty strings to undefined for optional ObjectId fields
-    pump = pump || undefined;
-    farmer = farmer || undefined;
-    trailer = trailer || undefined;
-    sand = sand || undefined;
-    field = field || undefined;
+    // Convert empty strings to null for optional ObjectId fields
+    const clean = (val) => val === '' ? null : val;
 
     const start = startHour ? parseFloat(startHour.replace(',', '.')) : NaN;
     const end = endHour ? parseFloat(endHour.replace(',', '.')) : NaN;
@@ -27,11 +23,11 @@ router.post("/submit-transfer", async (req, res) => {
 
     await Transfer.create({
       tractor,
-      pump,
-      farmer,
-      trailer,
-      sand,
-      field,
+      pump: clean(pump),
+      farmer: clean(farmer),
+      trailer: clean(trailer),
+      sand: clean(sand),
+      field: clean(field),
       startHour: start,
       endHour: !isNaN(end) ? end : undefined,
       totalHours,
@@ -46,3 +42,4 @@ router.post("/submit-transfer", async (req, res) => {
 });
 
 module.exports = router;
+
