@@ -278,6 +278,23 @@
       .catch(err => console.error("❌ Service Worker registration failed:", err));
   }
 </script>
+<div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:red; color:white; text-align:center; padding:10px; font-weight:bold; z-index:9999;">
+  ⚠️ No internet connection. Submissions will be saved when you’re back online.
+</div>
+<script>
+  function updateOnlineStatus() {
+    const banner = document.getElementById("offline-banner");
+    if (navigator.onLine) {
+      banner.style.display = "none";
+    } else {
+      banner.style.display = "block";
+    }
+  }
+
+  window.addEventListener("load", updateOnlineStatus);
+  window.addEventListener("online", updateOnlineStatus);
+  window.addEventListener("offline", updateOnlineStatus);
+</script>
 
 </body>
 </html>
