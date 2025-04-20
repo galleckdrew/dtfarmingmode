@@ -174,9 +174,11 @@
         <th>Farm</th>
         <th>Field & Pit</th>
         <th>Gallons</th>
-        <th>Hours</th>
-        <th>Transfer Start</th>
-        <th>Transfer End</th>
+        <th>Total Hours</th>
+        <th>Start Hour (Load)</th>
+        <th>End Hour (Load)</th>
+        <th>Start Hour (Transfer)</th>
+        <th>End Hour (Transfer)</th>
         <th>Pump</th>
         <th>Fuel</th>
         <th>Sand</th>
@@ -193,9 +195,11 @@
           <td><%= data.farm?.name || '-' %></td>
           <td><%= (data.field?.name || '-') + ' / ' + (data.pit?.name || '-') %></td>
           <td><%= type === 'load' ? data.gallons : type === 'fuel' ? data.amount : '' %></td>
-          <td><%= type === 'load' ? (data.totalHours || '-') : '' %></td>
-          <td><%= type === 'transfer-start' ? data.startHour : '' %></td>
-          <td><%= type === 'transfer-end' ? data.endHour : '' %></td>
+          <td><%= data.totalHours || '-' %></td>
+          <td><%= type === 'load' ? data.startHour || '-' : '' %></td>
+          <td><%= type === 'load' ? data.endHour || '-' : '' %></td>
+          <td><%= type === 'transfer' ? data.startHour || '-' : '' %></td>
+          <td><%= type === 'transfer' ? data.endHour || '-' : '' %></td>
           <td><%= type === 'trailer' ? data.trailer : '' %></td>
           <td><%= type === 'fuel' ? data.amount : '' %></td>
           <td><%= type === 'sand' ? data.sand : '' %></td>
