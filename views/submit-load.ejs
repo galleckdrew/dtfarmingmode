@@ -258,5 +258,27 @@
       </div>
     <% } %>
   </div>
+  <!-- existing content... -->
+
+  <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
+    <div class="tracked">
+      <h3>✅ Tracked Start Hours</h3>
+      <ul>
+        <% for (let key in trackedHours) { %>
+          <li><strong><%= key %></strong>: <%= trackedHours[key] %></li>
+        <% } %>
+      </ul>
+    </div>
+  <% } %>
+</div>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(() => console.log("✅ Service Worker Registered"))
+      .catch(err => console.error("❌ Service Worker registration failed:", err));
+  }
+</script>
+
 </body>
 </html>
+
