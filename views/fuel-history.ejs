@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>⛽ Fuel History</title>
+  <title>🚜 Driver Load & Fuel History</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     h1, h2 { text-align: center; }
@@ -13,9 +13,9 @@
   </style>
 </head>
 <body>
-  <h1>⛽ Fuel History</h1>
+  <h1>🚜 Driver Load & ⛽ Fuel History</h1>
 
-  <form method="GET" action="/fuel-history">
+  <form method="GET" action="/driver-history">
     <label>From: <input type="date" name="from" value="<%= from || '' %>"></label>
     <label>To: <input type="date" name="to" value="<%= to || '' %>"></label>
     <label>Tractor:
@@ -38,8 +38,44 @@
     <button type="button" onclick="window.print()">🖨️ Print</button>
   </form>
 
-  <h2>Total Fuel: <%= typeof totalFuel !== 'undefined' ? totalFuel.toFixed(2) : '0.00' %> gallons</h2>
+  <h2>Summary</h2>
+  <p style="text-align: center; font-weight: bold;">
+    Total Loads: <%= totalLoads %> | Total Gallons: <%= totalGallons %> | Total Hours: <%= totalHours.toFixed(2) %> | Total Fuel: <%= totalFuel.toFixed(2) %> gallons
+  </p>
 
+  <h2>📋 Load History</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Tractor</th>
+        <th>Farm</th>
+        <th>Field</th>
+        <th>Pit</th>
+        <th>Gallons</th>
+        <th>Start Hour</th>
+        <th>End Hour</th>
+        <th>Total Hours</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% loads.forEach(load => { %>
+        <tr>
+          <td><%= new Date(load.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %></td>
+          <td><%= load.tractor?.name || '' %></td>
+          <td><%= load.farm?.name || '' %></td>
+          <td><%= load.field?.name || '' %></td>
+          <td><%= load.pit?.name || '' %></td>
+          <td><%= load.gallons %></td>
+          <td><%= load.startHour ?? '' %></td>
+          <td><%= load.endHour ?? '' %></td>
+          <td><%= load.totalHours?.toFixed(2) ?? '' %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <h2>⛽ Fuel History</h2>
   <table>
     <thead>
       <tr>
@@ -47,7 +83,6 @@
         <th>Tractor</th>
         <th>Field</th>
         <th>Gallons</th>
-        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -57,14 +92,6 @@
           <td><%= fuel.tractor?.name || '' %></td>
           <td><%= fuel.field?.name || '' %></td>
           <td><%= fuel.amount %></td>
-          <td>
-            <form method="GET" action="/fuel-history/<%= fuel._id %>/edit" style="display:inline">
-              <button>Edit</button>
-            </form>
-            <form method="POST" action="/fuel-history/<%= fuel._id %>?_method=DELETE" style="display:inline">
-              <button>Delete</button>
-            </form>
-          </td>
         </tr>
       <% }) %>
     </tbody>

@@ -93,6 +93,52 @@
 </style>
 </head>
 <body>
+<div id="sync-banner" style="display:none; text-align:center; background:#222; color:#fff; font-size:20px; padding:10px; font-weight:bold;"></div>
+
+<script>
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.register('/service-worker.js').then(() => {
+      console.log("✅ Service Worker Registered");
+    });
+
+    window.addEventListener("load", () => {
+      const form = document.querySelector("form[action='/load']");
+      const banner = document.getElementById("sync-banner");
+
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        if (event.data.type === "queue-update") {
+          banner.textContent = `⏳ ${event.data.count} load(s) waiting to sync`;
+          banner.style.display = "block";
+        } else if (event.data.type === "sync-complete") {
+          banner.textContent = event.data.count > 0
+            ? `⏳ ${event.data.count} load(s) waiting to sync`
+            : `✅ All pending loads synced`;
+          banner.style.display = "block";
+        } else if (event.data.type === "show-banner") {
+          banner.textContent = event.data.message;
+          banner.style.display = "block";
+        }
+      });
+
+      form?.addEventListener("submit", async (e) => {
+        if (!navigator.onLine) {
+          e.preventDefault();
+          const formData = new FormData(form);
+          const data = {};
+          formData.forEach((v, k) => data[k] = v);
+          const registration = await navigator.serviceWorker.ready;
+          registration.active.postMessage({
+            type: "store-form",
+            url: "/load",
+            data
+          });
+          alert("📦 Load saved offline and will sync when back online.");
+        }
+      });
+    });
+  }
+</script>
+
   <div class="container">
     <h1>D&T Manure Hauling</h1>
     <h3>Total Gallons Today: <%= totalGallons %></h3>
