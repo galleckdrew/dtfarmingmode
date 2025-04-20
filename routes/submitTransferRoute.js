@@ -1,4 +1,3 @@
-
 const express = require("express");
 const router = express.Router();
 const Transfer = require("../models/Transfer");
@@ -7,28 +6,19 @@ router.post("/submit-transfer", async (req, res) => {
   try {
     const { tractor, pump, farmer, trailer, sand, field, startHour, endHour } = req.body;
 
-    // Log inputs for debugging
-    console.log("Received Transfer Data:", {
-      tractor, pump, farmer, trailer, sand, field, startHour, endHour
-    });
+    const start = startHour ? parseFloat(startHour.replace(',', '.')) : NaN;
+    const end = endHour ? parseFloat(endHour.replace(',', '.')) : null;
 
-    // Basic presence check
-    if (!startHour || !endHour) {
-      return res.send(`<script>alert('Please fill in both start and end hour fields.'); window.location.href = '/submit-load';</script>`);
+    if (isNaN(start)) {
+      return res.send(`<script>alert('Please enter a valid Start Hour'); window.location.href = '/submit-load';</script>`);
     }
 
-    // Parse hours safely
-    const start = parseFloat(startHour.replace(',', '.'));
-    const end = parseFloat(endHour.replace(',', '.'));
-
-    if (isNaN(start) || isNaN(end)) {
-      return res.send(`<script>alert('Invalid number format for start or end hour'); window.location.href = '/submit-load';</script>`);
+    let totalHours = null;
+    if (end !== null && !isNaN(end)) {
+      totalHours = end >= start ? end - start : 24 - start + end;
+      totalHours = Math.round(totalHours * 100) / 100;
     }
 
-    // Calculate total hours, accounting for midnight rollover
-    const totalHours = Math.round((end >= start ? end - start : 24 - start + end) * 100) / 100;
-
-    // Save transfer to DB
     await Transfer.create({
       tractor,
       pump,
