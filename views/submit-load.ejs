@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>🚜 Submit Load</title>
-  <style>
+ <style>
   body {
     font-family: Arial, sans-serif;
     background: url("/dt-bg.png") no-repeat center center fixed;
@@ -10,7 +10,7 @@
     margin: 0;
     padding: 0;
     color: #fff;
-    font-size: 18px; /* larger base font */
+    font-size: 18px;
   }
 
   .container {
@@ -28,6 +28,15 @@
     margin-bottom: 15px;
   }
 
+  .form-section-title {
+    font-size: 22px;
+    text-align: center;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+
   label {
     display: block;
     font-weight: bold;
@@ -37,16 +46,16 @@
 
   select, input {
     width: 100%;
-    padding: 14px;
+    padding: 18px; /* more touchable */
     margin-top: 6px;
     margin-bottom: 18px;
-    border-radius: 6px;
+    border-radius: 8px;
     border: none;
-    font-size: 16px;
+    font-size: 17px;
   }
 
   button {
-    padding: 14px;
+    padding: 16px;
     font-size: 18px;
     background: #4CAF50;
     border: none;
@@ -70,9 +79,10 @@
   }
 
   .form-section {
-    margin-bottom: 30px;
+    margin-bottom: 40px;
   }
 </style>
+
 </head>
 <body>
   <div class="container">
@@ -89,7 +99,8 @@
 
  <!-- Load Submission Form -->
 <form method="POST" action="/load">
-  <label for="tractor">Tractor:</label>
+<div class="form-section-title">Submit Load</div>
+ <label for="tractor">Tractor:</label>
   <select name="tractor" required>
     <% tractors.forEach(t => { %>
       <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>>
