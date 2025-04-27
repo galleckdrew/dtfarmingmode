@@ -1,6 +1,6 @@
+
 const express = require("express");
 const router = express.Router();
-const moment = require("moment");
 const Load = require("../models/Load");
 const Fuel = require("../models/Fuel");
 const Transfer = require("../models/Transfer");
@@ -12,7 +12,7 @@ const Pump = require("../models/Pump");
 const Farmer = require("../models/Farmer");
 const Trailer = require("../models/Trailer");
 const Sand = require("../models/Sand");
-const tractorFarmStartHours = require("../trackedHours");
+const { tractorFarmStartHours, saveTrackedHours } = require("../trackedHoursStore");
 
 // GET /submit-load
 router.get("/submit-load", async (req, res) => {
@@ -33,11 +33,13 @@ router.get("/submit-load", async (req, res) => {
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
 
-    const loadsToday = await Load.find({ timestamp: { $gte: todayStart, $lte: todayEnd } });
-    const fuelsToday = await Fuel.find({ timestamp: { $gte: todayStart, $lte: todayEnd } });
+    const [loadsToday, fuelsToday] = await Promise.all([
+      Load.find({ timestamp: { $gte: todayStart, $lte: todayEnd } }),
+      Fuel.find({ timestamp: { $gte: todayStart, $lte: todayEnd } })
+    ]);
 
-    const totalGallons = loadsToday.reduce((sum, l) => sum + (l.gallons || 0), 0);
-    const totalFuel = fuelsToday.reduce((sum, f) => sum + (f.amount || 0), 0);
+    const totalGallons = loadsToday.reduce((sum, load) => sum + (load.gallons || 0), 0);
+    const totalFuel = fuelsToday.reduce((sum, fuel) => sum + (fuel.amount || 0), 0);
 
     const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate("tractor farm field") || null;
 
@@ -121,20 +123,26 @@ router.post("/", async (req, res) => {
 router.post("/submit-end-hour", async (req, res) => {
   try {
     const { endHour } = req.body;
-    const key = Object.keys(tractorFarmStartHours)[0];
-    const startHour = tractorFarmStartHours[key];
-    if (!startHour || isNaN(startHour)) {
+    const end = parseFloat(endHour.replace(',', '.'));
+    if (isNaN(end)) {
+      return res.send(`<script>alert('End hour is invalid'); window.location.href='/submit-load';</script>`);
+    }
+
+    const keys = Object.keys(tractorFarmStartHours);
+    if (!keys.length) {
       return res.send(`<script>alert('No tracked start hour found.'); window.location.href='/submit-load';</script>`);
     }
 
-    const end = parseFloat(endHour.replace(',', '.'));
-    const totalHours = Math.round((end >= startHour ? end - startHour : 24 - startHour + end) * 100) / 100;
-
+    const key = keys[0];
+    const start = tractorFarmStartHours[key];
     const [tractorId, farmId] = key.split("_");
+
+    const totalHours = Math.round((end >= start ? end - start : 24 - start + end) * 100) / 100;
+
     await Load.create({
       tractor: tractorId,
       farm: farmId,
-      startHour,
+      startHour: start,
       endHour: end,
       totalHours,
       timestamp: new Date()
@@ -152,14 +160,13 @@ router.post("/submit-end-hour", async (req, res) => {
 router.post("/submit-fuel", async (req, res) => {
   const { tractor, field, amount, farm } = req.body;
   try {
-    const newFuel = new Fuel({
+    await Fuel.create({
       tractor,
       field,
       amount,
       farm,
       timestamp: new Date()
     });
-    await newFuel.save();
     res.redirect("/submit-load");
   } catch (err) {
     console.error("❌ Failed to submit fuel:", err);
@@ -173,27 +180,31 @@ router.post("/submit-transfer", async (req, res) => {
     const { tractor, pump, farmer, trailer, sand, field, startHour, endHour } = req.body;
 
     const start = parseFloat(startHour.replace(',', '.'));
-    const end = parseFloat(endHour.replace(',', '.'));
-    if (isNaN(start) || isNaN(end)) {
-      return res.send(`<script>alert('Invalid start or end hour'); window.location.href = '/submit-load';</script>`);
+    const end = endHour ? parseFloat(endHour.replace(',', '.')) : null;
+
+    if (isNaN(start)) {
+      return res.send(`<script>alert('Start hour is required'); window.location.href='/submit-load';</script>`);
     }
 
-    const totalHours = Math.round((end >= start ? end - start : 24 - start + end) * 100) / 100;
+    let totalHours = null;
+    if (end !== null && !isNaN(end)) {
+      totalHours = Math.round((end >= start ? end - start : 24 - start + end) * 100) / 100;
+    }
 
     await Transfer.create({
       tractor,
-      pump,
-      farmer,
-      trailer,
-      sand,
-      field,
+      pump: pump || undefined,
+      farmer: farmer || undefined,
+      trailer: trailer || undefined,
+      sand: sand || undefined,
+      field: field || undefined,
       startHour: start,
-      endHour: end,
+      endHour: !isNaN(end) ? end : undefined,
       totalHours,
       timestamp: new Date()
     });
 
-    res.send(`<html><head><meta http-equiv="refresh" content="5; URL=/submit-load" /></head><body><h2>✅ Transfer hours submitted!</h2><p>Redirecting in 5 seconds...</p></body></html>`);
+    res.send(`<html><head><meta http-equiv="refresh" content="5; URL=/submit-load" /></head><body><h2>✅ Transfer submitted successfully!</h2><p>Redirecting in 5 seconds...</p></body></html>`);
   } catch (err) {
     console.error("Error submitting transfer:", err);
     res.status(500).send("Failed to submit transfer hours");

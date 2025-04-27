@@ -3,6 +3,8 @@
 const CACHE_NAME = "dt-hauling-cache-v3";
 const urlsToCache = [
   "/submit-load",
+  "/submit-fuel",
+  "/submit-transfer",
   "/dt-bg.png",
   "/login-bg.png"
 ];
@@ -78,4 +80,4 @@ async function storeOfflineForm(formData) {
       message: `⏳ ${current.length} load(s) waiting to sync`
     });
   });
-} 
+}
