@@ -1,10 +1,7 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
   <title>🚜 Submit Load</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js" integrity="sha512-yEdgV7l7nFYv0HqSRu13kI2jq3x4mS7zS0S3/dc2AEgUvRSPHjZs9O6scPbQwDtwO1GZx3z2NUk7SK7AyQXG8Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -23,12 +20,12 @@
       border-radius: 14px;
     }
     h1, h2, h3 {
-      text-align: center;
       font-weight: bold;
+      text-align: center;
     }
-    h1 { font-size: 34px; margin-bottom: 20px; }
-    h2 { font-size: 28px; margin-top: 40px; }
-    h3 { font-size: 24px; margin: 10px 0; }
+    h1 { font-size: 32px; margin-bottom: 10px; }
+    h2 { font-size: 26px; margin-top: 30px; }
+    h3 { font-size: 22px; margin-bottom: 12px; }
     label {
       font-size: 22px;
       font-weight: bold;
@@ -60,234 +57,127 @@
       padding: 18px;
       margin-top: 30px;
       border-radius: 10px;
+      font-size: 20px;
     }
     .tracked ul { padding-left: 20px; }
-    #sync-banner, #offline-banner {
-      display: none;
+    .form-section { margin-top: 30px; }
+
+    #sync-banner, #offline-save-banner {
       text-align: center;
-      padding: 10px;
-      font-weight: bold;
       font-size: 20px;
+      font-weight: bold;
+      padding: 10px;
+      position: fixed;
+      top: -100px;
+      left: 0;
+      right: 0;
       z-index: 9999;
+      opacity: 0;
+      transition: top 0.5s ease, opacity 0.5s ease;
     }
     #sync-banner { background: #222; color: #fff; }
-    #offline-banner { background: red; color: white; position: fixed; top: 0; left: 0; right: 0; }
+    #offline-save-banner { background: green; color: white; }
+    .show-banner {
+      top: 0;
+      opacity: 1;
+    }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
 
 <div id="sync-banner"></div>
-
-<div class="container">
-  <h1>D&T Manure Hauling</h1>
-  <h3>Total Gallons Today: <%= totalGallons %></h3>
-  <h3>Total Fuel Used Today: <%= totalFuel %></h3>
-
-  <% if (typeof lastLoad !== "undefined" && lastLoad) { %>
-    <p><strong>Most Recent Load:</strong>
-      <%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) %>
-      by <%= lastLoad.tractor?.name || "Unknown Tractor" %>
-    </p>
-  <% } %>
-
-  <!-- Submit Load -->
-  <form method="POST" action="/load">
-    <h2>Submit Load</h2>
-
-    <label for="tractor">Tractor:</label>
-    <select name="tractor" required>
-      <% tractors.forEach(t => { %>
-        <option value="<%= t._id %>"><%= t.name %> (<%= t.gallons %> gal)</option>
-      <% }) %>
-    </select>
-
-    <label for="farm">Farm:</label>
-    <select name="farm" required>
-      <% farms.forEach(f => { %>
-        <option value="<%= f._id %>"><%= f.name %></option>
-      <% }) %>
-    </select>
-
-    <label for="field">Field:</label>
-    <select name="field" required>
-      <% fields.forEach(f => { %>
-        <option value="<%= f._id %>"><%= f.name %></option>
-      <% }) %>
-    </select>
-
-    <label for="pit">Pit:</label>
-    <select name="pit" required>
-      <% pits.forEach(p => { %>
-        <option value="<%= p._id %>"><%= p.name %></option>
-      <% }) %>
-    </select>
-
-    <label for="startHour">Start Hour</label>
-    <input type="number" name="startHour" step="0.1" min="0" placeholder="Required On First Load">
-
-    <button type="submit">Submit Load</button>
-  </form>
-
-  <!-- Submit End Hour -->
-  <form method="POST" action="/submit-end-hour" class="dual-buttons">
-    <h2>Submit End Hour</h2>
-    <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
-    <button type="submit">Submit End Hour</button>
-  </form>
-
-  <!-- Submit Fuel -->
-  <form method="POST" action="/submit-fuel">
-    <h2>Submit Fuel</h2>
-    <label for="tractor">Tractor:</label>
-    <select name="tractor" required>
-      <% tractors.forEach(t => { %>
-        <option value="<%= t._id %>"><%= t.name %></option>
-      <% }) %>
-    </select>
-
-    <label for="farm">Farm:</label>
-    <select name="farm">
-      <option value="">None</option>
-      <% farms.forEach(f => { %>
-        <option value="<%= f._id %>"><%= f.name %></option>
-      <% }) %>
-    </select>
-
-    <label for="amount">Fuel Amount:</label>
-    <input type="number" step="0.1" name="amount" required>
-
-    <button type="submit">Submit Fuel</button>
-  </form>
-
-  <!-- Submit Transfer/Hauling -->
-  <form method="POST" action="/submit-transfer">
-    <h2>Submit Transfer/Hauling Hours</h2>
-    <label for="tractor">Tractor:</label>
-    <select name="tractor" required>
-      <% tractors.forEach(t => { %>
-        <option value="<%= t._id %>"><%= t.name %></option>
-      <% }) %>
-    </select>
-
-    <label for="field">Fields:</label>
-    <select name="field">
-      <option value="">None</option>
-      <% fields.forEach(f => { %>
-        <option value="<%= f._id %>"><%= f.name %></option>
-      <% }) %>
-    </select>
-
-    <label for="pump">Pump:</label>
-    <select name="pump">
-      <option value="">None</option>
-      <% (pumps || []).forEach(p => { %>
-        <option value="<%= p._id %>"><%= p.name %></option>
-      <% }) %>
-    </select>
-
-    <label for="farmer">Farmer:</label>
-    <select name="farmer">
-      <option value="">None</option>
-      <% (farmers || []).forEach(f => { %>
-        <option value="<%= f._id %>"><%= f.name %></option>
-      <% }) %>
-    </select>
-
-    <label for="trailer">Trailer:</label>
-    <select name="trailer">
-      <option value="">None</option>
-      <% (trailers || []).forEach(t => { %>
-        <option value="<%= t._id %>"><%= t.name %></option>
-      <% }) %>
-    </select>
-
-    <label for="sand">Sand Spreader:</label>
-    <select name="sand">
-      <option value="">None</option>
-      <% (sands || []).forEach(s => { %>
-        <option value="<%= s._id %>"><%= s.name %></option>
-      <% }) %>
-    </select>
-
-    <label for="startHour">Start Hour:</label>
-    <input type="text" name="startHour" required>
-
-    <label for="endHour">End Hour:</label>
-    <input type="text" name="endHour">
-
-    <button type="submit">Submit Transfer Hours</button>
-  </form>
-
-  <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
-    <div class="tracked">
-      <h3>✅ Tracked Start Hours</h3>
-      <ul>
-        <% for (let key in trackedHours) { %>
-          <li><strong><%= key %></strong>: <%= trackedHours[key] %></li>
-        <% } %>
-      </ul>
-    </div>
-  <% } %>
-
+<div id="offline-save-banner">✅ Load saved offline and will sync when back online.</div>
+<div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:red; color:white; text-align:center; padding:10px; font-weight:bold; z-index:9999;">
+  ⚠️ No internet connection. Submissions will be saved when you’re back online.
 </div>
 
-<!-- Offline / Sync Scripts -->
 <script>
-  if ('serviceWorker' in navigator && 'SyncManager' in window) {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(() => console.log("✅ Service Worker Registered"))
-      .catch(err => console.error("❌ Service Worker registration failed:", err));
-
-    window.addEventListener("load", () => {
-      const form = document.querySelector("form[action='/load']");
-      const banner = document.getElementById("sync-banner");
+if ('serviceWorker' in navigator && 'SyncManager' in window) {
+  navigator.serviceWorker.register('/service-worker.js').then(() => {
+    console.log("✅ Service Worker Registered");
+    navigator.serviceWorker.ready.then(registration => {
+      const syncBanner = document.getElementById("sync-banner");
+      const offlineBanner = document.getElementById("offline-save-banner");
 
       navigator.serviceWorker.addEventListener("message", (event) => {
         if (event.data.type === "queue-update") {
-          banner.textContent = `⏳ ${event.data.count} load(s) waiting to sync`;
-          banner.style.display = "block";
+          syncBanner.innerHTML = `<span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync`;
+          syncBanner.classList.add("show-banner");
         } else if (event.data.type === "sync-complete") {
-          banner.textContent = event.data.count > 0
-            ? `⏳ ${event.data.count} load(s) waiting to sync`
+          syncBanner.innerHTML = event.data.count > 0
+            ? `<span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync`
             : `✅ All pending loads synced`;
-          banner.style.display = "block";
+          syncBanner.classList.add("show-banner");
+          if (event.data.count === 0) {
+            setTimeout(() => syncBanner.classList.remove("show-banner"), 5000);
+          }
+        } else if (event.data.type === "show-banner") {
+          syncBanner.innerHTML = event.data.message;
+          syncBanner.classList.add("show-banner");
         }
       });
 
-      form?.addEventListener("submit", async (e) => {
-        if (!navigator.onLine) {
-          e.preventDefault();
-          const formData = new FormData(form);
-          const data = {};
-          formData.forEach((v, k) => data[k] = v);
-          const registration = await navigator.serviceWorker.ready;
-          registration.active.postMessage({
-            type: "store-form",
-            url: "/load",
-            data
-          });
-          alert("📦 Load saved offline and will sync when back online.");
-        }
+      const forms = [
+        { selector: "form[action='/load']", url: "/load" },
+        { selector: "form[action='/submit-fuel']", url: "/submit-fuel" },
+        { selector: "form[action='/submit-transfer']", url: "/submit-transfer" }
+      ];
+
+      forms.forEach(({ selector, url }) => {
+        const form = document.querySelector(selector);
+        form?.addEventListener("submit", async (e) => {
+          if (!navigator.onLine) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((v, k) => data[k] = v);
+            registration.active.postMessage({ type: "store-form", url, data });
+            if (url === "/load") {
+              offlineBanner.classList.add("show-banner");
+              setTimeout(() => offlineBanner.classList.remove("show-banner"), 4000);
+            } else {
+              alert(`✅ ${url.split("/")[1]} saved offline and will sync.`);
+            }
+          }
+        });
       });
     });
-  }
+  });
 
-  function updateOnlineStatus() {
-    const banner = document.getElementById("offline-banner");
-    if (navigator.onLine) {
-      banner.style.display = "none";
-    } else {
-      banner.style.display = "block";
+  window.addEventListener("online", async () => {
+    const registration = await navigator.serviceWorker.ready;
+    try {
+      await registration.sync.register('sync-forms');
+      console.log("🔄 Sync triggered after reconnect");
+    } catch (err) {
+      console.error("❌ Failed to trigger sync", err);
     }
-  }
-  window.addEventListener("load", updateOnlineStatus);
-  window.addEventListener("online", updateOnlineStatus);
-  window.addEventListener("offline", updateOnlineStatus);
-</script>
+  });
+}
 
-<div id="offline-banner">
-  ⚠️ No internet connection. Submissions will be saved when you’re back online.
-</div>
+function updateOnlineStatus() {
+  const banner = document.getElementById("offline-banner");
+  banner.style.display = navigator.onLine ? "none" : "block";
+}
+window.addEventListener("load", updateOnlineStatus);
+window.addEventListener("online", updateOnlineStatus);
+window.addEventListener("offline", updateOnlineStatus);
+</script>
 
 </body>
 </html>
