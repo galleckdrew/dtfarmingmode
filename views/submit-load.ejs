@@ -2,126 +2,168 @@
 <html>
 <head>
   <title>🚜 Submit Load</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: url("/dt-bg.png") no-repeat center center fixed;
-      background-size: cover;
-      margin: 0;
-      padding: 0;
-      color: #fff;
-      font-size: 20px;
-    }
-    .container {
-      background: rgba(0, 0, 0, 0.8);
-      padding: 30px 24px;
-      max-width: 700px;
-      margin: 40px auto;
-      border-radius: 14px;
-    }
-    h1, h2, h3 {
-      font-weight: bold;
-      text-align: center;
-    }
-    h1 { font-size: 32px; margin-bottom: 10px; }
-    h2 { font-size: 26px; margin-top: 30px; }
-    h3 { font-size: 22px; margin-bottom: 12px; }
-    label {
-      font-size: 22px;
-      font-weight: bold;
-      display: block;
-      margin-top: 18px;
-    }
-    select, input {
-      width: 100%;
-      padding: 16px;
-      margin-top: 8px;
-      border-radius: 6px;
-      border: none;
-      font-size: 20px;
-    }
-    button {
-      padding: 16px 24px;
-      font-size: 20px;
-      background: #4CAF50;
-      border: none;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-      width: 100%;
-      font-weight: bold;
-      margin-top: 16px;
-    }
-    .tracked {
-      background: #222;
-      padding: 18px;
-      margin-top: 30px;
-      border-radius: 10px;
-      font-size: 20px;
-    }
-    .tracked ul { padding-left: 20px; }
-    .form-section { margin-top: 30px; }
+<style>
+/* Already existing styles... */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
 
-    #sync-banner, #offline-save-banner {
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      padding: 10px;
-      position: fixed;
-      top: -100px;
-      left: 0;
-      right: 0;
-      z-index: 9999;
-      opacity: 0;
-      transition: top 0.5s ease, opacity 0.5s ease;
-    }
-    #sync-banner { background: #222; color: #fff; }
-    #offline-save-banner { background: green; color: white; }
-    .show-banner {
-      top: 0;
-      opacity: 1;
-    }
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-top: 3px solid #fff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+  body {
+    font-family: Arial, sans-serif;
+    background: url("/dt-bg.png") no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    color: #fff;
+    font-size: 20px;
+  }
+  .container {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 30px 24px;
+    max-width: 700px;
+    margin: 40px auto;
+    border-radius: 14px;
+  }
+  h1, h2, h3 {
+    font-weight: bold;
+    text-align: center;
+  }
+  h1 { font-size: 32px; margin-bottom: 10px; }
+  h2 { font-size: 26px; margin-top: 30px; }
+  h3 { font-size: 22px; margin-bottom: 12px; }
+  label {
+    font-size: 22px;
+    font-weight: bold;
+    display: block;
+    margin-top: 18px;
+  }
+  select, input {
+    width: 100%;
+    padding: 16px;
+    margin-top: 8px;
+    border-radius: 6px;
+    border: none;
+    font-size: 20px;
+  }
+  button {
+    padding: 16px 24px;
+    font-size: 20px;
+    background: #4CAF50;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    margin-top: 16px;
+  }
+  .tracked {
+    background: #222;
+    padding: 18px;
+    margin-top: 30px;
+    border-radius: 10px;
+    font-size: 20px;
+  }
+  .tracked ul { padding-left: 20px; }
+  .form-section { margin-top: 30px; }
+
+  /* 🆕 Smooth banner animations */
+  #sync-banner, #offline-save-banner {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 10px;
+  position: fixed;
+  top: -100px;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  opacity: 0; /* New */
+  transition: top 0.5s ease, opacity 0.5s ease; /* New: also animate opacity */
+}
+
+<style>
+/* Already existing spinner and sync-banner styles... */
+
+#offline-save-banner {
+  text-align: center;
+  background: green;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 10px;
+  position: fixed;
+  top: -100px; /* start hidden above */
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  opacity: 0;
+  transition: top 0.5s ease, opacity 0.5s ease;
+}
+
+.show-banner {
+  top: 0;
+  opacity: 1;
+}
+</style>
+
+
+.show-banner {
+  top: 0;
+  opacity: 1; /* New: when showing, opacity becomes 1 */
+}
+
+  #sync-banner {
+    background: #222;
+    color: #fff;
+  }
+  #offline-save-banner {
+    background: green;
+    color: #fff;
+  }
+  .show-banner {
+    top: 0;
+  }
+</style>
 </head>
 <body>
 
-<div id="sync-banner"></div>
-<div id="offline-save-banner">✅ Load saved offline and will sync when back online.</div>
-<div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:red; color:white; text-align:center; padding:10px; font-weight:bold; z-index:9999;">
-  ⚠️ No internet connection. Submissions will be saved when you’re back online.
+<div id="sync-banner" style="display:none; text-align:center; background:#222; color:#fff; font-size:20px; padding:10px; font-weight:bold;"></div>
+<div id="offline-save-banner" style="display:none; text-align:center; background:green; color:white; font-size:20px; padding:10px; font-weight:bold; z-index:9999;">
+  ✅ Load saved offline and will sync when back online.
 </div>
 
 <script>
 if ('serviceWorker' in navigator && 'SyncManager' in window) {
   navigator.serviceWorker.register('/service-worker.js').then(() => {
     console.log("✅ Service Worker Registered");
+
     navigator.serviceWorker.ready.then(registration => {
+      // Handle Submit Load form
+      const loadForm = document.querySelector("form[action='/load']");
       const syncBanner = document.getElementById("sync-banner");
       const offlineBanner = document.getElementById("offline-save-banner");
 
       navigator.serviceWorker.addEventListener("message", (event) => {
         if (event.data.type === "queue-update") {
-          syncBanner.innerHTML = `<span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync`;
+          syncBanner.innerHTML = <span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync;
           syncBanner.classList.add("show-banner");
         } else if (event.data.type === "sync-complete") {
           syncBanner.innerHTML = event.data.count > 0
-            ? `<span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync`
-            : `✅ All pending loads synced`;
+            ? <span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync
+            : ✅ All pending loads synced;
           syncBanner.classList.add("show-banner");
           if (event.data.count === 0) {
             setTimeout(() => syncBanner.classList.remove("show-banner"), 5000);
@@ -132,33 +174,48 @@ if ('serviceWorker' in navigator && 'SyncManager' in window) {
         }
       });
 
-      const forms = [
-        { selector: "form[action='/load']", url: "/load" },
-        { selector: "form[action='/submit-fuel']", url: "/submit-fuel" },
-        { selector: "form[action='/submit-transfer']", url: "/submit-transfer" }
-      ];
-
-      forms.forEach(({ selector, url }) => {
-        const form = document.querySelector(selector);
-        form?.addEventListener("submit", async (e) => {
-          if (!navigator.onLine) {
-            e.preventDefault();
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((v, k) => data[k] = v);
-            registration.active.postMessage({ type: "store-form", url, data });
-            if (url === "/load") {
-              offlineBanner.classList.add("show-banner");
-              setTimeout(() => offlineBanner.classList.remove("show-banner"), 4000);
-            } else {
-              alert(`✅ ${url.split("/")[1]} saved offline and will sync.`);
-            }
-          }
-        });
+      loadForm?.addEventListener("submit", async (e) => {
+        if (!navigator.onLine) {
+          e.preventDefault();
+          const formData = new FormData(loadForm);
+          const data = {};
+          formData.forEach((v, k) => data[k] = v);
+          registration.active.postMessage({ type: "store-form", url: "/load", data });
+          offlineBanner.classList.add("show-banner");
+          setTimeout(() => offlineBanner.classList.remove("show-banner"), 4000);
+        }
       });
+
+      // Submit Fuel
+      const fuelForm = document.querySelector("form[action='/submit-fuel']");
+      fuelForm?.addEventListener("submit", async (e) => {
+        if (!navigator.onLine) {
+          e.preventDefault();
+          const formData = new FormData(fuelForm);
+          const data = {};
+          formData.forEach((v, k) => data[k] = v);
+          registration.active.postMessage({ type: "store-form", url: "/submit-fuel", data });
+          alert("✅ Fuel submission saved offline and will sync when back online.");
+        }
+      });
+
+      // Submit Transfer
+      const transferForm = document.querySelector("form[action='/submit-transfer']");
+      transferForm?.addEventListener("submit", async (e) => {
+        if (!navigator.onLine) {
+          e.preventDefault();
+          const formData = new FormData(transferForm);
+          const data = {};
+          formData.forEach((v, k) => data[k] = v);
+          registration.active.postMessage({ type: "store-form", url: "/submit-transfer", data });
+          alert("✅ Transfer submission saved offline and will sync when back online.");
+        }
+      });
+
     });
   });
 
+  // Auto-sync on reconnect
   window.addEventListener("online", async () => {
     const registration = await navigator.serviceWorker.ready;
     try {
@@ -169,15 +226,279 @@ if ('serviceWorker' in navigator && 'SyncManager' in window) {
     }
   });
 }
+</script>
 
+  window.addEventListener("load", () => {
+    const form = document.querySelector("form[action='/load']");
+    const syncBanner = document.getElementById("sync-banner");
+    const offlineBanner = document.getElementById("offline-save-banner");
+navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data.type === "queue-update") {
+      syncBanner.innerHTML = <span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync;
+      syncBanner.classList.add("show-banner");
+    } else if (event.data.type === "sync-complete") {
+      if (event.data.count > 0) {
+        syncBanner.innerHTML = <span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync;
+      } else {
+        syncBanner.innerHTML = ✅ All pending loads synced;
+        setTimeout(() => {
+          syncBanner.classList.remove("show-banner");
+        }, 5000);
+      }
+      syncBanner.classList.add("show-banner");
+    } else if (event.data.type === "show-banner") {
+      syncBanner.innerHTML = event.data.message;
+      syncBanner.classList.add("show-banner");
+    }
+  });
+
+  form?.addEventListener("submit", async (e) => {
+    if (!navigator.onLine) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((v, k) => data[k] = v);
+      const registration = await navigator.serviceWorker.ready;
+      registration.active.postMessage({ type: "store-form", url: "/load", data });
+
+      // Animate the offline save banner
+      offlineBanner.classList.add("show-banner");
+      setTimeout(() => {
+        offlineBanner.classList.remove("show-banner");
+      }, 4000);
+    }
+  });
+});
+
+    // ✨ NEW: Fade out after 5 seconds if all loads synced
+    if (event.data.count === 0) {
+      setTimeout(() => {
+        syncBanner.classList.remove("show-banner");
+      }, 5000);
+    }
+  } else if (event.data.type === "show-banner") {
+    syncBanner.textContent = event.data.message;
+    syncBanner.classList.add("show-banner");
+  }
+});
+
+    form?.addEventListener("submit", async (e) => {
+      if (!navigator.onLine) {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((v, k) => data[k] = v);
+        const registration = await navigator.serviceWorker.ready;
+        registration.active.postMessage({ type: "store-form", url: "/load", data });
+
+        // Show the green "saved offline" banner
+        offlineBanner.classList.add("show-banner");
+        setTimeout(() => {
+          offlineBanner.classList.remove("show-banner");
+        }, 4000); // Hide after 4 seconds
+      }
+    });
+  }); 
+
+// Auto-sync immediately when back online
+window.addEventListener("online", async () => {
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    const registration = await navigator.serviceWorker.ready;
+    try {
+      await registration.sync.register('sync-forms');
+      console.log("🔄 Sync triggered after reconnect");
+    } catch (err) {
+      console.error("❌ Failed to trigger sync after reconnect", err);
+    }
+  }
+});
+</script>
+
+<div class="container">
+  <h1>D&T Manure Hauling</h1>
+
+  <% if (typeof lastLoad !== "undefined" && lastLoad) { %>
+    <h3>🕒 Last Load: 
+      <%= lastLoad.timestamp ? new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) : "Unknown" %>
+      - <%= lastLoad.tractor?.name || "Unknown Tractor" %>
+    </h3>
+  <% } %>
+
+  <h3>Total Gallons Today: <%= totalGallons %></h3>
+  <h3>Total Fuel Used Today: <%= totalFuel %></h3>
+
+  <!-- Load Submission Form -->
+  <form method="POST" action="/load">
+    <h2>Submit Load</h2>
+
+    <label>Tractor:</label>
+    <select name="tractor" required>
+      <% tractors.forEach(t => { %>
+        <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>>
+          <%= t.name %> (<%= t.gallons %> gal)
+        </option>
+      <% }) %>
+    </select>
+
+    <label>Farm:</label>
+    <select name="farm" required>
+      <% farms.forEach(f => { %>
+        <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>>
+          <%= f.name %>
+        </option>
+      <% }) %>
+    </select>
+
+    <label>Field:</label>
+    <select name="field" required>
+      <% fields.forEach(f => { %>
+        <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>>
+          <%= f.name %>
+        </option>
+      <% }) %>
+    </select>
+
+    <label>Pit:</label>
+    <select name="pit" required>
+      <% pits.forEach(p => { %>
+        <option value="<%= p._id %>"><%= p.name %></option>
+      <% }) %>
+    </select>
+
+    <label>Start Hour:</label>
+    <input type="number" name="startHour" step="0.1" min="0" placeholder="Required On First Load">
+
+    <button type="submit">Submit Load</button>
+  </form>
+
+  <!-- End Hour Submission Form -->
+  <div class="form-section">
+    <h2>Submit End Hour</h2>
+    <form method="POST" action="/submit-end-hour">
+      <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
+      <button type="submit">Submit End Hour</button>
+    </form>
+  </div>
+
+  <!-- Submit Fuel -->
+  <div class="form-section">
+    <h2>Submit Fuel</h2>
+    <form method="POST" action="/submit-fuel">
+      <label>Tractor:</label>
+      <select name="tractor" required>
+        <% tractors.forEach(t => { %>
+          <option value="<%= t._id %>"><%= t.name %></option>
+        <% }) %>
+      </select>
+
+      <label>Farm:</label>
+      <select name="farm">
+        <option value="">None</option>
+        <% farms.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+
+      <label>Fuel Amount:</label>
+      <input type="number" step="0.1" name="amount" required>
+
+      <button type="submit">Submit Fuel</button>
+    </form>
+  </div>
+
+  <!-- Submit Transfer -->
+  <div class="form-section">
+    <h2>Submit Transfer/Hauling Hours</h2>
+    <form method="POST" action="/submit-transfer">
+      <label>Tractor:</label>
+      <select name="tractor" required>
+        <% tractors.forEach(t => { %>
+          <option value="<%= t._id %>"><%= t.name %></option>
+        <% }) %>
+      </select>
+
+      <label>Fields:</label>
+      <select name="field">
+        <option value="">None</option>
+        <% fields.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+
+      <label>Pump:</label>
+      <select name="pump">
+        <option value="">None</option>
+        <% pumps.forEach(p => { %>
+          <option value="<%= p._id %>"><%= p.name %></option>
+        <% }) %>
+      </select>
+
+      <label>Farmer:</label>
+      <select name="farmer">
+        <option value="">None</option>
+        <% farmers.forEach(f => { %>
+          <option value="<%= f._id %>"><%= f.name %></option>
+        <% }) %>
+      </select>
+
+      <label>Trailer:</label>
+      <select name="trailer">
+        <option value="">None</option>
+        <% trailers.forEach(t => { %>
+          <option value="<%= t._id %>"><%= t.name %></option>
+        <% }) %>
+      </select>
+
+      <label>Sand Spreader:</label>
+      <select name="sand">
+        <option value="">None</option>
+        <% sands.forEach(s => { %>
+          <option value="<%= s._id %>"><%= s.name %></option>
+        <% }) %>
+      </select>
+
+      <label>Start Hour:</label>
+      <input type="text" name="startHour" required>
+
+      <label>End Hour:</label>
+      <input type="text" name="endHour">
+
+      <button type="submit">Submit Transfer Hours</button>
+    </form>
+  </div>
+
+  <!-- Tracked Start Hours -->
+  <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
+    <div class="tracked">
+      <h3>✅ Tracked Start Hours</h3>
+      <ul>
+        <% Object.entries(trackedHours).forEach(([label, hour]) => { %>
+          <li><strong><%= label %></strong>: <%= hour %> hrs</li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+</div>
+
+<script>
 function updateOnlineStatus() {
   const banner = document.getElementById("offline-banner");
-  banner.style.display = navigator.onLine ? "none" : "block";
+  if (navigator.onLine) {
+    banner.style.display = "none";
+  } else {
+    banner.style.display = "block";
+  }
 }
+
 window.addEventListener("load", updateOnlineStatus);
 window.addEventListener("online", updateOnlineStatus);
 window.addEventListener("offline", updateOnlineStatus);
 </script>
+
+<div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:red; color:white; text-align:center; padding:10px; font-weight:bold; z-index:9999;">
+⚠️ No internet connection. Submissions will be saved when you’re back online.
+</div>
 
 </body>
 </html>
