@@ -132,23 +132,13 @@ body {
 <div class="container">
   <h1>D&T Manure Hauling</h1>
 
-<% if (lastLoad && lastLoad.timestamp && lastLoad.tractor) { %>
+ <% if (lastLoad && lastLoad.timestamp && lastLoad.tractor) { %>
   <div id="recent-load-box">
     🚜 Recent Load<br>
     <div><%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "numeric", hour12: true }) %></div>
     <div>Tractor: <%= lastLoad.tractor.name %></div>
   </div>
 <% } %>
-
-  <div style="position: fixed; top: 0; left: 0; right: 0; background: #e3f2fd; border-bottom: 3px solid #2196F3; padding: 14px 20px; color: #0d47a1; font-weight: bold; font-size: 20px; z-index: 10000; text-align: center;">
-    📦 Recent Load: 
-    <%= new Date(lastLoad.timestamp).toLocaleDateString("en-US", dateOptions) %> at 
-    <%= new Date(lastLoad.timestamp).toLocaleTimeString("en-US", timeOptions) %> – 
-    <%= lastLoad.tractor?.name || "Unknown Tractor" %>
-  </div>
-  <div style="height: 70px;"></div> <!-- Spacer to push content below fixed banner -->
-<% } %>
-
 
   <h3>Total Gallons Today: <%= totalGallons %></h3>
   <h3>Total Fuel Used Today: <%= totalFuel %></h3>
