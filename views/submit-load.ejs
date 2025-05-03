@@ -143,17 +143,9 @@ body {
     }) %></div>
     <div>Tractor: <%= lastLoad.tractor.name %></div>
   </div>
+  <div style="height: 70px;"></div> <!-- spacer to push content down -->
 <% } %>
 
-
-  <div style="position: fixed; top: 0; left: 0; right: 0; background: #e3f2fd; border-bottom: 3px solid #2196F3; padding: 14px 20px; color: #0d47a1; font-weight: bold; font-size: 20px; z-index: 10000; text-align: center;">
-    📦 Recent Load:
-    <%= new Date(lastLoad.timestamp).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' }) %> at
-    <%= new Date(lastLoad.timestamp).toLocaleTimeString("en-US", { hour: 'numeric', minute: 'numeric', hour12: true }) %> –
-    <%= lastLoad.tractor.name %>
-  </div>
-  <div style="height: 70px;"></div>
-<% } %>
 
   <h3>Total Gallons Today: <%= totalGallons %></h3>
   <h3>Total Fuel Used Today: <%= totalFuel %></h3>
