@@ -133,7 +133,7 @@ body {
   <h1>D&T Manure Hauling</h1>
 
 <% if (lastLoad && lastLoad.timestamp && lastLoad.tractor) { %>
-  <div id="recent-load-box" style="background:#007BFF;padding:12px;border-radius:8px;color:white;font-weight:bold;text-align:center;margin-bottom:20px;position:sticky;top:0;z-index:999;">
+  <div id="recent-load-box">
     🚜 Recent Load<br>
     <div><%= new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "numeric", hour12: true }) %></div>
     <div>Tractor: <%= lastLoad.tractor.name %></div>
