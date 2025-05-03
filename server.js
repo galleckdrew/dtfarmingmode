@@ -28,6 +28,7 @@ const Trailer = require("./models/Trailer");
 const Sand = require("./models/Sand");
 const Farmer = require("./models/Farmer");
 const Fuel = require("./models/Fuel");
+const loadRoutes = require("./routes/loadRoutes");
 
 // View engine
 app.set("view engine", "ejs");
@@ -39,6 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(require("./routes/submitTransferRoute"));
+app.use("/", loadRoutes);
 app.use(editRoutes);
 app.use(methodOverride("_method"));
 app.use(
