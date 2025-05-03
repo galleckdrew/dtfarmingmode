@@ -2,323 +2,120 @@
 <html>
 <head>
   <title>🚜 Submit Load</title>
-<style>
-/* Already existing styles... */
-.spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top: 3px solid #fff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  vertical-align: middle;
-  margin-right: 8px;
-}
+  <style>
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-  body {
-    font-family: Arial, sans-serif;
-    background: url("/dt-bg.png") no-repeat center center fixed;
-    background-size: cover;
-    margin: 0;
-    padding: 0;
-    color: #fff;
-    font-size: 20px;
-  }
-  .container {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 30px 24px;
-    max-width: 700px;
-    margin: 40px auto;
-    border-radius: 14px;
-  }
-  h1, h2, h3 {
-    font-weight: bold;
-    text-align: center;
-  }
-  h1 { font-size: 32px; margin-bottom: 10px; }
-  h2 { font-size: 26px; margin-top: 30px; }
-  h3 { font-size: 22px; margin-bottom: 12px; }
-  label {
-    font-size: 22px;
-    font-weight: bold;
-    display: block;
-    margin-top: 18px;
-  }
-  select, input {
-    width: 100%;
-    padding: 16px;
-    margin-top: 8px;
-    border-radius: 6px;
-    border: none;
-    font-size: 20px;
-  }
-  button {
-    padding: 16px 24px;
-    font-size: 20px;
-    background: #4CAF50;
-    border: none;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    width: 100%;
-    font-weight: bold;
-    margin-top: 16px;
-  }
-  .tracked {
-    background: #222;
-    padding: 18px;
-    margin-top: 30px;
-    border-radius: 10px;
-    font-size: 20px;
-  }
-  .tracked ul { padding-left: 20px; }
-  .form-section { margin-top: 30px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: url("/dt-bg.png") no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      color: #fff;
+      font-size: 20px;
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 30px 24px;
+      max-width: 700px;
+      margin: 40px auto;
+      border-radius: 14px;
+    }
+    h1, h2, h3 {
+      font-weight: bold;
+      text-align: center;
+    }
+    h1 { font-size: 32px; margin-bottom: 10px; }
+    h2 { font-size: 26px; margin-top: 30px; }
+    h3 { font-size: 22px; margin-bottom: 12px; }
 
-  /* 🆕 Smooth banner animations */
-  #sync-banner, #offline-save-banner {
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  padding: 10px;
-  position: fixed;
-  top: -100px;
-  left: 0;
-  right: 0;
-  z-index: 9999;
-  opacity: 0; /* New */
-  transition: top 0.5s ease, opacity 0.5s ease; /* New: also animate opacity */
-}
+    label {
+      font-size: 22px;
+      font-weight: bold;
+      display: block;
+      margin-top: 18px;
+    }
+    select, input {
+      width: 100%;
+      padding: 16px;
+      margin-top: 8px;
+      border-radius: 6px;
+      border: none;
+      font-size: 20px;
+    }
+    button {
+      padding: 16px 24px;
+      font-size: 20px;
+      background: #4CAF50;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      margin-top: 16px;
+    }
 
-<style>
-/* Already existing spinner and sync-banner styles... */
+    .form-section { margin-top: 30px; }
+    .tracked {
+      background: #222;
+      padding: 18px;
+      margin-top: 30px;
+      border-radius: 10px;
+      font-size: 20px;
+    }
+    .tracked ul { padding-left: 20px; }
 
-#offline-save-banner {
-  text-align: center;
-  background: green;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-  padding: 10px;
-  position: fixed;
-  top: -100px; /* start hidden above */
-  left: 0;
-  right: 0;
-  z-index: 9999;
-  opacity: 0;
-  transition: top 0.5s ease, opacity 0.5s ease;
-}
-
-.show-banner {
-  top: 0;
-  opacity: 1;
-}
-</style>
-
-
-.show-banner {
-  top: 0;
-  opacity: 1; /* New: when showing, opacity becomes 1 */
-}
-
-  #sync-banner {
-    background: #222;
-    color: #fff;
-  }
-  #offline-save-banner {
-    background: green;
-    color: #fff;
-  }
-  .show-banner {
-    top: 0;
-  }
-</style>
+    #sync-banner, #offline-save-banner {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 10px;
+      position: fixed;
+      top: -100px;
+      left: 0;
+      right: 0;
+      z-index: 9999;
+      opacity: 0;
+      transition: top 0.5s ease, opacity 0.5s ease;
+    }
+    #sync-banner {
+      background: #222;
+      color: #fff;
+    }
+    #offline-save-banner {
+      background: green;
+      color: white;
+    }
+    .show-banner {
+      top: 0;
+      opacity: 1;
+    }
+  </style>
 </head>
 <body>
 
-<div id="sync-banner" style="display:none; text-align:center; background:#222; color:#fff; font-size:20px; padding:10px; font-weight:bold;"></div>
-<div id="offline-save-banner" style="display:none; text-align:center; background:green; color:white; font-size:20px; padding:10px; font-weight:bold; z-index:9999;">
-  ✅ Load saved offline and will sync when back online.
-</div>
-
-<script>
-if ('serviceWorker' in navigator && 'SyncManager' in window) {
-  navigator.serviceWorker.register('/service-worker.js').then(() => {
-    console.log("✅ Service Worker Registered");
-
-    navigator.serviceWorker.ready.then(registration => {
-      // Handle Submit Load form
-      const loadForm = document.querySelector("form[action='/load']");
-      const syncBanner = document.getElementById("sync-banner");
-      const offlineBanner = document.getElementById("offline-save-banner");
-
-      navigator.serviceWorker.addEventListener("message", (event) => {
-        if (event.data.type === "queue-update") {
-          syncBanner.innerHTML = <span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync;
-          syncBanner.classList.add("show-banner");
-        } else if (event.data.type === "sync-complete") {
-          syncBanner.innerHTML = event.data.count > 0
-            ? <span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync
-            : ✅ All pending loads synced;
-          syncBanner.classList.add("show-banner");
-          if (event.data.count === 0) {
-            setTimeout(() => syncBanner.classList.remove("show-banner"), 5000);
-          }
-        } else if (event.data.type === "show-banner") {
-          syncBanner.innerHTML = event.data.message;
-          syncBanner.classList.add("show-banner");
-        }
-      });
-
-      loadForm?.addEventListener("submit", async (e) => {
-        if (!navigator.onLine) {
-          e.preventDefault();
-          const formData = new FormData(loadForm);
-          const data = {};
-          formData.forEach((v, k) => data[k] = v);
-          registration.active.postMessage({ type: "store-form", url: "/load", data });
-          offlineBanner.classList.add("show-banner");
-          setTimeout(() => offlineBanner.classList.remove("show-banner"), 4000);
-        }
-      });
-
-      // Submit Fuel
-      const fuelForm = document.querySelector("form[action='/submit-fuel']");
-      fuelForm?.addEventListener("submit", async (e) => {
-        if (!navigator.onLine) {
-          e.preventDefault();
-          const formData = new FormData(fuelForm);
-          const data = {};
-          formData.forEach((v, k) => data[k] = v);
-          registration.active.postMessage({ type: "store-form", url: "/submit-fuel", data });
-          alert("✅ Fuel submission saved offline and will sync when back online.");
-        }
-      });
-
-      // Submit Transfer
-      const transferForm = document.querySelector("form[action='/submit-transfer']");
-      transferForm?.addEventListener("submit", async (e) => {
-        if (!navigator.onLine) {
-          e.preventDefault();
-          const formData = new FormData(transferForm);
-          const data = {};
-          formData.forEach((v, k) => data[k] = v);
-          registration.active.postMessage({ type: "store-form", url: "/submit-transfer", data });
-          alert("✅ Transfer submission saved offline and will sync when back online.");
-        }
-      });
-
-    });
-  });
-
-  // Auto-sync on reconnect
-  window.addEventListener("online", async () => {
-    const registration = await navigator.serviceWorker.ready;
-    try {
-      await registration.sync.register('sync-forms');
-      console.log("🔄 Sync triggered after reconnect");
-    } catch (err) {
-      console.error("❌ Failed to trigger sync", err);
-    }
-  });
-}
-</script>
-
-  window.addEventListener("load", () => {
-    const form = document.querySelector("form[action='/load']");
-    const syncBanner = document.getElementById("sync-banner");
-    const offlineBanner = document.getElementById("offline-save-banner");
-navigator.serviceWorker.addEventListener("message", (event) => {
-    if (event.data.type === "queue-update") {
-      syncBanner.innerHTML = <span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync;
-      syncBanner.classList.add("show-banner");
-    } else if (event.data.type === "sync-complete") {
-      if (event.data.count > 0) {
-        syncBanner.innerHTML = <span class="spinner"></span> ⏳ ${event.data.count} load(s) waiting to sync;
-      } else {
-        syncBanner.innerHTML = ✅ All pending loads synced;
-        setTimeout(() => {
-          syncBanner.classList.remove("show-banner");
-        }, 5000);
-      }
-      syncBanner.classList.add("show-banner");
-    } else if (event.data.type === "show-banner") {
-      syncBanner.innerHTML = event.data.message;
-      syncBanner.classList.add("show-banner");
-    }
-  });
-
-  form?.addEventListener("submit", async (e) => {
-    if (!navigator.onLine) {
-      e.preventDefault();
-      const formData = new FormData(form);
-      const data = {};
-      formData.forEach((v, k) => data[k] = v);
-      const registration = await navigator.serviceWorker.ready;
-      registration.active.postMessage({ type: "store-form", url: "/load", data });
-
-      // Animate the offline save banner
-      offlineBanner.classList.add("show-banner");
-      setTimeout(() => {
-        offlineBanner.classList.remove("show-banner");
-      }, 4000);
-    }
-  });
-});
-
-    // ✨ NEW: Fade out after 5 seconds if all loads synced
-    if (event.data.count === 0) {
-      setTimeout(() => {
-        syncBanner.classList.remove("show-banner");
-      }, 5000);
-    }
-  } else if (event.data.type === "show-banner") {
-    syncBanner.textContent = event.data.message;
-    syncBanner.classList.add("show-banner");
-  }
-});
-
-    form?.addEventListener("submit", async (e) => {
-      if (!navigator.onLine) {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const data = {};
-        formData.forEach((v, k) => data[k] = v);
-        const registration = await navigator.serviceWorker.ready;
-        registration.active.postMessage({ type: "store-form", url: "/load", data });
-
-        // Show the green "saved offline" banner
-        offlineBanner.classList.add("show-banner");
-        setTimeout(() => {
-          offlineBanner.classList.remove("show-banner");
-        }, 4000); // Hide after 4 seconds
-      }
-    });
-  }); 
-
-// Auto-sync immediately when back online
-window.addEventListener("online", async () => {
-  if ('serviceWorker' in navigator && 'SyncManager' in window) {
-    const registration = await navigator.serviceWorker.ready;
-    try {
-      await registration.sync.register('sync-forms');
-      console.log("🔄 Sync triggered after reconnect");
-    } catch (err) {
-      console.error("❌ Failed to trigger sync after reconnect", err);
-    }
-  }
-});
-</script>
-
+<div id="sync-banner"></div>
+<div id="offline-save-banner">✅ Load saved offline and will sync when back online.</div>
 <div class="container">
   <h1>D&T Manure Hauling</h1>
 
   <% if (typeof lastLoad !== "undefined" && lastLoad) { %>
-    <h3>🕒 Last Load: 
+    <h3>🕒 Last Load:
       <%= lastLoad.timestamp ? new Date(lastLoad.timestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: true }) : "Unknown" %>
       - <%= lastLoad.tractor?.name || "Unknown Tractor" %>
     </h3>
@@ -478,26 +275,20 @@ window.addEventListener("online", async () => {
       </ul>
     </div>
   <% } %>
-
 </div>
 
 <script>
-function updateOnlineStatus() {
-  const banner = document.getElementById("offline-banner");
-  if (navigator.onLine) {
-    banner.style.display = "none";
-  } else {
-    banner.style.display = "block";
+  function updateOnlineStatus() {
+    const banner = document.getElementById("offline-banner");
+    banner.style.display = navigator.onLine ? "none" : "block";
   }
-}
-
-window.addEventListener("load", updateOnlineStatus);
-window.addEventListener("online", updateOnlineStatus);
-window.addEventListener("offline", updateOnlineStatus);
+  window.addEventListener("load", updateOnlineStatus);
+  window.addEventListener("online", updateOnlineStatus);
+  window.addEventListener("offline", updateOnlineStatus);
 </script>
 
 <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:red; color:white; text-align:center; padding:10px; font-weight:bold; z-index:9999;">
-⚠️ No internet connection. Submissions will be saved when you’re back online.
+  ⚠️ No internet connection. Submissions will be saved when you’re back online.
 </div>
 
 </body>
