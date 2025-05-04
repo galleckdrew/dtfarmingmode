@@ -76,15 +76,15 @@ router.post("/", async (req, res) => {
 
     const gallons = tractorData.gallons;
     const timestamp = new Date();
-    const key = `${tractor}_${farm}`;
-    const readableKey = `${tractorData.name} (${gallons} gal) – ${farmData.name}`;
+    const key = `${tractor}_${Field}`;
+    const readableKey = `${tractorData.name} (${gallons} gal) – Field ${field}`;
 
     let start = startHour ? parseFloat(startHour.replace(',', '.')) : tractorFarmStartHours[key];
     let end = endHour ? parseFloat(endHour.replace(',', '.')) : null;
     let totalHours = null;
 
     if ((start === undefined || isNaN(start)) && !tractorFarmStartHours[key]) {
-      return res.send(`<script>alert('Please enter a start hour for this tractor before using this farm.'); window.location.href='/submit-load';</script>`);
+      return res.send(`<script>alert('Please enter a start hour for this tractor before using this Field.'); window.location.href='/submit-load';</script>`);
     }
 
     if (startHour) {
@@ -135,13 +135,13 @@ router.post("/submit-end-hour", async (req, res) => {
 
     const key = keys[0];
     const start = tractorFarmStartHours[key];
-    const [tractorId, farmId] = key.split("_");
+    const [tractorId, fieldId] = key.split("_");
 
     const totalHours = Math.round((end >= start ? end - start : 24 - start + end) * 100) / 100;
 
     await Load.create({
       tractor: tractorId,
-      farm: farmId,
+      field: fieldId,
       startHour: start,
       endHour: end,
       totalHours,
