@@ -76,7 +76,7 @@ router.post("/", async (req, res) => {
 
     const gallons = tractorData.gallons;
     const timestamp = new Date();
-    const key = `${tractor}_${Field}`;
+    const key = `${tractor}_${field}`;
     const readableKey = `${tractorData.name} (${gallons} gal) – Field ${field}`;
 
     let start = startHour ? parseFloat(startHour.replace(',', '.')) : tractorFarmStartHours[key];
@@ -84,7 +84,7 @@ router.post("/", async (req, res) => {
     let totalHours = null;
 
     if ((start === undefined || isNaN(start)) && !tractorFarmStartHours[key]) {
-      return res.send(`<script>alert('Please enter a start hour for this tractor before using this Field.'); window.location.href='/submit-load';</script>`);
+      return res.send(`<script>alert('Please enter a start hour for this tractor before using this field.'); window.location.href='/submit-load';</script>`);
     }
 
     if (startHour) {
