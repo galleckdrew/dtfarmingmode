@@ -128,14 +128,16 @@ router.post("/submit-end-hour", async (req, res) => {
       return res.send(`<script>alert('End hour is invalid'); window.location.href='/submit-load';</script>`);
     }
 
-    const keys = Object.keys(tractorFarmStartHours);
-    if (!keys.length) {
-      return res.send(`<script>alert('No tracked start hour found.'); window.location.href='/submit-load';</script>`);
-    }
+const keys = Object.keys(tractorFarmStartHours).filter(k => k.includes("_"));
+if (!keys.length) {
+  return res.send(`<script>alert('No tracked start hour found.'); window.location.href='/submit-load';</script>`);
+}
 
-    const key = keys[0];
-    const start = tractorFarmStartHours[key];
-    const [tractorId, fieldId] = key.split("_");
+const key = keys[0];
+const start = tractorFarmStartHours[key];
+const [tractorId, fieldId] = key.split("_");
+
+
 
     const totalHours = Math.round((end >= start ? end - start : 24 - start + end) * 100) / 100;
 
