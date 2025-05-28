@@ -296,10 +296,14 @@ body {
     <div class="tracked">
       <h3>✅ Tracked Start Hours</h3>
       <ul>
-        <% Object.entries(trackedHours).forEach(([label, hour]) => { %>
-          <li><strong><%= label %></strong>: <%= hour %> hrs</li>
-        <% }) %>
-      </ul>
+        <% Object.entries(trackedHours).forEach(([sandId, hour]) => {
+     const sand = sands.find(s => s._id.toString() === sandId);
+%>
+  <li>
+    <strong><%= sand ? sand.name : 'Unknown Spreader' %></strong>: <%= hour %> hrs
+  </li>
+<% }) %>
+     </ul>
     </div>
   <% } %>
 </div>
