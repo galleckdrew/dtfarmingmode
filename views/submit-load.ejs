@@ -303,7 +303,7 @@ body {
            const field = fields.find(f => f._id.toString() === fieldId);
            const displayKey = `${tractor ? tractor.name : 'Unknown Tractor'} – ${field ? field.name : 'Unknown Field'}`;
 
-           if (!seenKeys.has(displayKey)) {
+           if (tractor && field && !seenKeys.has(displayKey)) {
              seenKeys.add(displayKey);
       %>
         <li>
