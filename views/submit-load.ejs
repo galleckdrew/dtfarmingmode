@@ -292,21 +292,27 @@ body {
   </div>
 
   <!-- Tracked Start Hours -->
-  <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
-    <div class="tracked">
-      <h3>✅ Tracked Start Hours</h3>
-      <ul>
-        <% Object.entries(trackedHours).forEach(([sandId, hour]) => {
-     const sand = sands.find(s => s._id.toString() === sandId);
-%>
-  <li>
-    <strong><%= sand ? sand.name : 'Unknown Spreader' %></strong>: <%= hour %> hrs
-  </li>
-<% }) %>
-     </ul>
-    </div>
-  <% } %>
-</div>
+ <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
+  <div class="tracked">
+    <h3>✅ Tracked Start Hours</h3>
+    <ul>
+      <% const seenKeys = new Set(); %>
+      <% Object.entries(trackedHours).forEach(([combinedId, hour]) => {
+           const [tractorId, fieldId] = combinedId.split('_');
+           const tractor = tractors.find(t => t._id.toString() === tractorId);
+           const field = fields.find(f => f._id.toString() === fieldId);
+           const displayKey = `${tractor ? tractor.name : 'Unknown Tractor'} – ${field ? field.name : 'Unknown Field'}`;
+
+           if (!seenKeys.has(displayKey)) {
+             seenKeys.add(displayKey);
+      %>
+        <li>
+          <strong><%= displayKey %></strong>: <%= hour %> hrs
+        </li>
+      <% } }) %>
+    </ul>
+  </div>
+<% } %>
 
 <script>
   function updateOnlineStatus() {
