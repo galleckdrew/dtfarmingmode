@@ -205,8 +205,20 @@
           <td><%= type === 'sand' ? data.sand : '' %></td>
           <td>
             <% if (type === 'load') { %>
-              <a href="/edit-load/<%= data._id %>" class="btn">Edit</a>
-              <form method="POST" action="/delete-load/<%= data._id %>">
+               <form method="POST" action="/edit-load/<%= data._id %>">
+  <select name="fieldId" required>
+    <% fields.forEach(f => { %>
+      <option value="<%= f._id %>" <%= data.field?._id?.toString() === f._id.toString() ? 'selected' : '' %>>
+        <%= f.name %>
+      </option>
+    <% }) %>
+  </select>
+
+  <input type="datetime-local" name="timestamp" value="<%= new Date(data.timestamp).toISOString().slice(0, 16) %>" required>
+
+  <button type="submit" class="btn">Save</button>
+</form>
+            <form method="POST" action="/delete-load/<%= data._id %>">
                 <button type="submit" class="btn">Delete</button>
               </form>
             <% } else if (type === 'fuel') { %>

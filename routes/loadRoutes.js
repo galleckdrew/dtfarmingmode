@@ -1,4 +1,5 @@
 
+
 const express = require("express");
 const router = express.Router();
 const Load = require("../models/Load");
@@ -128,16 +129,14 @@ router.post("/submit-end-hour", async (req, res) => {
       return res.send(`<script>alert('End hour is invalid'); window.location.href='/submit-load';</script>`);
     }
 
-const keys = Object.keys(tractorFarmStartHours).filter(k => k.includes("_"));
-if (!keys.length) {
-  return res.send(`<script>alert('No tracked start hour found.'); window.location.href='/submit-load';</script>`);
-}
+    const keys = Object.keys(tractorFarmStartHours).filter(k => k.includes("_"));
+    if (!keys.length) {
+      return res.send(`<script>alert('No tracked start hour found.'); window.location.href='/submit-load';</script>`);
+    }
 
-const key = keys[0];
-const start = tractorFarmStartHours[key];
-const [tractorId, fieldId] = key.split("_");
-
-
+    const key = keys[0];
+    const start = tractorFarmStartHours[key];
+    const [tractorId, fieldId] = key.split("_");
 
     const totalHours = Math.round((end >= start ? end - start : 24 - start + end) * 100) / 100;
 
@@ -210,6 +209,23 @@ router.post("/submit-transfer", async (req, res) => {
   } catch (err) {
     console.error("Error submitting transfer:", err);
     res.status(500).send("Failed to submit transfer hours");
+  }
+});
+
+// ✅ NEW: POST /edit-load/:id
+router.post("/edit-load/:id", async (req, res) => {
+  try {
+    const { fieldId, timestamp } = req.body;
+
+    await Load.findByIdAndUpdate(req.params.id, {
+      field: fieldId,
+      timestamp: new Date(timestamp)
+    });
+
+    res.redirect("/driver-history");
+  } catch (err) {
+    console.error("❌ Failed to update load:", err);
+    res.status(500).send("Update failed");
   }
 });
 
