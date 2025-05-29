@@ -1,22 +1,86 @@
-<<!-- views/edit-load.ejs -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Edit Load</title>
+  <style>
+    body {
+      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      color: #000;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    label {
+      font-weight: bold;
+    }
+    input, select, button {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #666;
+    }
+    .back-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .back-link a {
+      text-decoration: none;
+      color: #007bff;
+    }
+  </style>
 </head>
 <body>
+
   <h1>Edit Load</h1>
+
   <form method="POST" action="/edit-load/<%= load._id %>">
-    <label>Gallons:</label>
-    <input type="number" name="gallons" value="<%= load.gallons %>" required><br>
+    <label for="fieldId">Field</label>
+    <select name="fieldId" required>
+      <% fields.forEach(f => { %>
+        <option value="<%= f._id %>" <%= load.field?._id?.toString() === f._id.toString() ? 'selected' : '' %>><%= f.name %></option>
+      <% }) %>
+    </select>
 
-    <label>Start Hour:</label>
-    <input type="text" name="startHour" value="<%= load.startHour %>"><br>
+    <label for="timestamp">Timestamp</label>
+    <input type="datetime-local" name="timestamp" value="<%= new Date(load.timestamp).toISOString().slice(0, 16) %>" required>
 
-    <label>End Hour:</label>
-    <input type="text" name="endHour" value="<%= load.endHour %>"><br>
+    <label for="gallons">Gallons</label>
+    <input type="number" name="gallons" step="0.01" value="<%= load.gallons || '' %>" required>
+
+    <label for="startHour">Start Hour</label>
+    <input type="number" name="startHour" step="0.01" value="<%= load.startHour || '' %>">
+
+    <label for="endHour">End Hour</label>
+    <input type="number" name="endHour" step="0.01" value="<%= load.endHour || '' %>">
 
     <button type="submit">Save Changes</button>
   </form>
+
+  <div class="back-link">
+    <a href="/driver-history">← Back to Driver History</a>
+  </div>
+
 </body>
 </html>
