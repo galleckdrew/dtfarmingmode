@@ -67,6 +67,15 @@ router.get("/submit-load", async (req, res) => {
   }
 });
 
+// GET edit-load/:id
+router.get('/edit-load/:id', async (req, res) => {
+  const load = await Load.findById(req.params.id).populate('field');
+  const fields = await Field.find();
+  res.render('edit-load', { load, fields });
+});
+
+// POST edit-load/:id (already added before, no changes needed if you're using the enhanced version)
+
 // POST /load
 router.post("/", async (req, res) => {
   try {
@@ -211,15 +220,27 @@ router.post("/submit-transfer", async (req, res) => {
     res.status(500).send("Failed to submit transfer hours");
   }
 });
-
-// ✅ NEW: POST /edit-load/:id
+// ✅ Enhanced: POST /edit-load/:id
 router.post("/edit-load/:id", async (req, res) => {
   try {
-    const { fieldId, timestamp } = req.body;
+    const { fieldId, timestamp, gallons, startHour, endHour } = req.body;
+
+    let start = startHour ? parseFloat(startHour) : null;
+    let end = endHour ? parseFloat(endHour) : null;
+    let totalHours = null;
+
+    if (!isNaN(start) && !isNaN(end)) {
+      totalHours = end >= start ? end - start : 24 - start + end;
+      totalHours = Math.round(totalHours * 100) / 100;
+    }
 
     await Load.findByIdAndUpdate(req.params.id, {
       field: fieldId,
-      timestamp: new Date(timestamp)
+      timestamp: new Date(timestamp),
+      gallons: gallons ? parseFloat(gallons) : undefined,
+      startHour: !isNaN(start) ? start : undefined,
+      endHour: !isNaN(end) ? end : undefined,
+      totalHours
     });
 
     res.redirect("/driver-history");
