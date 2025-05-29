@@ -250,4 +250,38 @@ router.post("/edit-load/:id", async (req, res) => {
   }
 });
 
+// GET /edit-fuel/:id
+router.get("/edit-fuel/:id", async (req, res) => {
+  try {
+    const fuel = await Fuel.findById(req.params.id).populate('tractor field farm');
+    const [tractors, fields, farms] = await Promise.all([
+      Tractor.find(),
+      Field.find(),
+      Farm.find()
+    ]);
+    res.render("edit-fuel", { fuel, tractors, fields, farms });
+  } catch (err) {
+    console.error("❌ Failed to load fuel edit page:", err);
+    res.status(500).send("Failed to load fuel edit page.");
+  }
+});
+
+// POST /edit-fuel/:id
+router.post("/edit-fuel/:id", async (req, res) => {
+  try {
+    const { tractor, field, farm, amount, timestamp } = req.body;
+    await Fuel.findByIdAndUpdate(req.params.id, {
+      tractor,
+      field,
+      farm,
+      amount: parseFloat(amount),
+      timestamp: new Date(timestamp)
+    });
+    res.redirect("/driver-history");
+  } catch (err) {
+    console.error("❌ Failed to update fuel:", err);
+    res.status(500).send("Failed to update fuel entry.");
+  }
+});
+
 module.exports = router;
