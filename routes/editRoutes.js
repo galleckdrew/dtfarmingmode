@@ -11,15 +11,22 @@ const Trailer = require("../models/Trailer");
 const Sand = require("../models/Sand");
 
 // LOADS
+// GET /edit-load/:id
 router.get("/edit-load/:id", async (req, res) => {
-  const load = await Load.findById(req.params.id).populate("tractor farm field pit");
-  const fields = await Field.find();
-  res.render("edit-load", { load, fields });
+  try {
+    const load = await Load.findById(req.params.id).populate("field");
+    const fields = await Field.find();
+    res.render("edit-load", { load, fields });
+  } catch (err) {
+    console.error("❌ Failed to load load edit page:", err);
+    res.status(500).send("Failed to load load edit page.");
+  }
 });
 
+// POST /edit-load/:id
 router.post("/edit-load/:id", async (req, res) => {
   try {
-    const { fieldId, timestamp, gallons, startHour, endHour } = req.body;
+    const { field, gallons, startHour, endHour, timestamp } = req.body;
 
     let start = startHour ? parseFloat(startHour) : null;
     let end = endHour ? parseFloat(endHour) : null;
@@ -31,24 +38,19 @@ router.post("/edit-load/:id", async (req, res) => {
     }
 
     await Load.findByIdAndUpdate(req.params.id, {
-      field: fieldId,
-      timestamp: new Date(timestamp),
-      gallons: gallons ? parseFloat(gallons) : undefined,
+      field,
+      gallons: parseFloat(gallons),
       startHour: !isNaN(start) ? start : undefined,
       endHour: !isNaN(end) ? end : undefined,
-      totalHours
+      totalHours,
+      timestamp: new Date(timestamp)
     });
 
     res.redirect("/driver-history");
   } catch (err) {
     console.error("❌ Failed to update load:", err);
-    res.status(500).send("Update failed");
+    res.status(500).send("Failed to update load entry.");
   }
-});
-
-router.post("/delete-load/:id", async (req, res) => {
-  await Load.findByIdAndDelete(req.params.id);
-  res.redirect("/driver-history");
 });
 
 // FUELS
