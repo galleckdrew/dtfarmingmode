@@ -283,5 +283,31 @@ router.post("/edit-fuel/:id", async (req, res) => {
     res.status(500).send("Failed to update fuel entry.");
   }
 });
+// GET /edit-transfer/:id
+router.get("/edit-transfer/:id", async (req, res) => {
+  try {
+    const transfer = await Transfer.findById(req.params.id).populate('tractor field pump farmer trailer sand');
+    const [tractors, fields, pumps, farmers, trailers, sands] = await Promise.all([
+      Tractor.find(),
+      Field.find(),
+      Pump.find(),
+      Farmer.find(),
+      Trailer.find(),
+      Sand.find()
+    ]);
+    res.render("edit-transfer", {
+      transfer,
+      tractors,
+      fields,
+      pumps,
+      farmers,
+      trailers,
+      sands
+    });
+  } catch (err) {
+    console.error("❌ Failed to load transfer edit page:", err);
+    res.status(500).send("Failed to load transfer edit page.");
+  }
+});
 
 module.exports = router;
