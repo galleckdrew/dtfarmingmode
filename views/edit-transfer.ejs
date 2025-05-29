@@ -1,25 +1,121 @@
-<!-- views/edit-transfer.ejs -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Edit Transfer Entry</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Transfer</title>
+  <style>
+    body {
+      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      color: #000;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    label {
+      font-weight: bold;
+    }
+    input, select, button {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #666;
+    }
+    .back-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .back-link a {
+      text-decoration: none;
+      color: #007bff;
+    }
+  </style>
 </head>
 <body>
-  <h1>Edit Transfer Entry</h1>
-  <form method="POST" action="/edit-transfer/<%= transfer._id %>">
-    <label>Start Hour:</label>
-    <input type="text" name="startHour" value="<%= transfer.startHour %>"><br>
 
-    <label>End Hour:</label>
-    <input type="text" name="endHour" value="<%= transfer.endHour %>"><br>
+<h1>Edit Transfer</h1>
 
-    <label>Trailer:</label>
-    <input type="text" name="trailer" value="<%= transfer.trailer %>"><br>
+<form method="POST" action="/edit-transfer/<%= transfer._id %>">
+  <label for="tractor">Tractor</label>
+  <select name="tractor" required>
+    <% tractors.forEach(t => { %>
+      <option value="<%= t._id %>" <%= transfer.tractor?._id?.toString() === t._id.toString() ? 'selected' : '' %>><%= t.name %></option>
+    <% }) %>
+  </select>
 
-    <label>Sand:</label>
-    <input type="text" name="sand" value="<%= transfer.sand %>"><br>
+  <label for="field">Field</label>
+  <select name="field" required>
+    <% fields.forEach(f => { %>
+      <option value="<%= f._id %>" <%= transfer.field?._id?.toString() === f._id.toString() ? 'selected' : '' %>><%= f.name %></option>
+    <% }) %>
+  </select>
 
-    <button type="submit">Save Changes</button>
-  </form>
+  <label for="pump">Pump</label>
+  <select name="pump">
+    <option value="">None</option>
+    <% pumps.forEach(p => { %>
+      <option value="<%= p._id %>" <%= transfer.pump?._id?.toString() === p._id.toString() ? 'selected' : '' %>><%= p.name %></option>
+    <% }) %>
+  </select>
+
+  <label for="farmer">Farmer</label>
+  <select name="farmer">
+    <option value="">None</option>
+    <% farmers.forEach(fa => { %>
+      <option value="<%= fa._id %>" <%= transfer.farmer?._id?.toString() === fa._id.toString() ? 'selected' : '' %>><%= fa.name %></option>
+    <% }) %>
+  </select>
+
+  <label for="trailer">Trailer</label>
+  <select name="trailer">
+    <option value="">None</option>
+    <% trailers.forEach(t => { %>
+      <option value="<%= t._id %>" <%= transfer.trailer?._id?.toString() === t._id.toString() ? 'selected' : '' %>><%= t.name %></option>
+    <% }) %>
+  </select>
+
+  <label for="sand">Sand Spreader</label>
+  <select name="sand">
+    <option value="">None</option>
+    <% sands.forEach(s => { %>
+      <option value="<%= s._id %>" <%= transfer.sand?._id?.toString() === s._id.toString() ? 'selected' : '' %>><%= s.name %></option>
+    <% }) %>
+  </select>
+
+  <label for="startHour">Start Hour</label>
+  <input type="number" name="startHour" step="0.01" value="<%= transfer.startHour || '' %>">
+
+  <label for="endHour">End Hour</label>
+  <input type="number" name="endHour" step="0.01" value="<%= transfer.endHour || '' %>">
+
+  <label for="timestamp">Timestamp</label>
+  <input type="datetime-local" name="timestamp" value="<%= new Date(transfer.timestamp).toISOString().slice(0,16) %>" required>
+
+  <button type="submit">Save Changes</button>
+</form>
+
+<div class="back-link">
+  <a href="/driver-history">← Back to Driver History</a>
+</div>
+
 </body>
 </html>

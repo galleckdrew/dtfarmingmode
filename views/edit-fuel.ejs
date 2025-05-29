@@ -1,16 +1,93 @@
-<!-- views/edit-fuel.ejs -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit Fuel Entry</title>
+  <style>
+    body {
+      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      color: #000;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    label {
+      font-weight: bold;
+    }
+    input, select, button {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #666;
+    }
+    .back-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .back-link a {
+      text-decoration: none;
+      color: #007bff;
+    }
+  </style>
 </head>
 <body>
-  <h1>Edit Fuel Entry</h1>
-  <form method="POST" action="/edit-fuel/<%= fuel._id %>">
-    <label>Fuel Amount (gallons):</label>
-    <input type="number" name="amount" value="<%= fuel.amount %>" required><br>
 
-    <button type="submit">Save Changes</button>
-  </form>
+<h1>Edit Fuel Entry</h1>
+
+<form method="POST" action="/edit-fuel/<%= fuel._id %>">
+  <label for="tractor">Tractor</label>
+  <select name="tractor" required>
+    <% tractors.forEach(t => { %>
+      <option value="<%= t._id %>" <%= fuel.tractor?._id?.toString() === t._id.toString() ? 'selected' : '' %>><%= t.name %></option>
+    <% }) %>
+  </select>
+
+  <label for="field">Field</label>
+  <select name="field" required>
+    <% fields.forEach(f => { %>
+      <option value="<%= f._id %>" <%= fuel.field?._id?.toString() === f._id.toString() ? 'selected' : '' %>><%= f.name %></option>
+    <% }) %>
+  </select>
+
+  <label for="farm">Farm</label>
+  <select name="farm" required>
+    <% farms.forEach(fa => { %>
+      <option value="<%= fa._id %>" <%= fuel.farm?._id?.toString() === fa._id.toString() ? 'selected' : '' %>><%= fa.name %></option>
+    <% }) %>
+  </select>
+
+  <label for="amount">Fuel Amount (gallons)</label>
+  <input type="number" name="amount" step="0.01" value="<%= fuel.amount || '' %>" required>
+
+  <label for="timestamp">Timestamp</label>
+  <input type="datetime-local" name="timestamp" value="<%= new Date(fuel.timestamp).toISOString().slice(0,16) %>" required>
+
+  <button type="submit">Save Changes</button>
+</form>
+
+<div class="back-link">
+  <a href="/driver-history">← Back to Driver History</a>
+</div>
+
 </body>
 </html>
