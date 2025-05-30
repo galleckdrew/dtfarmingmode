@@ -204,48 +204,22 @@
           <td><%= type === 'fuel' ? data.amount : '' %></td>
           <td><%= type === 'sand' ? data.sand : '' %></td>
           <td>
-<% if (type === 'load') { %>
-  <form method="POST" action="/edit-load/<%= data._id %>">
-    <!-- Field dropdown -->
-    <select name="fieldId" required>
-      <% fields.forEach(f => { %>
-        <option value="<%= f._id %>" <%= data.field?._id?.toString() === f._id.toString() ? 'selected' : '' %>>
-          <%= f.name %>
-        </option>
-      <% }) %>
-    </select>
-
-    <!-- Timestamp -->
-    <input type="datetime-local" name="timestamp" value="<%= new Date(data.timestamp).toISOString().slice(0, 16) %>" required>
-
-    <!-- Gallons -->
-    <input type="number" name="gallons" step="0.01" placeholder="Gallons" value="<%= data.gallons || '' %>" required>
-
-    <!-- Start Hour -->
-    <input type="number" name="startHour" step="0.01" placeholder="Start Hour" value="<%= data.startHour || '' %>">
-
-    <!-- End Hour -->
-    <input type="number" name="endHour" step="0.01" placeholder="End Hour" value="<%= data.endHour || '' %>">
-
-    <!-- Save Button -->
-    <button type="submit" class="btn">Save</button>
-  </form>
-
-  <!-- Delete Button -->
-  <form method="POST" action="/delete-load/<%= data._id %>">
-    <button type="submit" class="btn">Delete</button>
-  </form>
-<% } else if (type === 'fuel') { %>
-  <a href="/edit-fuel/<%= data._id %>" class="btn">Edit</a>
-  <form method="POST" action="/delete-fuel/<%= data._id %>">
-    <button type="submit" class="btn">Delete</button>
-  </form>
-<% } else { %>
-  <a href="/edit-transfer/<%= data._id %>" class="btn">Edit</a>
-  <form method="POST" action="/delete-transfer/<%= data._id %>">
-    <button type="submit" class="btn">Delete</button>
-  </form>
-<% } %>
+            <% if (type === 'load') { %>
+              <a href="/edit-load/<%= data._id %>" class="btn">Edit</a>
+              <form method="POST" action="/delete-load/<%= data._id %>">
+                <button type="submit" class="btn">Delete</button>
+              </form>
+            <% } else if (type === 'fuel') { %>
+              <a href="/edit-fuel/<%= data._id %>" class="btn">Edit</a>
+              <form method="POST" action="/delete-fuel/<%= data._id %>">
+                <button type="submit" class="btn">Delete</button>
+              </form>
+            <% } else { %>
+              <a href="/edit-transfer/<%= data._id %>" class="btn">Edit</a>
+              <form method="POST" action="/delete-transfer/<%= data._id %>">
+                <button type="submit" class="btn">Delete</button>
+              </form>
+            <% } %>
           </td>
         </tr>
       <% }) %>
