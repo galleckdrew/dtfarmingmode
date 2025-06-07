@@ -173,14 +173,12 @@ body {
       <% }) %>
     </select>
 
-    <label>Field:</label>
-    <select name="field" required>
-      <% fields.forEach(f => { %>
-        <option value="<%= f._id %>" <%= f._id.toString() === selectedFieldId ? 'selected' : '' %>>
-          <%= f.name %>
-        </option>
-      <% }) %>
-    </select>
+   <label>Field:</label>
+<select name="field" required>
+  <% fields.forEach(fl => { %>
+    <option value="<%= fl._id %>"><%= fl.name %></option>
+  <% }) %>
+</select>
 
     <label>Pit:</label>
     <select name="pit" required>
