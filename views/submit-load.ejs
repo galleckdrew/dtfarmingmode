@@ -300,10 +300,9 @@ body {
            const displayKey = `${tractor ? tractor.name : 'Unknown Tractor'} – ${field ? field.name : 'Unknown Field'}`;
 
            if (tractor && field && !seenKeys.has(displayKey)) {
-             seenKeys.add(displayKey);
-      %>
-        <li><strong><%= displayKey %></strong>: <%= hour %> hrs</li>
-      <% } }) %>
+                   <strong><%= displayKey %></strong>: <%= hour %> hrs
+        </li>
+      <% } }); %>
     </ul>
   </div>
 <% } %>
@@ -313,6 +312,7 @@ body {
     const banner = document.getElementById("offline-banner");
     banner.style.display = navigator.onLine ? "none" : "block";
   }
+
   window.addEventListener("load", updateOnlineStatus);
   window.addEventListener("online", updateOnlineStatus);
   window.addEventListener("offline", updateOnlineStatus);
@@ -322,7 +322,9 @@ body {
   ⚠️ No internet connection. Submissions will be saved when you’re back online.
 </div>
 
-<div style="height: 70px;"></div> <!-- spacer to push content down -->
+<div style="height: 70px;"></div> <!-- spacer -->
 
 </body>
 </html>
+    seenKeys.add(displayKey);
+    
