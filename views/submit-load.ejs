@@ -201,7 +201,7 @@ body {
     </form>
   </div>
 
-  <!-- Submit Fuel -->
+<!-- Submit Fuel -->
 <div class="form-section">
   <h2>Submit Fuel</h2>
   <form method="POST" action="/submit-fuel">
@@ -226,69 +226,69 @@ body {
   </form>
 </div>
 
-  <!-- Submit Transfer -->
-  <div class="form-section">
-    <h2>Submit Transfer/Hauling Hours</h2>
-    <form method="POST" action="/submit-transfer">
-      <label>Tractor:</label>
-      <select name="tractor" required>
-        <% tractors.forEach(t => { %>
-          <option value="<%= t._id %>"><%= t.name %></option>
-        <% }) %>
-      </select>
+<!-- Submit Transfer -->
+<div class="form-section">
+  <h2>Submit Transfer/Hauling Hours</h2>
+  <form method="POST" action="/submit-transfer">
+    <label>Tractor:</label>
+    <select name="tractor" required>
+      <% tractors.forEach(t => { %>
+        <option value="<%= t._id %>"><%= t.name %></option>
+      <% }) %>
+    </select>
 
-      <label>Fields:</label>
-      <select name="field">
-        <option value="">None</option>
-        <% fields.forEach(f => { %>
-          <option value="<%= f._id %>"><%= f.name %></option>
-        <% }) %>
-      </select>
+    <label>Fields:</label>
+    <select name="field">
+      <option value="">None</option>
+      <% fields.forEach(f => { %>
+        <option value="<%= f._id %>"><%= f.name %></option>
+      <% }) %>
+    </select>
 
-      <label>Pump:</label>
-      <select name="pump">
-        <option value="">None</option>
-        <% pumps.forEach(p => { %>
-          <option value="<%= p._id %>"><%= p.name %></option>
-        <% }) %>
-      </select>
+    <label>Pump:</label>
+    <select name="pump">
+      <option value="">None</option>
+      <% pumps.forEach(p => { %>
+        <option value="<%= p._id %>"><%= p.name %></option>
+      <% }) %>
+    </select>
 
-      <label>Farmer:</label>
-      <select name="farmer">
-        <option value="">None</option>
-        <% farmers.forEach(f => { %>
-          <option value="<%= f._id %>"><%= f.name %></option>
-        <% }) %>
-      </select>
+    <label>Farmer:</label>
+    <select name="farmer">
+      <option value="">None</option>
+      <% farmers.forEach(f => { %>
+        <option value="<%= f._id %>"><%= f.name %></option>
+      <% }) %>
+    </select>
 
-      <label>Trailer:</label>
-      <select name="trailer">
-        <option value="">None</option>
-        <% trailers.forEach(t => { %>
-          <option value="<%= t._id %>"><%= t.name %></option>
-        <% }) %>
-      </select>
+    <label>Trailer:</label>
+    <select name="trailer">
+      <option value="">None</option>
+      <% trailers.forEach(t => { %>
+        <option value="<%= t._id %>"><%= t.name %></option>
+      <% }) %>
+    </select>
 
-      <label>Sand Spreader:</label>
-      <select name="sand">
-        <option value="">None</option>
-        <% sands.forEach(s => { %>
-          <option value="<%= s._id %>"><%= s.name %></option>
-        <% }) %>
-      </select>
+    <label>Sand Spreader:</label>
+    <select name="sand">
+      <option value="">None</option>
+      <% sands.forEach(s => { %>
+        <option value="<%= s._id %>"><%= s.name %></option>
+      <% }) %>
+    </select>
 
-      <label>Start Hour:</label>
-      <input type="text" name="startHour" required>
+    <label>Start Hour:</label>
+    <input type="text" name="startHour" required>
 
-      <label>End Hour:</label>
-      <input type="text" name="endHour">
+    <label>End Hour:</label>
+    <input type="text" name="endHour">
 
-      <button type="submit">Submit Transfer Hours</button>
-    </form>
-  </div>
+    <button type="submit">Submit Transfer Hours</button>
+  </form>
+</div>
 
-  <!-- Tracked Start Hours -->
- <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
+<!-- Tracked Start Hours -->
+<% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
   <div class="tracked">
     <h3>✅ Tracked Start Hours</h3>
     <ul>
@@ -302,9 +302,7 @@ body {
            if (tractor && field && !seenKeys.has(displayKey)) {
              seenKeys.add(displayKey);
       %>
-        <li>
-          <strong><%= displayKey %></strong>: <%= hour %> hrs
-        </li>
+        <li><strong><%= displayKey %></strong>: <%= hour %> hrs</li>
       <% } }) %>
     </ul>
   </div>
@@ -324,6 +322,7 @@ body {
   ⚠️ No internet connection. Submissions will be saved when you’re back online.
 </div>
 
-</body>iv style="height: 70px;"></div> <!-- spacer to push content down -->
-<% 
+<div style="height: 70px;"></div> <!-- spacer to push content down -->
+
+</body>
 </html>
