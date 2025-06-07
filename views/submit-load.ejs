@@ -144,8 +144,7 @@ body {
     }) %></div>
     <div>Tractor: <%= lastLoad.tractor.name %></div>
   </div>
-  <div style="height: 70px;"></div> <!-- spacer to push content down -->
-<% } %>
+  <d} %>
 
 
   <h3>Total Gallons Today: <%= totalGallons %></h3>
@@ -203,30 +202,29 @@ body {
   </div>
 
   <!-- Submit Fuel -->
-  <div class="form-section">
-    <h2>Submit Fuel</h2>
-    <form method="POST" action="/submit-fuel">
-      <label>Tractor:</label>
-      <select name="tractor" required>
-        <% tractors.forEach(t => { %>
-          <option value="<%= t._id %>"><%= t.name %></option>
-        <% }) %>
-      </select>
+<div class="form-section">
+  <h2>Submit Fuel</h2>
+  <form method="POST" action="/submit-fuel">
+    <label>Tractor:</label>
+    <select name="tractor" required>
+      <% tractors.forEach(t => { %>
+        <option value="<%= t._id %>"><%= t.name %></option>
+      <% }) %>
+    </select>
 
-      <label>Farm:</label>
-      <select name="farm">
-        <option value="">None</option>
-        <% farms.forEach(f => { %>
-          <option value="<%= f._id %>"><%= f.name %></option>
-        <% }) %>
-      </select>
+    <label>Field:</label>
+    <select name="field" required>
+      <% fields.forEach(f => { %>
+        <option value="<%= f._id %>"><%= f.name %></option>
+      <% }) %>
+    </select>
 
-      <label>Fuel Amount:</label>
-      <input type="number" step="0.1" name="gallons" required>
+    <label>Fuel Amount (Gallons):</label>
+    <input type="number" step="0.1" name="gallons" required>
 
-      <button type="submit">Submit Fuel</button>
-    </form>
-  </div>
+    <button type="submit">Submit Fuel</button>
+  </form>
+</div>
 
   <!-- Submit Transfer -->
   <div class="form-section">
@@ -326,5 +324,6 @@ body {
   ⚠️ No internet connection. Submissions will be saved when you’re back online.
 </div>
 
-</body>
+</body>iv style="height: 70px;"></div> <!-- spacer to push content down -->
+<% 
 </html>
