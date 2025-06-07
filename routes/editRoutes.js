@@ -166,5 +166,15 @@ router.post("/delete-transfer/:id", async (req, res) => {
   await Transfer.findByIdAndDelete(req.params.id);
   res.redirect("/driver-history");
 });
+// DELETE LOAD
+router.post("/delete-load/:id", async (req, res) => {
+  try {
+    await Load.findByIdAndDelete(req.params.id);
+    res.redirect("/driver-history");
+  } catch (err) {
+    console.error("❌ Failed to delete load:", err);
+    res.status(500).send("Failed to delete load.");
+  }
+});
 
 module.exports = router;
