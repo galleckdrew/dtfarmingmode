@@ -170,11 +170,12 @@ router.post("/submit-end-hour", async (req, res) => {
 router.post("/submit-fuel", async (req, res) => {
   const { tractor, field, amount, farm } = req.body;
   try {
+    const parsedAmount = parseFloat(amount); // ✅ Add this line
     await Fuel.create({
       tractor,
       field,
+      gallons: parsedAmount, // ✅ Use the parsed number under the correct key
       farm,
-      gallons: parsedAmount,
       timestamp: new Date()
     });
     res.redirect("/submit-load");
