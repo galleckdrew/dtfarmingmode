@@ -77,7 +77,7 @@
   </select>
 
   <label for="amount">Fuel Amount (gallons)</label>
-  <input type="number" name="amount" step="0.01" value="<%= fuel.amount || '' %>" required>
+  <input type="number" name="amount" step="0.01" value="<%= fuel.gallons || '' %>" required>
 
   <label for="timestamp">Timestamp</label>
   <input type="datetime-local" name="timestamp" value="<%= new Date(fuel.timestamp).toISOString().slice(0,16) %>" required>

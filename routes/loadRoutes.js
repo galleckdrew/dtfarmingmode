@@ -173,8 +173,8 @@ router.post("/submit-fuel", async (req, res) => {
     await Fuel.create({
       tractor,
       field,
-      amount,
       farm,
+      gallons: parseFloat(amount),
       timestamp: new Date()
     });
     res.redirect("/submit-load");
