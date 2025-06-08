@@ -132,7 +132,7 @@ body {
 <div id="offline-save-banner">✅ Load saved offline and will sync when back online.</div>
 <div class="container">
 
-<h1 style="margin-top: 80px;">D&T Manure Hauling</h1>
+<h1 style="margin-top: 120px;">D&T Manure Hauling</h1>
 <% if (typeof lastLoad !== "undefined" && lastLoad && lastLoad.timestamp && lastLoad.tractor) { %>
   <div id="recent-load-box">
     🚜 Recent Load<br>
@@ -144,8 +144,7 @@ body {
     }) %></div>
     <div>Tractor: <%= lastLoad.tractor.name %></div>
   </div>
-  <d} %>
-
+<% } %>
 
   <h3>Total Gallons Today: <%= totalGallons %></h3>
   <h3>Total Fuel Used Today: <%= totalFuel %></h3>
@@ -172,12 +171,12 @@ body {
       <% }) %>
     </select>
 
-   <label>Field:</label>
-<select name="field" required>
-  <% fields.forEach(fl => { %>
-    <option value="<%= fl._id %>"><%= fl.name %></option>
-  <% }) %>
-</select>
+    <label>Field:</label>
+    <select name="field" required>
+      <% fields.forEach(fl => { %>
+        <option value="<%= fl._id %>"><%= fl.name %></option>
+      <% }) %>
+    </select>
 
     <label>Pit:</label>
     <select name="pit" required>
@@ -300,10 +299,9 @@ body {
            const displayKey = `${tractor ? tractor.name : 'Unknown Tractor'} – ${field ? field.name : 'Unknown Field'}`;
 
            if (tractor && field && !seenKeys.has(displayKey)) {
-     "<%"       
-          
-          <strong><%= displayKey %></strong>: <%= hour %> hrs
-        </li>
+             seenKeys.add(displayKey);
+      %>
+        <li><strong><%= displayKey %></strong>: <%= hour %> hrs</li>
       <% } }); %>
     </ul>
   </div>
@@ -328,5 +326,3 @@ body {
 
 </body>
 </html>
-    seenKeys.add(displayKey);
-    
