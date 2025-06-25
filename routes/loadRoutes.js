@@ -18,7 +18,7 @@ router.post('/submit-fuel', async (req, res) => {
   try {
     const { tractor, field, gallons } = req.body;
 
-    if (!tractor || !field || gallons === undefined || isNaN(gallons) || gallons <= 0) {
+    if (!tractor || !field || gallons === undefined || isNaN(parseFloat(gallons)) || parseFloat(gallons) <= 0) {
       throw new Error('Invalid fuel amount');
     }
 
