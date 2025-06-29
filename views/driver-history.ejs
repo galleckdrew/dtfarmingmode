@@ -194,14 +194,14 @@
           <td><%= data.tractor?.name || '-' %></td>
           <td><%= data.farm?.name || '-' %></td>
           <td><%= (data.field?.name || '-') + ' / ' + (data.pit?.name || '-') %></td>
-          <td><%= type === 'load' ? data.gallons : type === 'fuel' ? data.amount : '' %></td>
+          <td><%= type === 'load' ? data.gallons : type === 'fuel' ? data.gallons : '' %></td>
           <td><%= data.totalHours || '-' %></td>
           <td><%= type === 'load' ? data.startHour || '-' : '' %></td>
           <td><%= type === 'load' ? data.endHour || '-' : '' %></td>
           <td><%= type === 'transfer' ? data.startHour || '-' : '' %></td>
           <td><%= type === 'transfer' ? data.endHour || '-' : '' %></td>
           <td><%= type === 'trailer' ? data.trailer : '' %></td>
-          <td><%= type === 'fuel' ? data.amount : '' %></td>
+          <td><%= type === 'fuel' ? data.gallons : '' %></td>
           <td><%= type === 'sand' ? data.sand : '' %></td>
           <td>
             <% if (type === 'load') { %>

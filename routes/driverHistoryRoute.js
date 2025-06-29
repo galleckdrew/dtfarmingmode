@@ -1,3 +1,4 @@
+// routes/driverHistoryRoute.js
 const express = require("express");
 const router = express.Router();
 const Load = require("../models/Load");
@@ -23,7 +24,7 @@ router.get("/driver-history", async (req, res) => {
 
     const [loads, fuels, transfers, tractors, farms, fields] = await Promise.all([
       Load.find(query).populate("tractor farm field pit"),
-      Fuel.find(query).populate("tractor field"),
+      Fuel.find(query).populate("tractor field farm"),
       Transfer.find(query).populate("tractor"),
       Tractor.find(),
       Farm.find(),
@@ -49,20 +50,17 @@ router.get("/driver-history", async (req, res) => {
       }
     });
 
-    // Filter by type if selected
     const filteredEntries = type ? allEntries.filter(e => e.type === type) : allEntries;
 
-    // Sort newest first
     filteredEntries.sort((a, b) => new Date(b.data.timestamp) - new Date(a.data.timestamp));
 
-    // Totals based on filtered entries
     const totalGallons = filteredEntries
       .filter(e => e.type === "load")
       .reduce((sum, e) => sum + (e.data.gallons || 0), 0);
 
     const totalFuel = filteredEntries
       .filter(e => e.type === "fuel")
-      .reduce((sum, e) => sum + (e.data.amount || 0), 0);
+      .reduce((sum, e) => sum + (e.data.gallons || 0), 0);
 
     const totalHours = filteredEntries
       .filter(e => e.type === "load")
@@ -71,7 +69,7 @@ router.get("/driver-history", async (req, res) => {
     const totalTransferHours = filteredEntries
       .filter(e => e.type === "transfer-start" || e.type === "transfer-end")
       .reduce((sum, e) => {
-        const hours = parseFloat(e.data.startHour || 0) + parseFloat(e.data.endHour || 0);
+        const hours = parseFloat(e.data.endHour || 0) - parseFloat(e.data.startHour || 0);
         return sum + (isNaN(hours) ? 0 : hours);
       }, 0);
 
