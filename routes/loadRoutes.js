@@ -73,7 +73,7 @@ router.get('/submit-load', async (req, res) => {
       selectedTractorId: '',
       selectedFarmId: '',
       trackedHours: {},
-      recentLoadsByField // ✅ Pass recent grouped loads
+      recentLoadsByField
     });
   } catch (err) {
     console.error('❌ Error loading submit-load page:', err);
@@ -111,18 +111,19 @@ router.post('/load', async (req, res) => {
   }
 });
 
-// ✅ POST Submit Fuel
+// ✅ POST Submit Fuel (now includes farm)
 router.post('/submit-fuel', async (req, res) => {
   try {
-    const { tractor, field, gallons } = req.body;
+    const { tractor, field, farm, gallons } = req.body;
 
-    if (!tractor || !field || gallons === undefined || isNaN(parseFloat(gallons)) || parseFloat(gallons) <= 0) {
-      throw new Error('Invalid fuel amount');
+    if (!tractor || !field || !farm || gallons === undefined || isNaN(parseFloat(gallons)) || parseFloat(gallons) <= 0) {
+      throw new Error('Invalid fuel input');
     }
 
     const newFuel = new Fuel({
       tractor,
       field,
+      farm, // ✅ This was missing
       gallons: parseFloat(gallons),
       timestamp: new Date()
     });
