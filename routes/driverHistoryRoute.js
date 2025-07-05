@@ -3,10 +3,10 @@ const express = require("express");
 const router = express.Router();
 const Load = require("../models/Load");
 const Fuel = require("../models/Fuel");
+const Transfer = require("../models/Transfer");
 const Tractor = require("../models/Tractor");
 const Farm = require("../models/Farm");
 const Field = require("../models/Field");
-const Transfer = require("../models/Transfer");
 
 router.get("/driver-history", async (req, res) => {
   try {
@@ -25,7 +25,7 @@ router.get("/driver-history", async (req, res) => {
     const [loads, fuels, transfers, tractors, farms, fields] = await Promise.all([
       Load.find(query).populate("tractor farm field pit"),
       Fuel.find(query).populate("tractor field farm"),
-      Transfer.find(query).populate("tractor"),
+      Transfer.find(query).populate("tractor field pump farmer trailer sand"),
       Tractor.find(),
       Farm.find(),
       Field.find(),
@@ -33,26 +33,25 @@ router.get("/driver-history", async (req, res) => {
 
     const allEntries = [];
 
+    // Load entries
     loads.forEach(l => allEntries.push({ type: "load", data: l }));
+
+    // Fuel entries
     fuels.forEach(f => allEntries.push({ type: "fuel", data: f }));
+
+    // Transfer entries (only once per transfer)
     transfers.forEach(t => {
-      if (t.startHour) {
-        allEntries.push({ type: "transfer-start", data: t });
-      }
-      if (t.endHour) {
-        allEntries.push({ type: "transfer-end", data: t });
-      }
-      if (t.trailer) {
-        allEntries.push({ type: "trailer", data: t });
-      }
-      if (t.sand) {
-        allEntries.push({ type: "sand", data: t });
-      }
+      allEntries.push({ type: "transfer", data: t });
     });
 
+    // Filter if needed
     const filteredEntries = type ? allEntries.filter(e => e.type === type) : allEntries;
 
+    // Sort newest first
     filteredEntries.sort((a, b) => new Date(b.data.timestamp) - new Date(a.data.timestamp));
+
+    // Totals
+    const totalLoads = filteredEntries.filter(e => e.type === "load").length;
 
     const totalGallons = filteredEntries
       .filter(e => e.type === "load")
@@ -66,14 +65,16 @@ router.get("/driver-history", async (req, res) => {
       .filter(e => e.type === "load")
       .reduce((sum, e) => sum + (e.data.totalHours || 0), 0);
 
-    const totalTransferHours = filteredEntries
-      .filter(e => e.type === "transfer-start" || e.type === "transfer-end")
+    const rawTransferHours = filteredEntries
+      .filter(e => e.type === "transfer")
       .reduce((sum, e) => {
-        const hours = parseFloat(e.data.endHour || 0) - parseFloat(e.data.startHour || 0);
-        return sum + (isNaN(hours) ? 0 : hours);
+        const start = parseFloat(e.data.startHour || 0);
+        const end = parseFloat(e.data.endHour || 0);
+        const diff = end > 0 ? end - start : 0;
+        return sum + (isNaN(diff) ? 0 : diff);
       }, 0);
 
-    const totalLoads = filteredEntries.filter(e => e.type === "load").length;
+    const totalTransferHours = rawTransferHours.toFixed(2);
 
     res.render("driver-history", {
       allEntries: filteredEntries,
@@ -90,7 +91,7 @@ router.get("/driver-history", async (req, res) => {
       totalGallons,
       totalFuel,
       totalHours,
-      totalTransferHours,
+      totalTransferHours
     });
   } catch (err) {
     console.error("❌ Error loading driver history:", err);

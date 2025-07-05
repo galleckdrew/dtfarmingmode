@@ -1,9 +1,8 @@
-<!-- views/driver-history.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>D&T Manure Hauling - Driver History</title>
   <style>
     body {
@@ -27,7 +26,7 @@
     th {
       background: #ccc;
     }
-    h1 {
+    h1, h2 {
       text-align: center;
       margin-top: 20px;
       color: #fff;
@@ -109,7 +108,7 @@
     <p>Total Gallons: <%= totalGallons %></p>
     <p>Total Hours: <%= totalHours %></p>
     <p>Total Fuel Used: <%= totalFuel %></p>
-    <p>Total Transfer Hours: <%= totalTransferHours %></p>
+    <p>Total Transfer Hours: <%= totalTransferHours %> hrs</p>
   </div>
 
   <form class="filters" method="GET" action="/driver-history">
@@ -146,10 +145,7 @@
         <option value="">All</option>
         <option value="load">Load</option>
         <option value="fuel">Fuel</option>
-        <option value="transfer-start">Transfer Start</option>
-        <option value="transfer-end">Transfer End</option>
-        <option value="trailer">Pump</option>
-        <option value="sand">Sand</option>
+        <option value="transfer">Transfer</option>
       </select>
     </div>
     <div>
@@ -165,65 +161,125 @@
     </div>
   </form>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Timestamp</th>
-        <th>Type</th>
-        <th>Tractor</th>
-        <th>Farm</th>
-        <th>Field & Pit</th>
-        <th>Gallons</th>
-        <th>Total Hours</th>
-        <th>Start Hour (Load)</th>
-        <th>End Hour (Load)</th>
-        <th>Start Hour (Transfer)</th>
-        <th>End Hour (Transfer)</th>
-        <th>Pump</th>
-        <th>Fuel</th>
-        <th>Sand</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% allEntries.forEach(entry => { %>
-        <% const type = entry.type; const data = entry.data; const isFuel = type === 'fuel'; %>
-        <tr class="<%= isFuel ? 'yellow-row' : '' %>">
-          <td><%= new Date(data.timestamp).toLocaleString() %></td>
-          <td><%= type %></td>
-          <td><%= data.tractor?.name || '-' %></td>
-          <td><%= data.farm?.name || '-' %></td>
-          <td><%= (data.field?.name || '-') + ' / ' + (data.pit?.name || '-') %></td>
-          <td><%= type === 'load' ? data.gallons : type === 'fuel' ? data.gallons : '' %></td>
-          <td><%= data.totalHours || '-' %></td>
-          <td><%= type === 'load' ? data.startHour || '-' : '' %></td>
-          <td><%= type === 'load' ? data.endHour || '-' : '' %></td>
-          <td><%= type === 'transfer' ? data.startHour || '-' : '' %></td>
-          <td><%= type === 'transfer' ? data.endHour || '-' : '' %></td>
-          <td><%= type === 'trailer' ? data.trailer : '' %></td>
-          <td><%= type === 'fuel' ? data.gallons : '' %></td>
-          <td><%= type === 'sand' ? data.sand : '' %></td>
-          <td>
-            <% if (type === 'load') { %>
-              <a href="/edit-load/<%= data._id %>" class="btn">Edit</a>
-              <form method="POST" action="/delete-load/<%= data._id %>">
-                <button type="submit" class="btn">Delete</button>
-              </form>
-            <% } else if (type === 'fuel') { %>
-              <a href="/edit-fuel/<%= data._id %>" class="btn">Edit</a>
-              <form method="POST" action="/delete-fuel/<%= data._id %>">
-                <button type="submit" class="btn">Delete</button>
-              </form>
-            <% } else { %>
-              <a href="/edit-transfer/<%= data._id %>" class="btn">Edit</a>
-              <form method="POST" action="/delete-transfer/<%= data._id %>">
-                <button type="submit" class="btn">Delete</button>
-              </form>
-            <% } %>
-          </td>
+  <!-- 🚛 LOAD ENTRIES -->
+  <% const loadEntries = allEntries.filter(e => e.type === 'load'); %>
+  <% if (loadEntries.length > 0) { %>
+    <h2>🚛 Load Entries</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Tractor</th>
+          <th>Farm</th>
+          <th>Field / Pit</th>
+          <th>Gallons</th>
+          <th>Total Hours</th>
+          <th>Start Hour</th>
+          <th>End Hour</th>
+          <th>Actions</th>
         </tr>
-      <% }) %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% loadEntries.forEach(e => { const l = e.data; %>
+          <tr>
+            <td><%= new Date(l.timestamp).toLocaleString() %></td>
+            <td><%= l.tractor?.name || '-' %></td>
+            <td><%= l.farm?.name || '-' %></td>
+            <td><%= (l.field?.name || '-') + ' / ' + (l.pit?.name || '-') %></td>
+            <td><%= l.gallons || '-' %></td>
+            <td><%= l.totalHours || '-' %></td>
+            <td><%= l.startHour || '-' %></td>
+            <td><%= l.endHour || '-' %></td>
+            <td>
+              <a href="/edit-load/<%= l._id %>" class="btn">Edit</a>
+              <form method="POST" action="/delete-load/<%= l._id %>">
+                <button type="submit" class="btn">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <!-- ⛽ FUEL ENTRIES -->
+  <% const fuelEntries = allEntries.filter(e => e.type === 'fuel'); %>
+  <% if (fuelEntries.length > 0) { %>
+    <h2>⛽ Fuel Entries</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Tractor</th>
+          <th>Farm</th>
+          <th>Field</th>
+          <th>Gallons</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% fuelEntries.forEach(e => { const f = e.data; %>
+          <tr class="yellow-row">
+            <td><%= new Date(f.timestamp).toLocaleString() %></td>
+            <td><%= f.tractor?.name || '-' %></td>
+            <td><%= f.farm?.name || '-' %></td>
+            <td><%= f.field?.name || '-' %></td>
+            <td><%= f.gallons || '-' %></td>
+            <td>
+              <a href="/edit-fuel/<%= f._id %>" class="btn">Edit</a>
+              <form method="POST" action="/delete-fuel/<%= f._id %>">
+                <button type="submit" class="btn">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <!-- 🚜 TRANSFER ENTRIES -->
+  <% const transferEntries = allEntries.filter(e => e.type === 'transfer'); %>
+  <% if (transferEntries.length > 0) { %>
+    <h2>🚜 Transfer/Hauling Entries</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Tractor</th>
+          <th>Field</th>
+          <th>Start Hour</th>
+          <th>End Hour</th>
+          <th>Total Hours</th>
+          <th>Pump</th>
+          <th>Farmer</th>
+          <th>Trailer</th>
+          <th>Sand</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% transferEntries.forEach(e => { const t = e.data; const total = (t.endHour && t.startHour) ? (parseFloat(t.endHour) - parseFloat(t.startHour)).toFixed(2) : '-'; %>
+          <tr>
+            <td><%= new Date(t.timestamp).toLocaleString() %></td>
+            <td><%= t.tractor?.name || '-' %></td>
+            <td><%= t.field?.name || '-' %></td>
+            <td><%= t.startHour || '-' %></td>
+            <td><%= t.endHour || '-' %></td>
+            <td><%= total %></td>
+            <td><%= t.pump?.name || '-' %></td>
+            <td><%= t.farmer?.name || '-' %></td>
+            <td><%= t.trailer?.name || '-' %></td>
+            <td><%= t.sand?.name || '-' %></td>
+            <td>
+              <a href="/edit-transfer/<%= t._id %>" class="btn">Edit</a>
+              <form method="POST" action="/delete-transfer/<%= t._id %>">
+                <button type="submit" class="btn">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
 </body>
 </html>
