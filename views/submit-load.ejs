@@ -322,7 +322,7 @@
   <!-- 📋 Recent Loads by Field with Tags & Slurry Dot -->
   <% if (recentLoadsByField && Object.keys(recentLoadsByField).length > 0) { %>
     <div class="form-section">
-      <h2>📋 Recent Loads (Grouped by 3 Most Recent Fields)</h2>
+      <h2>📋 Recent Loads</h2>
       <% Object.entries(recentLoadsByField).forEach(([fieldName, loads], idx) => {
            const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0).toFixed(0);
       %>
