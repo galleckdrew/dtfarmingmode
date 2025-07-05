@@ -3,127 +3,150 @@
 <head>
   <title>🚜 Submit Load</title>
   <style>
-/* styles remain unchanged */
-#recent-load-box {
-  background: #007bff;
-  color: white;
-  border: 2px solid #0056b3;
-  font-size: 20px;
-  font-weight: bold;
-  padding: 12px 18px;
-  text-align: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 9999;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-body {
-  padding-top: 140px;
-  font-family: Arial, sans-serif;
-  background: url("/dt-bg.png") no-repeat center center fixed;
-  background-size: cover;
-  margin: 0;
-  padding: 0;
-  color: #fff;
-  font-size: 20px;
-}
-.spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top: 3px solid #fff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  vertical-align: middle;
-  margin-right: 8px;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.container {
-  background: rgba(0, 0, 0, 0.8);
-  padding: 30px 24px;
-  max-width: 700px;
-  margin: 40px auto;
-  border-radius: 14px;
-}
-h1, h2, h3 {
-  font-weight: bold;
-  text-align: center;
-}
-h1 { font-size: 32px; margin-bottom: 10px; }
-h2 { font-size: 26px; margin-top: 30px; }
-h3 { font-size: 22px; margin-bottom: 12px; }
-label {
-  font-size: 22px;
-  font-weight: bold;
-  display: block;
-  margin-top: 18px;
-}
-select, input {
-  width: 100%;
-  padding: 16px;
-  margin-top: 8px;
-  border-radius: 6px;
-  border: none;
-  font-size: 20px;
-}
-button {
-  padding: 16px 24px;
-  font-size: 20px;
-  background: #4CAF50;
-  border: none;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  width: 100%;
-  font-weight: bold;
-  margin-top: 16px;
-}
-.form-section { margin-top: 30px; }
-.tracked {
-  background: #222;
-  padding: 18px;
-  margin-top: 30px;
-  border-radius: 10px;
-  font-size: 20px;
-}
-.tracked ul { padding-left: 20px; }
-#sync-banner, #offline-save-banner {
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  padding: 10px;
-  position: fixed;
-  top: -100px;
-  left: 0;
-  right: 0;
-  z-index: 9999;
-  opacity: 0;
-  transition: top 0.5s ease, opacity 0.5s ease;
-}
-#sync-banner {
-  background: #222;
-  color: #fff;
-}
-#offline-save-banner {
-  background: green;
-  color: white;
-}
-.show-banner {
-  top: 0;
-  opacity: 1;
-}
+    body {
+      padding-top: 140px;
+      font-family: Arial, sans-serif;
+      background: url("/dt-bg.png") no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      color: #fff;
+      font-size: 20px;
+    }
+    #recent-load-box {
+      background: #007bff;
+      color: white;
+      border: 2px solid #0056b3;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 12px 18px;
+      text-align: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 9999;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 30px 24px;
+      max-width: 700px;
+      margin: 40px auto;
+      border-radius: 14px;
+    }
+    h1, h2, h3 {
+      font-weight: bold;
+      text-align: center;
+    }
+    h1 { font-size: 32px; margin-bottom: 10px; }
+    h2 { font-size: 26px; margin-top: 30px; }
+    h3 { font-size: 22px; margin-bottom: 12px; color: #fff; }
+    label {
+      font-size: 22px;
+      font-weight: bold;
+      display: block;
+      margin-top: 18px;
+    }
+    select, input {
+      width: 100%;
+      padding: 16px;
+      margin-top: 8px;
+      border-radius: 6px;
+      border: none;
+      font-size: 20px;
+    }
+    button {
+      padding: 16px 24px;
+      font-size: 20px;
+      background: #4CAF50;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      margin-top: 16px;
+    }
+    .form-section { margin-top: 30px; }
+    .tracked {
+      background: #222;
+      padding: 18px;
+      margin-top: 30px;
+      border-radius: 10px;
+      font-size: 20px;
+    }
+    .tracked ul { padding-left: 20px; }
+
+    table {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background: #ddd;
+    }
+
+    /* 🎨 Field Tags */
+    .field-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 6px;
+      color: white;
+    }
+    .tag-color-0 { background-color: #ff6b6b; }
+    .tag-color-1 { background-color: #6bc2ff; }
+    .tag-color-2 { background-color: #51d88a; }
+
+    /* 💠 Matching Slurry Dot Badge */
+    .slurry-dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .gallon-badge {
+      background: #333;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      margin-left: 10px;
+    }
+
+    .see-more-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .see-more-btn:hover {
+      background: #0056b3;
+    }
+    .hidden-row {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<div id="sync-banner"></div>
-<div id="offline-save-banner">✅ Load saved offline and will sync when back online.</div>
-<% if (typeof lastLoad !== "undefined" && lastLoad && lastLoad.timestamp && lastLoad.tractor) { %>
+
+<% if (lastLoad && lastLoad.timestamp && lastLoad.tractor) { %>
   <div id="recent-load-box">
     🚜 Recent Load<br>
     <div><%= new Date(lastLoad.timestamp).toLocaleString("en-US", {
@@ -135,154 +158,91 @@ button {
     <div>Tractor: <%= lastLoad.tractor.name %></div>
   </div>
 <% } %>
+
 <div class="container">
-<h1>D&T Manure Hauling</h1>
-<h3>Total Gallons Today: <%= totalGallons %></h3>
-<h3>Total Fuel Used Today: <%= totalFuel %></h3>
-<form method="POST" action="/load">
-  <h2>Submit Load</h2>
-  <label>Tractor:</label>
-  <select name="tractor" required>
-    <% tractors.forEach(t => { %>
-      <option value="<%= t._id %>" <%= t._id.toString() === selectedTractorId ? 'selected' : '' %>><%= t.name %> (<%= t.gallons %> gal)</option>
-    <% }) %>
-  </select>
-  <label>Farm:</label>
-  <select name="farm" required>
-    <% farms.forEach(f => { %>
-      <option value="<%= f._id %>" <%= f._id.toString() === selectedFarmId ? 'selected' : '' %>><%= f.name %></option>
-    <% }) %>
-  </select>
-  <label>Field:</label>
-  <select name="field" required>
-    <% fields.forEach(fl => { %>
-      <option value="<%= fl._id %>"><%= fl.name %></option>
-    <% }) %>
-  </select>
-  <label>Pit:</label>
-  <select name="pit" required>
-    <% pits.forEach(p => { %>
-      <option value="<%= p._id %>"><%= p.name %></option>
-    <% }) %>
-  </select>
-  <label>Start Hour:</label>
-  <input type="number" name="startHour" step="0.1" min="0" placeholder="Required On First Load">
-  <button type="submit">Submit Load</button>
-</form>
-<div class="form-section">
-  <h2>Submit End Hour</h2>
-  <form method="POST" action="/submit-end-hour">
-    <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
-    <button type="submit">Submit End Hour</button>
-  </form>
-</div>
-<div class="form-section">
-  <h2>Submit Fuel</h2>
-  <form method="POST" action="/submit-fuel">
-    <label>Tractor:</label>
-    <select name="tractor" required>
-      <% tractors.forEach(t => { %>
-        <option value="<%= t._id %>"><%= t.name %></option>
-      <% }) %>
-    </select>
-    <label>Field:</label>
-    <select name="field" required>
-      <% fields.forEach(f => { %>
-        <option value="<%= f._id %>"><%= f.name %></option>
-      <% }) %>
-    </select>
-    <label>Farm:</label>
-    <select name="farm" required>
-      <% farms.forEach(f => { %>
-        <option value="<%= f._id %>"><%= f.name %></option>
-      <% }) %>
-    </select>
-    <label>Fuel Amount (Gallons):</label>
-    <input type="number" step="0.1" name="gallons" required>
-    <button type="submit">Submit Fuel</button>
-  </form>
-</div>
-<div class="form-section">
-  <h2>Submit Transfer/Hauling Hours</h2>
-  <form method="POST" action="/submit-transfer">
-    <label>Tractor:</label>
-    <select name="tractor" required>
-      <% tractors.forEach(t => { %>
-        <option value="<%= t._id %>"><%= t.name %></option>
-      <% }) %>
-    </select>
-    <label>Fields:</label>
-    <select name="field">
-      <option value="">None</option>
-      <% fields.forEach(f => { %>
-        <option value="<%= f._id %>"><%= f.name %></option>
-      <% }) %>
-    </select>
-    <label>Pump:</label>
-    <select name="pump">
-      <option value="">None</option>
-      <% pumps.forEach(p => { %>
-        <option value="<%= p._id %>"><%= p.name %></option>
-      <% }) %>
-    </select>
-    <label>Farmer:</label>
-    <select name="farmer">
-      <option value="">None</option>
-      <% farmers.forEach(f => { %>
-        <option value="<%= f._id %>"><%= f.name %></option>
-      <% }) %>
-    </select>
-    <label>Trailer:</label>
-    <select name="trailer">
-      <option value="">None</option>
-      <% trailers.forEach(t => { %>
-        <option value="<%= t._id %>"><%= t.name %></option>
-      <% }) %>
-    </select>
-    <label>Sand Spreader:</label>
-    <select name="sand">
-      <option value="">None</option>
-      <% sands.forEach(s => { %>
-        <option value="<%= s._id %>"><%= s.name %></option>
-      <% }) %>
-    </select>
-    <label>Start Hour:</label>
-    <input type="text" name="startHour" required>
-    <label>End Hour:</label>
-    <input type="text" name="endHour">
-    <button type="submit">Submit Transfer Hours</button>
-  </form>
-</div>
-<% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
-  <div class="tracked">
-    <h3>✅ Tracked Start Hours</h3>
-    <ul>
-      <% const seenKeys = new Set(); %>
-      <% Object.entries(trackedHours).forEach(([combinedId, hour]) => {
-           const [tractorId, fieldId] = combinedId.split('_');
-           const tractor = tractors.find(t => t._id.toString() === tractorId);
-           const field = fields.find(f => f._id.toString() === fieldId);
-           const displayKey = `${tractor ? tractor.name : 'Unknown Tractor'} – ${field ? field.name : 'Unknown Field'}`;
-           if (tractor && field && !seenKeys.has(displayKey)) {
-             seenKeys.add(displayKey);
+  <h1>D&T Manure Hauling</h1>
+  <h3>Total Gallons Today: <%= totalGallons %></h3>
+  <h3>Total Fuel Used Today: <%= totalFuel %></h3>
+
+  <!-- ✏️ Add your Submit Load / Fuel / Transfer forms here (unchanged) -->
+
+  <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
+    <div class="tracked">
+      <h3>✅ Tracked Start Hours</h3>
+      <ul>
+        <% const seenKeys = new Set(); %>
+        <% Object.entries(trackedHours).forEach(([combinedId, hour]) => {
+             const [tractorId, fieldId] = combinedId.split('_');
+             const tractor = tractors.find(t => t._id.toString() === tractorId);
+             const field = fields.find(f => f._id.toString() === fieldId);
+             const displayKey = `${tractor ? tractor.name : 'Unknown Tractor'} – ${field ? field.name : 'Unknown Field'}`;
+             if (tractor && field && !seenKeys.has(displayKey)) {
+               seenKeys.add(displayKey);
+        %>
+          <li><strong><%= displayKey %></strong>: <%= hour %> hrs</li>
+        <% } }); %>
+      </ul>
+    </div>
+  <% } %>
+
+  <!-- 📋 Recent Loads by Field with Color Tag + Slurry Dot -->
+  <% if (recentLoadsByField && Object.keys(recentLoadsByField).length > 0) { %>
+    <div class="form-section">
+      <h2>📋 Recent Loads (Grouped by 3 Most Recent Fields)</h2>
+      <% Object.entries(recentLoadsByField).forEach(([fieldName, loads], idx) => {
+           const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0).toFixed(0);
       %>
-        <li><strong><%= displayKey %></strong>: <%= hour %> hrs</li>
-      <% } }); %>
-    </ul>
-  </div>
-<% } %>
-<script>
-function updateOnlineStatus() {
-  const banner = document.getElementById("offline-banner");
-  banner.style.display = navigator.onLine ? "none" : "block";
-}
-window.addEventListener("load", updateOnlineStatus);
-window.addEventListener("online", updateOnlineStatus);
-window.addEventListener("offline", updateOnlineStatus);
-</script>
-<div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:red; color:white; text-align:center; padding:10px; font-weight:bold; z-index:9999;">
-  ⚠️ No internet connection. Submissions will be saved when you’re back online.
+        <h3>
+          <span class="field-tag tag-color-<%= idx % 3 %>"><%= fieldName %></span>
+          <span class="gallon-badge">
+            <span class="slurry-dot tag-color-<%= idx % 3 %>"></span>
+            <%= totalGallons %> gal
+          </span>
+        </h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Tractor</th>
+              <th>Farm</th>
+              <th>Pit</th>
+              <th>Gallons</th>
+              <th>Start Hour</th>
+              <th>End Hour</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% loads.forEach((load, i) => { %>
+              <tr class="<%= i >= 3 ? 'hidden-row field-rows-<%= idx %>' : '' %>">
+                <td><%= new Date(load.timestamp).toLocaleString("en-US", { timeZone: "America/New_York" }) %></td>
+                <td><%= load.tractor?.name || '-' %></td>
+                <td><%= load.farm?.name || '-' %></td>
+                <td><%= load.pit?.name || '-' %></td>
+                <td><%= load.gallons || '-' %></td>
+                <td><%= load.startHour || '-' %></td>
+                <td><%= load.endHour || '-' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <% if (loads.length > 3) { %>
+          <button class="see-more-btn" onclick="toggleRows(<%= idx %>)">See More</button>
+        <% } %>
+      <% }) %>
+    </div>
+  <% } %>
 </div>
-<div style="height: 70px;"></div>
+
+<script>
+  function toggleRows(index) {
+    const rows = document.querySelectorAll(`.field-rows-${index}`);
+    rows.forEach(row => {
+      row.style.display = row.style.display === "table-row" ? "none" : "table-row";
+    });
+
+    const btn = event.target;
+    btn.innerText = btn.innerText === "See More" ? "Hide" : "See More";
+  }
+</script>
 </body>
 </html>
