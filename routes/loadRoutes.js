@@ -119,5 +119,34 @@ router.post('/load', async (req, res) => {
   }
 });
 
+// ✅ POST Submit Transfer / Hauling Hours
+router.post('/submit-transfer', async (req, res) => {
+  try {
+    const { tractor, field, pump, farmer, trailer, sand, startHour, endHour } = req.body;
+
+    if (!tractor || !startHour) {
+      throw new Error('Tractor and Start Hour are required');
+    }
+
+    const newTransfer = new Transfer({
+      tractor,
+      field: field || null,
+      pump: pump || null,
+      farmer: farmer || null,
+      trailer: trailer || null,
+      sand: sand || null,
+      startHour: parseFloat(startHour),
+      endHour: endHour ? parseFloat(endHour) : null,
+      timestamp: new Date()
+    });
+
+    await newTransfer.save();
+    res.redirect('/submit-load');
+  } catch (err) {
+    console.error('❌ Failed to submit transfer:', err);
+    res.status(400).send('Failed to submit transfer');
+  }
+});
+
 
 module.exports = router;
