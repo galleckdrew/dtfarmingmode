@@ -88,4 +88,36 @@ router.post('/submit-fuel', async (req, res) => {
   }
 });
 
+// ✅ POST Submit Load
+router.post('/load', async (req, res) => {
+  try {
+    const { tractor, farm, field, pit, startHour } = req.body;
+
+    if (!tractor || !farm || !field || !pit) {
+      throw new Error('Missing required fields');
+    }
+
+    // Example default gallons per tractor
+    const tractorData = await Tractor.findById(tractor);
+    const gallons = tractorData ? tractorData.gallons : 0;
+
+    const newLoad = new Load({
+      tractor,
+      farm,
+      field,
+      pit,
+      gallons,
+      startHour: startHour ? parseFloat(startHour) : undefined,
+      timestamp: new Date()
+    });
+
+    await newLoad.save();
+    res.redirect('/submit-load');
+  } catch (err) {
+    console.error('❌ Failed to submit load:', err);
+    res.status(400).send('Failed to submit load');
+  }
+});
+
+
 module.exports = router;
