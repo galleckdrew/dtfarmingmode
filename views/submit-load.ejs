@@ -107,7 +107,7 @@
     .tag-color-1 { background-color: #6bc2ff; }
     .tag-color-2 { background-color: #51d88a; }
 
-    /* 💠 Matching Slurry Dot Badge */
+    /* 💠 Slurry Dot Badge */
     .slurry-dot {
       display: inline-block;
       width: 12px;
@@ -164,7 +164,7 @@
   <h3>Total Gallons Today: <%= totalGallons %></h3>
   <h3>Total Fuel Used Today: <%= totalFuel %></h3>
 
-  <!-- ✏️ Add your Submit Load / Fuel / Transfer forms here (unchanged) -->
+  <!-- ✏️ Your Submit Forms Here -->
 
   <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
     <div class="tracked">
@@ -185,7 +185,7 @@
     </div>
   <% } %>
 
-  <!-- 📋 Recent Loads by Field with Color Tag + Slurry Dot -->
+  <!-- 📋 Recent Loads by Field -->
   <% if (recentLoadsByField && Object.keys(recentLoadsByField).length > 0) { %>
     <div class="form-section">
       <h2>📋 Recent Loads (Grouped by 3 Most Recent Fields)</h2>
@@ -213,7 +213,7 @@
           </thead>
           <tbody>
             <% loads.forEach((load, i) => { %>
-              <tr class="<%= i >= 3 ? 'hidden-row field-rows-<%= idx %>' : '' %>">
+              <tr class="<%= i >= 3 ? ('hidden-row field-rows-' + idx) : '' %>">
                 <td><%= new Date(load.timestamp).toLocaleString("en-US", { timeZone: "America/New_York" }) %></td>
                 <td><%= load.tractor?.name || '-' %></td>
                 <td><%= load.farm?.name || '-' %></td>
