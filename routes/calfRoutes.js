@@ -21,4 +21,19 @@ router.get('/calves', async (req, res) => {
   res.render('calf-list', { calves });
 });
 
+// View individual calf + weight form
+router.get('/calves/:id', async (req, res) => {
+  const calf = await Calf.findById(req.params.id);
+  res.render('calf-detail', { calf });
+});
+
+// Submit weight entry
+router.post('/calves/:id/add-weight', async (req, res) => {
+  const { weight, date } = req.body;
+  const calf = await Calf.findById(req.params.id);
+  calf.weights.push({ weight, date });
+  await calf.save();
+  res.redirect(`/calves/${req.params.id}`);
+});
+
 module.exports = router;

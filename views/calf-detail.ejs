@@ -1,0 +1,20 @@
+<h1>Calf: <%= calf.calfId %></h1>
+<p>Birth Date: <%= calf.birthDate.toDateString() %></p>
+<p>Age: <%= Math.floor((Date.now() - new Date(calf.birthDate)) / (1000 * 60 * 60 * 24)) %> days</p>
+
+<h3>📈 Weight Logs</h3>
+<ul>
+  <% calf.weights.forEach(w => { %>
+    <li><%= w.weight %> lbs on <%= new Date(w.date).toDateString() %></li>
+  <% }) %>
+</ul>
+
+<form action="/calves/<%= calf._id %>/add-weight" method="POST">
+  <label>Weight (lbs):</label>
+  <input type="number" name="weight" required><br>
+  <label>Date:</label>
+  <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>" required><br>
+  <button type="submit">Add Weight</button>
+</form>
+
+<a href="/calves">⬅ Back to List</a>
