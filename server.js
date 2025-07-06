@@ -170,6 +170,10 @@ app.get("/submit-load", requireLogin, async (req, res) => {
   }
 });
 
+const calfRoutes = require('./routes/calfRoutes');
+app.use('/', calfRoutes);
+
+
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
