@@ -49,12 +49,21 @@ router.get('/submit-load', async (req, res) => {
     const recentLoadsByField = {};
     for (const fieldId of recentFieldsLimited) {
       const field = await Field.findById(fieldId);
+
       const loads = await Load.find({ field: fieldId })
         .sort({ timestamp: -1 })
         .limit(10)
         .populate('tractor farm pit');
 
-      recentLoadsByField[field?.name || 'Unknown Field'] = loads;
+      const transfers = await Transfer.find({ field: fieldId })
+        .sort({ timestamp: -1 })
+        .limit(10)
+        .populate('tractor farm pit');
+
+      const combined = [...loads, ...transfers];
+      combined.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      recentLoadsByField[field?.name || 'Unknown Field'] = combined;
     }
 
     res.render('submit-load', {
