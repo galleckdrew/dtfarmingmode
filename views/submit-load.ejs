@@ -387,7 +387,7 @@
 <% } %>
 
 <!-- ⛽ Recent Fuel Entries -->
-<% if (recentFuel && recentFuel.length > 0) { %>
+<% if (typeof recentFuel !== 'undefined' && recentFuel.length > 0) { %>
   <div class="form-section">
     <h2>⛽ Recent Fuel Entries</h2>
     <table style="background: #fff8dc;"> <!-- Light yellow background -->
