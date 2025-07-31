@@ -333,10 +333,11 @@
 <% if (recentLoadsByField && Object.keys(recentLoadsByField).length > 0) { %>
   <div class="form-section">
     <h2>📋 Recent Loads</h2>
-    <% Object.entries(recentLoadsByField).forEach(([fieldName, loads], idx) => {
-         const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0).toFixed(0);
-    %>
-      <h3>
+    
+<% Object.entries(recentLoadsByField).forEach(([fieldName, loads], idx) => { %>
+  <% const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0).toFixed(0); %>
+    
+ <h3>
         <span class="field-tag tag-color-<%= idx % 3 %>"><%= fieldName %></span>
         <span class="gallon-badge">
           <span class="slurry-dot tag-color-<%= idx % 3 %>"></span>
