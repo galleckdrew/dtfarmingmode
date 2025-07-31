@@ -270,4 +270,16 @@ router.post('/submit-fuel', async (req, res) => {
   }
 });
 
+// ✅ DELETE Load Entry by ID
+router.post('/delete-load/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Load.findByIdAndDelete(id);
+    res.redirect('/submit-load');
+  } catch (err) {
+    console.error("❌ Failed to delete load:", err);
+    res.status(500).send("Failed to delete load");
+  }
+});
+
 module.exports = router;
