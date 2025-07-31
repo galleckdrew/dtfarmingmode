@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-
-const Fuel = require('../models/Fuel');
 const Load = require('../models/Load');
+const Fuel = require('../models/Fuel');
 const Transfer = require('../models/Transfer');
 const Tractor = require('../models/Tractor');
 const Field = require('../models/Field');
@@ -26,122 +25,48 @@ router.get('/submit-load', async (req, res) => {
     const sands = await Sand.find();
     const farmers = await Farmer.find();
 
-    const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate('tractor');
+    const lastLoad = await Load.findOne().sort({ timestamp: -1 }).populate('tractor farm field pit');
 
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
 
-    const loadsToday = await Load.find({ timestamp: { $gte: startOfDay, $lte: endOfDay } });
-    const totalGallons = loadsToday.reduce((sum, load) => sum + (load.gallons || 0), 0);
+    const loadsToday = await Load.find({ timestamp: { $gte: startOfDay } });
+    const totalGallons = loadsToday.reduce((sum, l) => sum + (l.gallons || 0), 0);
 
-    const fuelsToday = await Fuel.find({ timestamp: { $gte: startOfDay, $lte: endOfDay } });
-    const totalFuel = fuelsToday.reduce((sum, f) => sum + (f.gallons || 0), 0);
+    const fuelToday = await Fuel.find({ timestamp: { $gte: startOfDay } });
+    const totalFuel = fuelToday.reduce((sum, f) => sum + (f.gallons || 0), 0);
 
-    const recentFieldIds = await Load.find({})
-      .sort({ timestamp: -1 })
-      .limit(50)
-      .distinct('field');
+    const trackedDocs = await TrackedStartHour.find();
+    const trackedHours = {};
+    trackedDocs.forEach(doc => {
+      trackedHours[`${doc.tractor}_${doc.farm}`] = doc.startHour;
+    });
 
-    const recentFieldsLimited = recentFieldIds.slice(0, 3);
-
+    const loads = await Load.find().sort({ timestamp: -1 }).limit(30).populate('tractor farm field pit');
     const recentLoadsByField = {};
-    for (const fieldId of recentFieldsLimited) {
-      const field = await Field.findById(fieldId);
+    loads.forEach(load => {
+      const fieldName = load.field?.name || 'Unknown Field';
+      if (!recentLoadsByField[fieldName]) recentLoadsByField[fieldName] = [];
+      recentLoadsByField[fieldName].push(load);
+    });
 
-      const loads = await Load.find({ field: fieldId })
-        .sort({ timestamp: -1 })
-        .limit(10)
-        .populate('tractor farm pit');
+    const recentFuel = await Fuel.find().sort({ timestamp: -1 }).limit(15).populate('tractor field farm');
 
-      const transfers = await Transfer.find({ field: fieldId })
-        .sort({ timestamp: -1 })
-        .limit(10)
-        .populate('tractor farm pit');
-
-      const combined = [...loads, ...transfers];
-      combined.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-      recentLoadsByField[field?.name || 'Unknown Field'] = combined;
-    }
+    // ✅ Append recent fuel entries into recentLoadsByField
+    recentFuel.forEach(fuel => {
+      const fieldName = fuel.field?.name || 'Unknown Field';
+      if (!recentLoadsByField[fieldName]) recentLoadsByField[fieldName] = [];
+      recentLoadsByField[fieldName].push({ ...fuel.toObject(), isFuel: true });
+    });
 
     res.render('submit-load', {
-      tractors,
-      fields,
-      farms,
-      pits,
-      pumps,
-      trailers,
-      sands,
-      farmers,
-      lastLoad,
-      totalGallons,
-      totalFuel,
-      selectedTractorId: '',
-      selectedFarmId: '',
-      trackedHours: {},
-      recentLoadsByField
+      tractors, farms, fields, pits, pumps, trailers, sands, farmers,
+      lastLoad, totalGallons, totalFuel,
+      trackedHours, recentLoadsByField, recentFuel
     });
   } catch (err) {
-    console.error('❌ Error loading submit-load page:', err);
-    res.status(500).send('Failed to load page');
-  }
-});
-
-// ✅ POST Submit Load (Start or End Hour)
-router.post('/load', async (req, res) => {
-  try {
-    const { tractor, farm, field, pit, startHour, endHour } = req.body;
-
-    if (!tractor || !farm || !field || !pit) {
-      throw new Error('Missing required fields');
-    }
-
-    const tractorData = await Tractor.findById(tractor);
-    const gallons = tractorData ? tractorData.gallons : 0;
-
-    let usedStartHour = startHour ? parseFloat(startHour) : undefined;
-    let usedEndHour = endHour ? parseFloat(endHour) : undefined;
-    let totalHours;
-    const keyInfo = { tractor, farm };
-
-    if (usedStartHour !== undefined && !isNaN(usedStartHour)) {
-      await TrackedStartHour.findOneAndUpdate(
-        keyInfo,
-        { startHour: usedStartHour, timestamp: new Date() },
-        { upsert: true }
-      );
-    }
-
-    if (usedEndHour !== undefined && !isNaN(usedEndHour)) {
-      const tracked = await TrackedStartHour.findOne(keyInfo);
-      if (!tracked) {
-        throw new Error('❌ No start hour found for this tractor and farm.');
-      }
-
-      usedStartHour = tracked.startHour;
-      totalHours = usedEndHour - usedStartHour;
-      await TrackedStartHour.deleteOne(keyInfo);
-    }
-
-    const newLoad = new Load({
-      tractor,
-      farm,
-      field,
-      pit,
-      gallons,
-      startHour: usedStartHour,
-      endHour: usedEndHour,
-      totalHours,
-      timestamp: new Date()
-    });
-
-    await newLoad.save();
-    res.redirect('/submit-load');
-  } catch (err) {
-    console.error('❌ Failed to submit load:', err.message);
-    res.status(400).send(err.message || 'Failed to submit load');
+    console.error('❌ Failed to load submit page:', err);
+    res.status(500).send('Server Error');
   }
 });
 
@@ -269,15 +194,14 @@ router.post('/submit-fuel', async (req, res) => {
   }
 });
 
-// ✅ DELETE Load Entry by ID
-router.post('/delete-load/:id', async (req, res) => {
+// ✅ DELETE Fuel
+router.post('/delete-fuel/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    await Load.findByIdAndDelete(id);
+    await Fuel.findByIdAndDelete(req.params.id);
     res.redirect('/submit-load');
   } catch (err) {
-    console.error("❌ Failed to delete load:", err);
-    res.status(500).send("Failed to delete load");
+    console.error('❌ Failed to delete fuel:', err);
+    res.status(400).send('Failed to delete fuel');
   }
 });
 
