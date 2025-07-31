@@ -300,25 +300,26 @@
     </form>
   </div>
 
-  <!-- ✅ Tracked Start Hours -->
-  <% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
-    <div class="tracked">
-      <h3>✅ Tracked Start Hours</h3>
-      <ul>
-        <% const seenKeys = new Set(); %>
-        <% Object.entries(trackedHours).forEach(([combinedId, hour]) => {
-             const [tractorId, fieldId] = combinedId.split('_');
-             const tractor = tractors.find(t => t._id.toString() === tractorId);
-             const field = fields.find(f => f._id.toString() === fieldId);
-             const displayKey = `${tractor ? tractor.name : 'Unknown Tractor'} – ${field ? field.name : 'Unknown Field'}`;
-             if (tractor && field && !seenKeys.has(displayKey)) {
-               seenKeys.add(displayKey);
-        %>
-          <li><strong><%= displayKey %></strong>: <%= hour %> hrs</li>
-        <% } }); %>
-      </ul>
-    </div>
-  <% } %>
+<!-- ✅ Tracked Start Hours -->
+<% if (trackedHours && Object.keys(trackedHours).length > 0) { %>
+  <div class="tracked">
+    <h3>✅ Tracked Start Hours</h3>
+    <ul>
+      <% const seenKeys = new Set(); %>
+      <% Object.entries(trackedHours).forEach(([combinedId, hour]) => {
+           const [tractorId, farmId] = combinedId.split('_');
+           const tractor = tractors.find(t => t._id.toString() === tractorId);
+           const farm = farms.find(f => f._id.toString() === farmId);
+           const displayKey = `${tractor ? tractor.name : 'Unknown Tractor'} – ${farm ? farm.name : 'Unknown Farm'}`;
+           if (tractor && farm && !seenKeys.has(displayKey)) {
+             seenKeys.add(displayKey);
+      %>
+        <li><strong><%= displayKey %></strong>: <%= hour %> hrs</li>
+      <% } }); %>
+    </ul>
+  </div>
+<% } %>
+
   <!-- 📋 Recent Loads by Field with Tags & Slurry Dot -->
   <% if (recentLoadsByField && Object.keys(recentLoadsByField).length > 0) { %>
     <div class="form-section">
