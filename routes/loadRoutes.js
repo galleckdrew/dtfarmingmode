@@ -187,6 +187,19 @@ router.post('/submit-fuel', async (req, res) => {
     });
 
     await newFuel.save();
+
+    // 🧩 Add fuel to recentLoadsByField grouping for frontend display
+    const fieldDoc = await Field.findById(field);
+    const fieldName = fieldDoc?.name || 'Unknown Field';
+
+    req.app.locals.newFuelEntry = {
+      fieldName,
+      entry: {
+        ...newFuel.toObject(),
+        isFuel: true
+      }
+    };
+
     res.redirect('/submit-load');
   } catch (err) {
     console.error('❌ Failed to submit fuel:', err);
@@ -206,3 +219,4 @@ router.post('/delete-fuel/:id', async (req, res) => {
 });
 
 module.exports = router;
+
