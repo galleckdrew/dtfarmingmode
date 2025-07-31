@@ -12,7 +12,7 @@ const Pump = require('../models/Pump');
 const Trailer = require('../models/Trailer');
 const Sand = require('../models/Sand');
 const Farmer = require('../models/Farmer');
-const TrackedStartHour = require('../models/TrackedStartHour'); // 🆕 Required for hour tracking
+const TrackedStartHour = require('../models/TrackedStartHour');
 
 // ✅ GET Submit Load Page
 router.get('/submit-load', async (req, res) => {
@@ -80,7 +80,7 @@ router.get('/submit-load', async (req, res) => {
   }
 });
 
-// ✅ POST Submit Load
+// ✅ POST Submit Load (Start or End Hour)
 router.post('/load', async (req, res) => {
   try {
     const { tractor, farm, field, pit, startHour, endHour } = req.body;
@@ -133,6 +133,49 @@ router.post('/load', async (req, res) => {
   } catch (err) {
     console.error('❌ Failed to submit load:', err.message);
     res.status(400).send(err.message || 'Failed to submit load');
+  }
+});
+
+// ✅ POST Submit End Hour Only
+router.post('/submit-end-hour', async (req, res) => {
+  try {
+    const { tractor, farm, endHour } = req.body;
+
+    if (!tractor || !farm || !endHour) {
+      throw new Error("Missing required fields for end hour submission.");
+    }
+
+    const keyInfo = { tractor, farm };
+    const tracked = await TrackedStartHour.findOne(keyInfo);
+
+    if (!tracked) {
+      throw new Error("⚠️ No start hour found for this tractor and farm. Please submit a start hour first.");
+    }
+
+    const usedStartHour = tracked.startHour;
+    const usedEndHour = parseFloat(endHour);
+    const totalHours = usedEndHour - usedStartHour;
+
+    const tractorData = await Tractor.findById(tractor);
+    const gallons = tractorData?.gallons || 0;
+
+    const newLoad = new Load({
+      tractor,
+      farm,
+      gallons,
+      startHour: usedStartHour,
+      endHour: usedEndHour,
+      totalHours,
+      timestamp: new Date()
+    });
+
+    await newLoad.save();
+    await TrackedStartHour.deleteOne(keyInfo);
+
+    res.redirect('/submit-load');
+  } catch (err) {
+    console.error('❌ Submit End Hour Error:', err.message);
+    res.status(400).send(err.message || 'Failed to submit end hour');
   }
 });
 
