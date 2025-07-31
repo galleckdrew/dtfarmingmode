@@ -165,7 +165,6 @@ router.post('/submit-end-hour', async (req, res) => {
     const usedEndHour = parseFloat(endHour);
     const totalHours = usedEndHour - usedStartHour;
 
-    // Gallons should only be added if not already counted; skipping if already submitted
     const gallons = 0; // No additional gallons for end hour submission only
 
     const newLoad = new Load({
