@@ -330,7 +330,7 @@
 <% } %>
 
 <!-- 📋 Recent Loads by Field with Tags & Slurry Dot -->
- <% if (recentLoadsByField && Object.keys(recentLoadsByField).length > 0) { %>
+<% if (recentLoadsByField && Object.keys(recentLoadsByField).length > 0) { %>
   <div class="form-section">
     <h2>📋 Recent Loads</h2>
     <% Object.entries(recentLoadsByField).forEach(([fieldName, loads], idx) => { %>
@@ -343,7 +343,8 @@
           <%= totalGallons %> gal
         </span>
       </h3>
-     <table>
+
+      <table>
         <thead>
           <tr>
             <th>Timestamp</th>
@@ -356,37 +357,47 @@
             <th>Action</th>
           </tr>
         </thead>
-       <tbody>
-  <% loads.forEach((load, i) => { %>
-    <tr class="<%= i >= 3 ? ('hidden-row field-rows-' + idx) : '' %>" style="<%= load.isFuel ? 'background-color:#fff8dc;' : '' %>">
-      <td><%= new Date(load.timestamp).toLocaleString("en-US", { timeZone: "America/New_York" }) %></td>
-      <td><%= load.tractor?.name || '-' %></td>
-      <td><%= load.farm?.name || '-' %></td>
-      <td>
-        <% if (load.isFuel) { %>
-          <%= load.field?.name || '-' %>
-        <% } else { %>
-          <%= load.pit?.name || '-' %>
-        <% } %>
-      </td>
-      <td><%= load.gallons || '-' %></td>
-      <td><%= load.isFuel ? '-' : (load.startHour || '-') %></td>
-      <td><%= load.isFuel ? '-' : (load.endHour || '-') %></td>
-      <td>
-        <form method="POST" action="/<%= load.isFuel ? 'delete-fuel' : 'delete-load' %>/<%= load._id %>" onsubmit="return confirm('Are you sure you want to delete this entry?');">
-          <button type="submit" style="background:red;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
-            Remove
-          </button>
-        </form>
-      </td>
-    </tr>
-  <% }) %>
-</tbody>
+        <tbody>
+          <% loads.forEach((load, i) => { %>
+            <tr class="<%= i >= 3 ? ('hidden-row field-rows-' + idx) : '' %>" style="<%= load.isFuel ? 'background-color:#fff8dc;' : '' %>">
+              <td><%= new Date(load.timestamp).toLocaleString("en-US", { timeZone: "America/New_York" }) %></td>
+              <td><%= load.tractor?.name || '-' %></td>
+              <td><%= load.farm?.name || '-' %></td>
+              <td>
+                <% if (load.isFuel) { %>
+                  <%= load.field?.name || '-' %>
+                <% } else { %>
+                  <%= load.pit?.name || '-' %>
+                <% } %>
+              </td>
+              <td><%= load.gallons || '-' %></td>
+              <td><%= load.isFuel ? '-' : (load.startHour || '-') %></td>
+              <td><%= load.isFuel ? '-' : (load.endHour || '-') %></td>
+              <td>
+                <form method="POST" action="/<%= load.isFuel ? 'delete-fuel' : 'delete-load' %>/<%= load._id %>" onsubmit="return confirm('Are you sure you want to delete this entry?');">
+                  <button type="submit" style="background:red;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
+                    Remove
+                  </button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+
+      <% if (loads.length > 3) { %>
+        <button class="see-more-btn" onclick="toggleRows(<%= idx %>, this)">See More</button>
+      <% } %>
+
+    <% }) %>
+  </div>
+<% } %>
 
 <!-- ⛽ Recent Fuel Entries -->
 <% if (typeof recentFuel !== 'undefined' && recentFuel.length > 0) { %>
   <div class="form-section">
-    <table style="background: #fff8dc;"> <!-- Light yellow background -->
+    <h2>⛽ Recent Fuel Entries</h2>
+    <table style="background: #fff8dc;">
       <thead>
         <tr>
           <th>Timestamp</th>
@@ -418,16 +429,17 @@
 <% } %>
 
 <script>
-  function toggleRows(index) {
+  window.toggleRows = function(index, btn) {
     const rows = document.querySelectorAll(`.field-rows-${index}`);
     rows.forEach(row => {
       row.style.display = row.style.display === "table-row" ? "none" : "table-row";
     });
 
-    const btn = event.target;
     btn.innerText = btn.innerText === "See More" ? "Hide" : "See More";
   }
 </script>
 
 </body>
 </html>
+
+
