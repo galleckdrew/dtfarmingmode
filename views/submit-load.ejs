@@ -198,42 +198,21 @@
 
     <button type="submit">Submit Load</button>
   </form>
-  <!-- ✅ Submit End Hour -->
+  
+<!-- ✅ Minimal Submit End Hour Form with Hidden Fields -->
 <div class="form-section">
   <h2>Submit End Hour</h2>
   <form method="POST" action="/submit-end-hour">
-    <label>Tractor:</label>
-    <select name="tractor" required>
-      <% tractors.forEach(t => { %>
-        <option value="<%= t._id %>"><%= t.name %></option>
-      <% }) %>
-    </select>
-
-    <label>Farm:</label>
-    <select name="farm" required>
-      <% farms.forEach(f => { %>
-        <option value="<%= f._id %>"><%= f.name %></option>
-      <% }) %>
-    </select>
-
-    <label>Field:</label>
-    <select name="field" required>
-      <% fields.forEach(fl => { %>
-        <option value="<%= fl._id %>"><%= fl.name %></option>
-      <% }) %>
-    </select>
-
-    <label>Pit:</label>
-    <select name="pit" required>
-      <% pits.forEach(p => { %>
-        <option value="<%= p._id %>"><%= p.name %></option>
-      <% }) %>
-    </select>
+    <!-- Hidden last selected values -->
+    <input type="hidden" name="tractor" value="<%= lastLoad?.tractor?._id %>">
+    <input type="hidden" name="farm" value="<%= lastLoad?.farm?._id %>">
+    <input type="hidden" name="field" value="<%= lastLoad?.field?._id %>">
+    <input type="hidden" name="pit" value="<%= lastLoad?.pit?._id %>">
 
     <label>End Hour:</label>
-    <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
+    <input type="number" name="endHour" step="0.1" min="0" required>
 
-    <button type="submit">Submit End Hour</button>
+    <button type="submit">✅ Submit End Hour Only</button>
   </form>
 </div>
 
