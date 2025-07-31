@@ -200,11 +200,27 @@
   </form>
   <!-- ✅ Submit End Hour -->
   <div class="form-section">
-    <h2>Submit End Hour</h2>
-    <form method="POST" action="/submit-end-hour">
-      <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
-      <button type="submit">Submit End Hour</button>
-    </form>
+ <h2>Submit End Hour</h2>
+<form method="POST" action="/submit-end-hour">
+  <label>Tractor:</label>
+  <select name="tractor" required>
+    <% tractors.forEach(t => { %>
+      <option value="<%= t._id %>"><%= t.name %></option>
+    <% }) %>
+  </select>
+
+  <label>Farm:</label>
+  <select name="farm" required>
+    <% farms.forEach(f => { %>
+      <option value="<%= f._id %>"><%= f.name %></option>
+    <% }) %>
+  </select>
+
+  <label>End Hour:</label>
+  <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
+
+  <button type="submit">Submit End Hour</button>
+</form>
   </div>
 
   <!-- ✅ Submit Fuel -->
