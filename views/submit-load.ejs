@@ -388,43 +388,7 @@
       <% if (loads.length > 3) { %>
         <button class="see-more-btn" onclick="toggleRows(<%= idx %>, this)">See More</button>
       <% } %>
-
     <% }) %>
-  </div>
-<% } %>
-
-<!-- ⛽ Recent Fuel Entries -->
-<% if (typeof recentFuel !== 'undefined' && recentFuel.length > 0) { %>
-  <div class="form-section">
-    <h2>⛽ Recent Fuel Entries</h2>
-    <table style="background: #fff8dc;">
-      <thead>
-        <tr>
-          <th>Timestamp</th>
-          <th>Tractor</th>
-          <th>Farm</th>
-          <th>Field</th>
-          <th>Gallons</th>
-          <th>Remove</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% recentFuel.forEach(fuel => { %>
-          <tr>
-            <td><%= new Date(fuel.timestamp).toLocaleString("en-US", { timeZone: "America/New_York" }) %></td>
-            <td><%= fuel.tractor?.name || '-' %></td>
-            <td><%= fuel.farm?.name || '-' %></td>
-            <td><%= fuel.field?.name || '-' %></td>
-            <td><%= fuel.gallons %></td>
-            <td>
-              <form method="POST" action="/delete-fuel/<%= fuel._id %>" onsubmit="return confirm('Delete this fuel entry?');">
-                <button type="submit" style="background:red;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;">Remove</button>
-              </form>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
   </div>
 <% } %>
 
@@ -438,8 +402,5 @@
     btn.innerText = btn.innerText === "See More" ? "Hide" : "See More";
   }
 </script>
-
 </body>
 </html>
-
-
