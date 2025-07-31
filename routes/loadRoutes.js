@@ -12,6 +12,7 @@ const Pump = require('../models/Pump');
 const Trailer = require('../models/Trailer');
 const Sand = require('../models/Sand');
 const Farmer = require('../models/Farmer');
+const TrackedStartHour = require('../models/TrackedStartHour'); // 🆕 Add this
 
 // ✅ GET Submit Load Page
 router.get('/submit-load', async (req, res) => {
@@ -47,7 +48,6 @@ router.get('/submit-load', async (req, res) => {
     const recentFieldsLimited = recentFieldIds.slice(0, 3);
 
     const recentLoadsByField = {};
-
     for (const fieldId of recentFieldsLimited) {
       const field = await Field.findById(fieldId);
       const loads = await Load.find({ field: fieldId })
@@ -72,7 +72,7 @@ router.get('/submit-load', async (req, res) => {
       totalFuel,
       selectedTractorId: '',
       selectedFarmId: '',
-      trackedHours: {},
+      trackedHours: {}, // Optional: update later if you want to show tracked hours
       recentLoadsByField
     });
   } catch (err) {
@@ -84,7 +84,7 @@ router.get('/submit-load', async (req, res) => {
 // ✅ POST Submit Load
 router.post('/load', async (req, res) => {
   try {
-    const { tractor, farm, field, pit, startHour } = req.body;
+    const { tractor, farm, field, pit, startHour, endHour } = req.body;
 
     if (!tractor || !farm || !field || !pit) {
       throw new Error('Missing required fields');
@@ -93,21 +93,50 @@ router.post('/load', async (req, res) => {
     const tractorData = await Tractor.findById(tractor);
     const gallons = tractorData ? tractorData.gallons : 0;
 
+    let usedStartHour = startHour ? parseFloat(startHour) : undefined;
+    let usedEndHour = endHour ? parseFloat(endHour) : undefined;
+    let totalHours;
+
+    const keyInfo = { tractor, farm };
+
+    if (usedStartHour !== undefined && !isNaN(usedStartHour)) {
+      await TrackedStartHour.findOneAndUpdate(
+        keyInfo,
+        { startHour: usedStartHour, timestamp: new Date() },
+        { upsert: true }
+      );
+    }
+
+    if (usedEndHour !== undefined && !isNaN(usedEndHour)) {
+      const tracked = await TrackedStartHour.findOne(keyInfo);
+      if (!tracked) {
+        throw new Error('❌ No start hour found for this tractor and farm.');
+      }
+
+      usedStartHour = tracked.startHour;
+      totalHours = usedEndHour - usedStartHour;
+
+      // Optional: delete after use
+      await TrackedStartHour.deleteOne(keyInfo);
+    }
+
     const newLoad = new Load({
       tractor,
       farm,
       field,
       pit,
       gallons,
-      startHour: startHour ? parseFloat(startHour) : undefined,
+      startHour: usedStartHour,
+      endHour: usedEndHour,
+      totalHours,
       timestamp: new Date()
     });
 
     await newLoad.save();
     res.redirect('/submit-load');
   } catch (err) {
-    console.error('❌ Failed to submit load:', err);
-    res.status(400).send('Failed to submit load');
+    console.error('❌ Failed to submit load:', err.message);
+    res.status(400).send(err.message || 'Failed to submit load');
   }
 });
 
@@ -123,7 +152,7 @@ router.post('/submit-fuel', async (req, res) => {
     const newFuel = new Fuel({
       tractor,
       field,
-      farm, // ✅ This was missing
+      farm,
       gallons: parseFloat(gallons),
       timestamp: new Date()
     });
