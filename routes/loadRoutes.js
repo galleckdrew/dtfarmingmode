@@ -148,9 +148,9 @@ router.post('/load', async (req, res) => {
 // ✅ POST Submit End Hour Only
 router.post('/submit-end-hour', async (req, res) => {
   try {
-    const { tractor, farm, endHour } = req.body;
+    const { tractor, farm, field, pit, endHour } = req.body;
 
-    if (!tractor || !farm || !endHour) {
+    if (!tractor || !farm || !field || !pit || !endHour) {
       throw new Error("Missing required fields for end hour submission.");
     }
 
@@ -171,6 +171,8 @@ router.post('/submit-end-hour', async (req, res) => {
     const newLoad = new Load({
       tractor,
       farm,
+      field,
+      pit,
       gallons,
       startHour: usedStartHour,
       endHour: usedEndHour,

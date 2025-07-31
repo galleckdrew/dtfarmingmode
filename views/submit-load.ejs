@@ -199,29 +199,43 @@
     <button type="submit">Submit Load</button>
   </form>
   <!-- ✅ Submit End Hour -->
-  <div class="form-section">
- <h2>Submit End Hour</h2>
-<form method="POST" action="/submit-end-hour">
-  <label>Tractor:</label>
-  <select name="tractor" required>
-    <% tractors.forEach(t => { %>
-      <option value="<%= t._id %>"><%= t.name %></option>
-    <% }) %>
-  </select>
+<div class="form-section">
+  <h2>Submit End Hour</h2>
+  <form method="POST" action="/submit-end-hour">
+    <label>Tractor:</label>
+    <select name="tractor" required>
+      <% tractors.forEach(t => { %>
+        <option value="<%= t._id %>"><%= t.name %></option>
+      <% }) %>
+    </select>
 
-  <label>Farm:</label>
-  <select name="farm" required>
-    <% farms.forEach(f => { %>
-      <option value="<%= f._id %>"><%= f.name %></option>
-    <% }) %>
-  </select>
+    <label>Farm:</label>
+    <select name="farm" required>
+      <% farms.forEach(f => { %>
+        <option value="<%= f._id %>"><%= f.name %></option>
+      <% }) %>
+    </select>
 
-  <label>End Hour:</label>
-  <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
+    <label>Field:</label>
+    <select name="field" required>
+      <% fields.forEach(fl => { %>
+        <option value="<%= fl._id %>"><%= fl.name %></option>
+      <% }) %>
+    </select>
 
-  <button type="submit">Submit End Hour</button>
-</form>
-  </div>
+    <label>Pit:</label>
+    <select name="pit" required>
+      <% pits.forEach(p => { %>
+        <option value="<%= p._id %>"><%= p.name %></option>
+      <% }) %>
+    </select>
+
+    <label>End Hour:</label>
+    <input type="number" name="endHour" step="0.1" min="0" placeholder="End Hour" required>
+
+    <button type="submit">Submit End Hour</button>
+  </form>
+</div>
 
   <!-- ✅ Submit Fuel -->
   <div class="form-section">
