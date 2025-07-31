@@ -330,21 +330,20 @@
 <% } %>
 
 <!-- 📋 Recent Loads by Field with Tags & Slurry Dot -->
-<% if (recentLoadsByField && Object.keys(recentLoadsByField).length > 0) { %>
+ <% if (recentLoadsByField && Object.keys(recentLoadsByField).length > 0) { %>
   <div class="form-section">
     <h2>📋 Recent Loads</h2>
-    
-<% Object.entries(recentLoadsByField).forEach(([fieldName, loads], idx) => { %>
-  <% const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0).toFixed(0); %>
-    
- <h3>
+    <% Object.entries(recentLoadsByField).forEach(([fieldName, loads], idx) => { %>
+      <% const totalGallons = loads.reduce((sum, l) => sum + (l.gallons || 0), 0).toFixed(0); %>
+
+      <h3>
         <span class="field-tag tag-color-<%= idx % 3 %>"><%= fieldName %></span>
         <span class="gallon-badge">
           <span class="slurry-dot tag-color-<%= idx % 3 %>"></span>
           <%= totalGallons %> gal
         </span>
       </h3>
-      <table>
+     <table>
         <thead>
           <tr>
             <th>Timestamp</th>
@@ -364,13 +363,15 @@
       <td><%= load.tractor?.name || '-' %></td>
       <td><%= load.farm?.name || '-' %></td>
       <td>
-        <%= load.isFuel 
-              ? (load.field?.name || '-') 
-              : (load.pit?.name || '-') %>
+        <% if (load.isFuel) { %>
+          <%= load.field?.name || '-' %>
+        <% } else { %>
+          <%= load.pit?.name || '-' %>
+        <% } %>
       </td>
-      <td><%= load.gallons ?? '-' %></td>
-      <td><%= load.isFuel ? '-' : (load.startHour ?? '-') %></td>
-      <td><%= load.isFuel ? '-' : (load.endHour ?? '-') %></td>
+      <td><%= load.gallons || '-' %></td>
+      <td><%= load.isFuel ? '-' : (load.startHour || '-') %></td>
+      <td><%= load.isFuel ? '-' : (load.endHour || '-') %></td>
       <td>
         <form method="POST" action="/<%= load.isFuel ? 'delete-fuel' : 'delete-load' %>/<%= load._id %>" onsubmit="return confirm('Are you sure you want to delete this entry?');">
           <button type="submit" style="background:red;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
